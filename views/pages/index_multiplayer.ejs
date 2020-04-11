@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Battleship</title>
+        <meta name = 'author' content = "Manas Sarpatwar">
+        <meta name="description" content="Battleship in browser">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" type="text/css" href="../../css/main.css" />
+        <script language="javascript" type="text/javascript" src="../../js/p5.js"></script>
+        <script language="javascript" type="text/javascript" src="../../js/p5.dom.js"></script>
+        <script language="javascript" type="text/javascript" src="../../js/sketch.js"></script>
+        <script language="javascript" type="text/javascript" src="../../js/Battleship.js"></script>
+        <script language="javascript" type="text/javascript" src="../../js/Piece.js"></script>
+        <script language="javascript" type="text/javascript" src="../../js/Player.js"></script>
+        
+    </head>
+    <body>
+        <main>
+            <div id = "board">
+                <div id = "player"></div>
+                <div id = "opponent"></div>
+            </div>
+        </main>
+    </body>
+    <script>
+        var gameID = "<%= game %>";
+        var playerID = "<%= playerID %>";
+    </script> 
+</html>

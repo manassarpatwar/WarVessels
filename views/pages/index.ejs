@@ -6,11 +6,35 @@
         <meta name = 'author' content = "Manas Sarpatwar">
         <meta name="description" content="Battleship in browser">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="./main.css">
-        <script language="javascript" type="text/javascript" src="./sketch.js"></script>
+        <link rel="stylesheet" type="text/css" href="css/main.css" />
+        <!-- <script language="javascript" type="text/javascript" src="js/p5.js"></script>
+        <script language="javascript" type="text/javascript" src="js/p5.dom.js"></script>
+        <script language="javascript" type="text/javascript" src="js/sketch.js"></script>
+        <script language="javascript" type="text/javascript" src="js/Battleship.js"></script>
+        <script language="javascript" type="text/javascript" src="js/Piece.js"></script>
+        <script language="javascript" type="text/javascript" src="js/Player.js"></script> -->
         
     </head>
     <body>
-        <h1>Testing heroku app</h1>
+        <button onclick = "init()" class = "button" id = "multiplayer">Multiplayer</button>
+        <!-- <main>
+            <div id = "board">
+                <div id = "player"></div>
+                <div id = "opponent"></div>
+            </div>
+        </main> -->
     </body>
+    <script>
+        function init(){
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/init', true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    var json = JSON.parse(xhr.responseText);
+                    window.location.href = '../play/'+json.game;
+                }
+            }
+            xhr.send();
+        }
+    </script>
 </html>

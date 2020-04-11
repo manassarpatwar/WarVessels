@@ -1,0 +1,56 @@
+html, body{
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',Helvetica,Arial,sans-serif;
+  background: #eee;
+}
+
+main{
+  position: absolute;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+}
+
+button{
+  box-sizing: inherit;
+  background-color: #222;
+  margin: .1rem;
+  padding: .75rem;
+  color: #fff;
+  text-align: center;
+  border-radius: .1875rem;
+  font-size: 18px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  outline: none;
+  z-index: 1;
+}
+
+.button:hover{
+  background-color: #eee;
+  color: #222;
+}
+
+#board{
+  display: flex;
+  flex-direction: row;
+}
+
+#board div{
+  margin: 0 20px;
+}
+
+
+@media only screen and (max-width: 700px) {
+  #board{
+    flex-direction: column-reverse;
+  }
+
+  #board div{
+    margin: 10px 0;
+  }
+}
