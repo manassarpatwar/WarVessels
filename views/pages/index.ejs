@@ -27,7 +27,7 @@
     <script>
         async function init(){
             var json = await request('POST', '/init', null, true)
-            alert(json.game);
+
             window.location.href = '../play/'+json.game;
         }
     </script>
