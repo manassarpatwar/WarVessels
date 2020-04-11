@@ -7,10 +7,27 @@ class Battleship{
         this.cellSize = width/size;
 
         this.ready = false;
-        this.lastAttack = Date.now();
+    }
+
+    attackOK(x, y, attack){
+        if(!(x >= 0 && x < this.size &&
+            y >= 0 && y < this.size)){
+                return false;
+        }
+
+        if(x == attack[0] && y == attack[1]){
+            return false;
+        }
+
+        return true;
     }
 
     piecePlaceOK(x, y, piece){
+        if(!(x >= 0 && x < this.size &&
+            y >= 0 && y < this.size)){
+                return false;
+        }
+
         if(x+piece.getLength()*(1-piece.rotation) > this.size 
         || y+piece.getLength()*piece.rotation > this.size ){
             return false;

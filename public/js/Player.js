@@ -1,7 +1,7 @@
 class Player{
     constructor(id){
         this.id = id;
-        this.attackHistory = [];
+        this.attack = [];
         this.ships = [];
         this.nextPiece = 0;
         this.pieces = [
@@ -14,11 +14,8 @@ class Player{
 
     }
     
-    addAttack([x, y, _]){
-        if(this.attackHistory.filter(([i,j, _]) => i == x && j == y ).length == 1){
-            return
-        }
-        this.attackHistory.push([x,y, _]);
+    addAttack([x, y]){
+        this.attack = [x, y]
     }
 
     getPiece(){
