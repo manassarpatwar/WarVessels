@@ -7,7 +7,10 @@ class Battleship{
         this.cellSize = width/size;
 
         this.ready = false;
+        this.lastAttack = null;
     }
+
+
 
     attackOK(x, y, attack){
         if(!(x >= 0 && x < this.size &&

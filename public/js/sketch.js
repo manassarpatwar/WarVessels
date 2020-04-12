@@ -3,8 +3,6 @@ var playerCanvas;
 var opponentCanvas;
 var battleship;
 var player;
-
-var testing = "TESTING";
 var turn;
 
 function setup(){
@@ -34,27 +32,30 @@ function postAttack(){
             var json = JSON.parse(xhr.responseText);
             let attack = json['attack'];
 
-            if(json['ready'] && player.attack.length == 0){
+            if(json['ready'] && json['turn'] == null){
                 turn.html('Attack to start playing');
             }
             if(attack){
-                if(json['turn'] == player.id){
-                    turn.html('Their turn');
-                }else{
-                    turn.html('Your turn');
-                }
-                if(battleship.playerBoard[attack[0]][attack[1]] >= 0){
-                    if(attack[2] == 1){
-                        battleship.playerBoard[attack[0]][attack[1]] = -1;
+                if(json['turn'] !== undefined){
+                    if(json['turn'] == player.id){
+                        turn.html('Their turn');
                     }else{
-                        battleship.playerBoard[attack[0]][attack[1]] = -2;
+                        turn.html('Your turn');
+                    }
+                    if(battleship.lastAttack == null || (battleship.lastAttack[0] != attack[0] && 
+                        battleship.lastAttack[1] != attack[1])){
+                        if(attack[2] == 1){
+                            battleship.playerBoard[attack[0]][attack[1]] = -1;
+                        }else{
+                            battleship.playerBoard[attack[0]][attack[1]] = -2;
+                        }
+                        battleship.lastAttack = attack;
                     }
                 }
-
             }
         }
     }
-    xhr.open('POST', '/requestAttack?after='+battleship.lastAttack+'&game='+gameID+'&player='+player.id);
+    xhr.open('POST', '/requestAttack?game='+gameID+'&player='+player.id);
     xhr.send();
 }
 
@@ -63,7 +64,7 @@ function start(){
     let data = {
         player: player.id,
         playerBoard: battleship.playerBoard,
-        game: gameID
+        game: battleship.id
     }
 
     var xhr = new XMLHttpRequest();
@@ -97,8 +98,10 @@ var playerSketch = (can) => {
                     can.fill(255);
                 if(battleship.playerBoard[i][j] > 0){
                     can.fill(0, 0, 255);
-                }else if(battleship.playerBoard[i][j] < 0){
+                }else if(battleship.playerBoard[i][j] == -1){
                     can.fill(255, 0, 0);
+                }else if(battleship.playerBoard[i][j] == -2){
+                    can.fill(0, 0, 0);
                 }
                 can.rect(j*cellSize+1, i*cellSize+1, cellSize+2/battleship.size, cellSize+2/battleship.size);
             } 
@@ -179,8 +182,10 @@ var opponentSketch = (can) => {
 
             var json = await request('POST', '/attack', data, true);
             let hit = json['hit']
-            if(hit){
-                let value = json['hit'] == true ? 1 : -1;
+            if(hit !== null){
+                console.log(hit);
+                let value = hit ? 1 : -1;
+                console.log(hit);
                 battleship.opponentBoard[attack[0]][attack[1]] = value;
                 let store = {
                     playerBoard: battleship.playerBoard,
