@@ -36,8 +36,8 @@ app.post('/init', (req, res, next) => {
 	const player = uuidv4();
 	ssn.player = player;
 	gameState[game] = {};
-	gameState[game][player] = {};
-	gameState[game][player]['ready'] = false;
+	gameState[game][ssn.player] = {};
+	gameState[game][ssn.player]['ready'] = false;
 
 	res.send({game: game});
 })
@@ -47,16 +47,18 @@ app.get('/play/:game', (req, res, next) => {
 	let gameExists = Object.keys(gameState).includes(game);
 	ssn = req.session;
 	if (gameExists) {
-		if (ssn.player) {
-			//Game exists and player has been given a unique id
-			res.render('pages/index_multiplayer', { game: game, playerID: ssn.player });
-		} else if (Object.keys(gameState[game]).length < 2) {
-			//Another player joins the game, and has not been given a unique id
-			const player = uuidv4();
-			ssn.player = player;
-			gameState[game][player] = {};
-			gameState[game][player]['ready'] = false;
-			res.render('pages/index_multiplayer', { game: game, playerID: ssn.player });
+		if (Object.keys(gameState[game]).length < 2) {
+			if (ssn.player) {
+				//Game exists and player has been given a unique id
+				res.render('pages/index_multiplayer', { game: game, playerID: ssn.player });
+			}else{
+				//Another player joins the game, and has not been given a unique id
+				const player = uuidv4();
+				ssn.player = player;
+				gameState[game][ssn.player] = {};
+				gameState[game][ssn.player]['ready'] = false;
+				res.render('pages/index_multiplayer', { game: game, playerID: ssn.player });
+			}
 		} else {
 			res.status(404).send('404: Page not Found');
 		}
@@ -80,7 +82,7 @@ app.post('/requestAttack', function (req, res) {
 	let queries = req.query;
 	let game = queries.game;
 	let player = queries.player;
-
+	// console.log(gameState);
 	if(gameState[game] !== undefined){
 		if(Object.keys(gameState[game]).length > 1){ //There are 2 players
 			let opponent = Object.fromEntries(Object.entries(gameState[game]).filter(([k, v]) => k != player));
