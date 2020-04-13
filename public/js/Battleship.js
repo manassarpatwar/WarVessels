@@ -1,20 +1,21 @@
 class Battleship{
-    constructor(gameID, size){
+    constructor(gameID, size, boardWidth){
         this.id = gameID;
         this.size = size;
         this.playerBoard = this.initBoard(size);
         this.opponentBoard = this.initBoard(size);
-        this.cellSize = width/size;
-
+        this.cellSize = boardWidth/size;
+        this.boardWidth = boardWidth
         this.ready = false;
         this.lastAttack = null;
+
+        this.offset = {};
     }
 
 
-
     attackOK(x, y, attack){
-        if(!(x >= 0 && x < this.size &&
-            y >= 0 && y < this.size)){
+        if(!(x >= 0 && x <= this.size &&
+            y >= 0 && y <= this.size)){
                 return false;
         }
 
@@ -26,21 +27,27 @@ class Battleship{
     }
 
     piecePlaceOK(x, y, piece){
-        if(!(x >= 0 && x < this.size &&
-            y >= 0 && y < this.size)){
+        if(!(x >= 0 && x <= this.size &&
+            y >= 0 && y <= this.size)){
                 return false;
         }
 
-        if(x+piece.getLength()*(1-piece.rotation) > this.size 
-        || y+piece.getLength()*piece.rotation > this.size ){
+        if(x+piece.getLength()*piece.rotation > this.size ||
+        y+piece.getLength()*(1-piece.rotation) > this.size){
             return false;
         }
 
         let pieceCoordinates = piece.coords.map(([i,j]) => [i+x, j+y]);
+
         for(let p of pieceCoordinates){
-            if(this.playerBoard[p[0]][p[1]] > 0)
+            if(p[0] > this.size || p[1] > this.size)
                 return false;
         }
+        for(let p of pieceCoordinates){
+            if(this.playerBoard[p[1]][p[0]] > 0)
+                return false;
+        }
+
         return true;
     }
 

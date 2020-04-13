@@ -1,21 +1,83 @@
 class Piece{
-    constructor(length){
+    constructor(length, el, cellSize, rot=0){
         this.coords = [];
-        // this.rotation = Math.round(Math.random());
-        this.rotation = 0;
+        this.boardCoords = [];
+        this.name = el;
+        this.el = select('#'+el)
+        this.rotation = rot;
         for(let i = 0; i < length; i++){
-            this.coords[i] = [i*(1-this.rotation),i*this.rotation];
+            this.coords[i] = [i*this.rotation, i*(1-this.rotation)];
         }
+        this.width = 0.4*cellSize+0.6*(length*(1/5)*cellSize);
+        this.height = 0.92*length*cellSize;
+        this.transform(0,0,this.rotation*90);
+
+        this.el.style('height', this.height+'px');
+        this.el.style('width' , this.width+'px');
+
+        this.dragged = false;
+        this.isDragging = false;
+        this.startPosition = {x: 0, y: 0};
+        this.delta = {x: 0, y: 0};
+        this.currentPosition;
+
+        this.ready = false;
+
+        this.el.mousePressed((e) => {
+            e.preventDefault();
+            if (e.touches) { e = e.touches[0]; }
+            selectedPiece = this;
+            this.isDragging = true;
+            this.startPosition = {x: e.clientX, y: e.clientY};
+            this.currentPosition = this.transform();
+        });
+
     }
+
+    getPiecePlace(){
+        let data = this.transform();
+        data.x -= (this.height/2-this.width/2)*this.rotation;
+        data.y += (this.height/2-this.width/2)*this.rotation;
+        return {x: data.x, y: data.y};
+    }
+
+    getFitBuffer(){
+        let data = {x: 0, y :0};
+        data.x = (this.height/2-this.width/2)*this.rotation;
+        data.y = -(this.height/2-this.width/2)*this.rotation;
+        return data;
+    }
+
+    fit(place, cellSize){
+        let fitBuffer = this.getFitBuffer();
+        let center = {x : (cellSize-this.width)/2, y: (cellSize*this.getLength()-this.height)/2}
+        if(this.rotation == 1){
+            let tmp = center.x;
+            center.x = center.y;
+            center.y = tmp;
+        }
+
+        this.transform(place.x*cellSize+fitBuffer.x+center.x, place.y*cellSize+fitBuffer.y+center.y);
+    }
+
+    transform(x, y, r, el = this.el){
+        let d = el.style('transform').split(',').map(d => parseInt(d));
+
+        x = x == null ? d[4] : x;
+        y = y == null ? d[5] : y;
+        r = r == null ? Math.round(Math.asin(d[1]) * (180/Math.PI)) : r;
+        el.style('transform', "translate("+x+"px, "+y+"px) rotate("+r+"deg)");
+        return {x: x, y: y, r: r};
+    };
 
     getLength(){
         return this.coords.length;
     }
 
     rotate(){
-        //flip rotation
         this.rotation = (this.rotation+1)%2;
-
         this.coords = this.coords.map(([i, j]) => ([j, i]));
+
+        this.transform(null, null, this.rotation*90);
     }
 } 

@@ -5,7 +5,19 @@ html, body{
   background: #eee;
 }
 
+.piece{
+  z-index: 3;
+  position: absolute;
+  transform: translate(0px, 0px);
+}
+
 main{
+  position: relative;
+  width: 100vw;
+}
+
+
+#game{
   position: absolute;
   width: 100vw;
   display: flex;
@@ -13,6 +25,7 @@ main{
   align-items: center;
 
 }
+
 
 #turn{
   position: absolute;
