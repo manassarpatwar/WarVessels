@@ -11,6 +11,10 @@ html, body{
   transform: translate(0px, 0px);
 }
 
+.loadingImg{
+  display: none;
+}
+
 main{
   position: relative;
   width: 100vw;
@@ -26,16 +30,16 @@ main{
   display: flex;
   justify-content: center;
   align-items: center;
-
+  flex-direction: column;
 }
 
 
 #turn{
-  position: absolute;
+  /* position: absolute;
   width: 80vw;
   left: 10vw;
   top: 100px;
-  font-size: 20px;
+  font-size: 20px; */
   text-align: center;
 }
 
@@ -70,7 +74,7 @@ button{
 }
 
 
-@media only screen and (max-width: 500px) {
+@media only screen and (max-width: 600px) {
   #board{
     flex-direction: column-reverse;
   }
@@ -80,7 +84,6 @@ button{
   }
 
   #turn{
-    top: 20px;
     font-size: 16px;
   }
 

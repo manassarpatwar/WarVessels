@@ -13,6 +13,7 @@ class Player {
             'battleship': new Piece(4, 'battleship', cellSize, 1),
             'carrier': new Piece(5, 'carrier', cellSize, 1)
         }
+        this.turn = false;
     }
 
     addAttack([x, y]) {

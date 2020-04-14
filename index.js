@@ -53,6 +53,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.post('/init', (req, res, next) => {
 	const game = uuidv4();
 	gameState[game] = {};
+	gameState[game]['started'] = false;
 	gameState[game]['time'] = Date.now();
 	gameState[game]['players'] = {};
 	res.send({ game: game });
@@ -87,7 +88,7 @@ app.post('/start', function (req, res) {
 	
 	gameState[game]['players'][ssn.player] = {};
 	gameState[game]['players'][ssn.player]['playerBoard'] = playerBoard;
-	gameState[game]['players'][ssn.player]['attack'] = null;
+	gameState[game]['players'][ssn.player]['attack'] = [];
 	gameState['changed'] = true;
 });
 
@@ -98,16 +99,12 @@ app.post('/requestAttack', function (req, res) {
 	// console.log(gameState);
 	if (gameState[game] !== undefined) {
 		if (Object.keys(gameState[game]['players']).length > 1) { //There are 2 players
-			let opponent = Object.fromEntries(Object.entries(gameState[game]['players']).filter(([k, v]) => k != player));
-			let opponentID = Object.keys(opponent)[0];
-			opponent = opponent[opponentID];
-			let turn = null;
-			if (gameState[game]['lastAttack'] !== undefined)
-				turn = gameState[game]['lastAttack']
-
-			res.send({ attack: opponent['attack'], ready: true, turn: turn });
+			let lastAttack = gameState[game]['lastAttack'];
+			let attack = lastAttack == null ? null : (lastAttack['player'] == player ? null : lastAttack['attack']);
+			let started = gameState[game]['started'];
+			res.send({ attack: attack, ready: true, started: started });
 		} else
-			res.send({ attack: null, ready: false, turn: null });
+			res.send({ attack: null, ready: false, started: false });
 	}
 })
 
@@ -117,15 +114,16 @@ app.post('/attack', function (req, res) {
 	let player = req.body['player'];
 	let attack = req.body['attack'];
 	let hit = null;
-	if (gameState[game]['lastAttack'] === undefined || gameState[game]['lastAttack'] != player) {
-		gameState[game]['lastAttack'] = player;
-		let opponent = Object.fromEntries(Object.entries(gameState[game]['players']).filter(([k, v]) => k != player));
-		let opponentID = Object.keys(opponent)[0]
-		opponent = opponent[opponentID];
-		hit = opponent['playerBoard'][attack[0]][attack[1]] > 0;
-		attack[2] = hit;
-		gameState[game]['players'][player]['attack'] = attack;
-		gameState['changed'] = true;
-	}
+
+	gameState[game]['started'] = true;
+	let opponent = Object.fromEntries(Object.entries(gameState[game]['players']).filter(([k, v]) => k != player));
+	let opponentID = Object.keys(opponent)[0]
+	opponent = opponent[opponentID];
+	hit = opponent['playerBoard'][attack[0]][attack[1]] > 0;
+	attack[2] = hit;
+	gameState[game]['players'][player]['attack'] = attack;
+	gameState[game]['lastAttack'] = {player: player, attack : attack};
+	gameState['changed'] = true;
+
 	res.send({ hit: hit });
 })

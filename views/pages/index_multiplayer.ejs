@@ -20,17 +20,17 @@
 
 <body>
     <main>
-        <p id="turn"></p>
+
         <button onclick="playerReady()" class="button" id="multiplayer">Ready</button>
         <div id="game">
-
+            <p id="turn"></p>
             <div id="board">
                 <div id="player">
-                    <img src="../../img/ships/png/patrol.png" draggable="false" id="patrol" class="interactable piece">
-                    <img id="submarine" draggable="false" class="interactable piece" src="../../img/ships/png/submarine.png">
-                    <img id="battleship" draggable="false" class="interactable piece" src="../../img/ships/png/battleship.png">
-                    <img id="carrier" draggable="false" class="interactable piece" src="../../img/ships/png/carrier.png">
-                    <img id="destroyer" draggable="false" class="interactable piece" src="../../img/ships/png/destroyer.png">
+                    <img id="patrol" draggable="false" class="interactable piece loadingImg" src="../../img/ships/png/patrol.png">
+                    <img id="submarine" draggable="false" class="interactable piece loadingImg" src="../../img/ships/png/submarine.png">
+                    <img id="battleship" draggable="false" class="interactable piece loadingImg" src="../../img/ships/png/battleship.png">
+                    <img id="carrier" draggable="false" class="interactable piece loadingImg" src="../../img/ships/png/carrier.png">
+                    <img id="destroyer" draggable="false" class="interactable piece loadingImg" src="../../img/ships/png/destroyer.png">
                 </div>
                 <div id="opponent"></div>
             </div>

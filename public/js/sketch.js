@@ -11,10 +11,11 @@ function setup() {
     createCanvas(0, 0);
     select('#game').style('height', windowHeight + 'px');
 
-    boardWidth = Math.max(windowWidth * 0.25, 225)
+    boardWidth = windowWidth < 600 ? 0.6*windowWidth : 0.25*windowWidth;
 
     battleship = new Battleship(gameID, 10, boardWidth);
     player = new Player(playerID, battleship.cellSize);
+    Object.values(player.pieces).map(x => x.el.removeClass('loadingImg'));
     let cellSize = battleship.cellSize;
     let carrier = player.pieces['carrier']
     carrier.transform(carrier.height / 2 - cellSize / 4, 3 * (boardWidth + cellSize) / 4 + carrier.width / 4);
@@ -35,8 +36,15 @@ function setup() {
         battleship.playerBoard = keys.includes('playerBoard') ? json.playerBoard : battleship.playerBoard;
         battleship.opponentBoard = keys.includes('opponentBoard') ? json.opponentBoard : battleship.opponentBoard;
         battleship.ready = json.ready;
+        battleship.started = keys.includes('started') ? json.started : battleship.started;
+        player.turn = keys.includes('turn') ? json.turn : player.turn;
         if (battleship.ready) {
             start();
+        }
+        if(player.turn && battleship.started){
+            turn.html('Your turn');
+        }else if(!player.turn && battleship.started){
+            turn.html('Their turn');
         }
         if (keys.includes('pieces')) {
             for (let p of Object.keys(player.pieces)) {
@@ -140,40 +148,39 @@ function mouseReleased() {
 
 
 function postAttack() {
-    var xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState == XMLHttpRequest.DONE) {
-            var json = JSON.parse(xhr.responseText);
-            console.log(json);
-            let attack = json['attack'];
-            if (json['ready'] && json['turn'] == null) {
-                turn.html('Attack to start playing');
-            }
-            if (json['turn'] !== undefined) {
-                if (json['turn'] == player.id) {
-                    turn.html('Their turn');
-                } else {
+    if (!player.turn || !battleship.started) { //don't ping server when it is your turn
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == XMLHttpRequest.DONE) {
+                var json = JSON.parse(xhr.responseText);
+                console.log(json);
+                let attack = json['attack'];
+                if(json['ready'] && !json['started']){
+                    playerReady.turn = true;
+                    turn.html('Attack to start playing');
+                }
+
+                if (attack !== null && json['started']) {
+                    battleship.started = true;
+                    player.turn = true;
                     turn.html('Your turn');
-                }
-            }
-            if (attack && (battleship.lastAttack == null || (battleship.lastAttack[0] != attack[0] &&
-                battleship.lastAttack[1] != attack[1]))) {
-                if (attack[2] == 1) {
-                    battleship.playerBoard[attack[0]][attack[1]] = -1;
-                } else {
-                    battleship.playerBoard[attack[0]][attack[1]] = -2;
-                }
-                battleship.lastAttack = attack;
+                    let store = JSON.parse(localStorage.getItem(battleship.id));
+                    if (attack[2] == 1) {
+                        battleship.playerBoard[attack[0]][attack[1]] = -1;
+                    } else {
+                        battleship.playerBoard[attack[0]][attack[1]] = -2;
+                    }
 
-                let store = JSON.parse(localStorage.getItem(battleship.id));
-                store['playerBoard'] = battleship.playerBoard;
-                localStorage.setItem(battleship.id, JSON.stringify(store));
-            }
+                    store['playerBoard'] = battleship.playerBoard;
+                    store['turn'] = player.turn;
+                    localStorage.setItem(battleship.id, JSON.stringify(store));
+                }
 
+            }
         }
+        xhr.open('POST', '/requestAttack?game=' + battleship.id + '&player=' + player.id);
+        xhr.send();
     }
-    xhr.open('POST', '/requestAttack?game=' + battleship.id + '&player=' + player.id);
-    xhr.send();
 }
 
 function start() {
@@ -299,26 +306,36 @@ var opponentSketch = (can) => {
             if (!battleship.attackOK(attack[0], attack[1], player.attack))
                 return
 
-            let data = {
-                player: player.id,
-                attack: attack,
-                game: gameID
-            }
+            if (player.turn || !battleship.started) {
+                let data = {
+                    player: player.id,
+                    attack: attack,
+                    game: gameID
+                }
 
-            var json = await request('POST', '/attack', data, true);
-            let hit = json['hit']
-            if (hit !== null) {
-                console.log(hit);
-                let value = hit ? 1 : -1;
-                console.log(hit);
-                battleship.opponentBoard[attack[0]][attack[1]] = value;
-
-                turn.html('Their turn');
-                player.addAttack(attack);
-                let store = JSON.parse(localStorage.getItem(battleship.id));
-                store['opponentBoard'] = battleship.opponentBoard;
-                localStorage.setItem(battleship.id, JSON.stringify(store));
-
+                var json = await request('POST', '/attack', data, true);
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', '/attack', true);
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState == XMLHttpRequest.DONE) {
+                        var json = JSON.parse(xhr.responseText);
+                        let hit = json['hit']
+                        let value = hit ? 1 : -1;
+                        battleship.opponentBoard[attack[0]][attack[1]] = value;
+                        battleship.started = true;
+                        player.turn = false;
+                        turn.html('Their turn');
+                        player.addAttack(attack);
+        
+                        let store = JSON.parse(localStorage.getItem(battleship.id));
+                        store['opponentBoard'] = battleship.opponentBoard;
+                        store['turn'] = player.turn;
+                        store['started'] = battleship.started;
+                        localStorage.setItem(battleship.id, JSON.stringify(store));
+                    }
+                }
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                xhr.send(JSON.stringify(data));
             } else {
                 turn.html('Not your turn');
             }

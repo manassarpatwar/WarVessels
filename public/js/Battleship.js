@@ -7,7 +7,7 @@ class Battleship{
         this.cellSize = boardWidth/size;
         this.boardWidth = boardWidth
         this.ready = false;
-        this.lastAttack = null;
+        this.started = false;
 
     }
 
