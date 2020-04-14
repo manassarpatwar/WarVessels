@@ -8,7 +8,15 @@ class Battleship{
         this.boardWidth = boardWidth
         this.ready = false;
         this.started = false;
+        this.finished = false;
 
+    }
+
+    done(){
+        let won = this.opponentBoard.flat().filter(x => x == 1).length == Player.totalPieceLength;
+        let lost = this.playerBoard.flat().filter(x => x == -1).length == Player.totalPieceLength;
+        this.finished = won || lost;
+        return won ? 1 : lost ? 0 : -1;
     }
 
 

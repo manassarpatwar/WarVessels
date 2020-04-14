@@ -20,3 +20,5 @@ class Player {
         this.attack = [x, y]
     }
 }
+
+Player.totalPieceLength = 17;

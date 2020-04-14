@@ -6,12 +6,14 @@ var turn;
 
 var boardWidth;
 var selectedPiece;
+var board;
 
 function setup() {
     createCanvas(0, 0);
     select('#game').style('height', windowHeight + 'px');
+    board = select('#board');
 
-    boardWidth = windowWidth < 600 ? 0.6*windowWidth : 0.25*windowWidth;
+    boardWidth = windowWidth < 600 ? 0.55*windowWidth : Math.min(350, 0.4*windowWidth);
 
     battleship = new Battleship(gameID, 10, boardWidth);
     player = new Player(playerID, battleship.cellSize);
@@ -148,7 +150,7 @@ function mouseReleased() {
 
 
 function postAttack() {
-    if (!player.turn || !battleship.started) { //don't ping server when it is your turn
+    if ((!player.turn || !battleship.started) && !battleship.finished) { //don't ping server when it is your turn
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function () {
             if (xhr.readyState == XMLHttpRequest.DONE) {
@@ -170,7 +172,15 @@ function postAttack() {
                     } else {
                         battleship.playerBoard[attack[0]][attack[1]] = -2;
                     }
-
+                    result = battleship.done();
+                    if(battleship.finished){
+                        setTimeout(() => {
+                            board.style('display', 'none');
+                            turn.style('font-size', '40px');
+                            turn.html('You '+(result == 1 ? 'won!' : 'lost!'));
+                            localStorage.removeItem(battleship.id);
+                        }, 1000);
+                    }
                     store['playerBoard'] = battleship.playerBoard;
                     store['turn'] = player.turn;
                     localStorage.setItem(battleship.id, JSON.stringify(store));
@@ -196,7 +206,7 @@ function start() {
     xhr.send(JSON.stringify(data));
 
     postAttack();
-    setInterval(postAttack, 5000);
+    setInterval(postAttack, 2000);
 }
 
 var playerSketch = (can) => {
@@ -245,8 +255,8 @@ var playerSketch = (can) => {
 
 
             let place = releasedPiece.getPiecePlace();
-            place.x = Math.round(place.x / can.width * 10);
-            place.y = Math.round(place.y / can.width * 10);
+            place.x = Math.round(place.x / can.width * battleship.size);
+            place.y = Math.round(place.y / can.width * battleship.size);
 
             if (releasedPiece.ready) {
                 releasedPiece.boardCoords.map(c => battleship.playerBoard[c[1]][c[0]] = 0);
@@ -288,7 +298,7 @@ var opponentSketch = (can) => {
         for (let i = 0; i < battleship.opponentBoard.length; i++) { //rows
             for (let j = 0; j < battleship.opponentBoard[i].length; j++) { //columns
                 can.noFill();
-                if (floor(can.mouseY / can.width * 10) == i && floor(can.mouseX / can.height * 10) == j)
+                if (floor(can.mouseY / can.width * battleship.size) == i && floor(can.mouseX / can.height * battleship.size) == j)
                     can.fill(255);
                 if (battleship.opponentBoard[i][j] > 0) {
                     can.fill(255, 0, 0);
@@ -300,9 +310,9 @@ var opponentSketch = (can) => {
         }
     }
 
-    can.mouseReleased = async () => {
+    can.mouseReleased = () => {
         if (battleship.ready) {
-            let attack = [floor(can.mouseY / can.width * 10), floor(can.mouseX / can.height * 10)];
+            let attack = [floor(can.mouseY / can.width * battleship.size), floor(can.mouseX / can.height * battleship.size)];
             if (!battleship.attackOK(attack[0], attack[1], player.attack))
                 return
 
@@ -313,7 +323,6 @@ var opponentSketch = (can) => {
                     game: gameID
                 }
 
-                var json = await request('POST', '/attack', data, true);
                 var xhr = new XMLHttpRequest();
                 xhr.open('POST', '/attack', true);
                 xhr.onreadystatechange = function () {
@@ -326,7 +335,16 @@ var opponentSketch = (can) => {
                         player.turn = false;
                         turn.html('Their turn');
                         player.addAttack(attack);
-        
+
+                        result = battleship.done();
+                        if(battleship.finished){
+                            setTimeout(() => {
+                                board.style('display', 'none');
+                                turn.style('font-size', '40px');
+                                turn.html('You '+(result == 1 ? 'won!' : 'lost!'));
+                                localStorage.removeItem(battleship.id);
+                            }, 1000);
+                        }
                         let store = JSON.parse(localStorage.getItem(battleship.id));
                         store['opponentBoard'] = battleship.opponentBoard;
                         store['turn'] = player.turn;

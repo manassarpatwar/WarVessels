@@ -35,11 +35,7 @@ main{
 
 
 #turn{
-  /* position: absolute;
-  width: 80vw;
-  left: 10vw;
-  top: 100px;
-  font-size: 20px; */
+  font-size: 20px; 
   text-align: center;
 }
 
