@@ -325,7 +325,6 @@ var opponentSketch = (can) => {
 
                 battleship.started = true;
                 player.turn = false;
-                turn.html('Their turn');
 
                 var xhr = new XMLHttpRequest();
                 xhr.open('POST', '/attack', true);
@@ -337,7 +336,7 @@ var opponentSketch = (can) => {
                         battleship.opponentBoard[attack[0]][attack[1]] = value;
 
                         player.addAttack(attack);
-
+                        turn.html('Their turn');
                         result = battleship.done();
                         if (battleship.finished) {
                             setTimeout(() => {

@@ -76,7 +76,11 @@ button{
   }
 
   button{
-    font-size: 16px;
+    font-size: 18px;
+  }
+
+  #turn{
+    font-size: 18px;
   }
 
   #board div{
