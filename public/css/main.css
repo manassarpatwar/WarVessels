@@ -70,13 +70,18 @@ button{
 }
 
 
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 500px) {
   #board{
     flex-direction: column-reverse;
   }
 
+  button{
+    font-size: 16px;
+  }
+
   #turn{
-    top: 30px;
+    top: 20px;
+    font-size: 16px;
   }
 
   #board div{

@@ -47,23 +47,23 @@ function setup() {
             }
         }
     } else {
-        localStorage.setItem(battleship.id, JSON.stringify({ 'ready': false, 'time': Date.now()}));
+        localStorage.setItem(battleship.id, JSON.stringify({ 'ready': false, 'time': Date.now() }));
     }
 
     //localStorage cleanup
 
     var currentTime = Date.now()
     const items = Object.keys(localStorage);
-   
+
     var maxAge = (1000 * 1) *//s
-                (60 * 1)*//m
-                (60 * 0.5) //h localStorage will be removed after 30 mins of initialization
+        (60 * 1) *//m
+        (60 * 0.5) //h localStorage will be removed after 30 mins of initialization
 
     for (let i of items) {
         let timestamp = JSON.parse(localStorage.getItem(i))['time'];
         if ((currentTime - timestamp) > maxAge) {
             localStorage.removeItem(i);
-            if(i == gameID){
+            if (i == gameID) {
                 window.location.href = '../../index';
             }
         }
@@ -110,7 +110,7 @@ function windowResized() {
 function update() {
     selectedPiece.isDragging = true;
     if (selectedPiece)
-        selectedPiece.transform(selectedPiece.currentPosition.x+selectedPiece.delta.x, selectedPiece.currentPosition.y+selectedPiece.delta.y);
+        selectedPiece.transform(selectedPiece.currentPosition.x + selectedPiece.delta.x, selectedPiece.currentPosition.y + selectedPiece.delta.y);
 }
 
 function mouseDragged(e) {
@@ -131,7 +131,7 @@ function mouseDragged(e) {
 
 function mouseReleased() {
     if (selectedPiece) {
-        selectedPiece.delta = {x: 0, y: 0};
+        selectedPiece.delta = { x: 0, y: 0 };
         selectedPiece.isDragging = false;
         selectedPiece.dragged = false;
         selectedPiece = false;
@@ -149,28 +149,27 @@ function postAttack() {
             if (json['ready'] && json['turn'] == null) {
                 turn.html('Attack to start playing');
             }
-            if (attack) {
-                if (json['turn'] !== undefined) {
-                    if (json['turn'] == player.id) {
-                        turn.html('Their turn');
-                    } else {
-                        turn.html('Your turn');
-                    }
-                    if (battleship.lastAttack == null || (battleship.lastAttack[0] != attack[0] &&
-                        battleship.lastAttack[1] != attack[1])) {
-                        if (attack[2] == 1) {
-                            battleship.playerBoard[attack[0]][attack[1]] = -1;
-                        } else {
-                            battleship.playerBoard[attack[0]][attack[1]] = -2;
-                        }
-                        battleship.lastAttack = attack;
-
-                        let store = JSON.parse(localStorage.getItem(battleship.id));
-                        store['playerBoard'] = battleship.playerBoard;
-                        localStorage.setItem(battleship.id, JSON.stringify(store));
-                    }
+            if (json['turn'] !== undefined) {
+                if (json['turn'] == player.id) {
+                    turn.html('Their turn');
+                } else {
+                    turn.html('Your turn');
                 }
             }
+            if (attack && (battleship.lastAttack == null || (battleship.lastAttack[0] != attack[0] &&
+                battleship.lastAttack[1] != attack[1]))) {
+                if (attack[2] == 1) {
+                    battleship.playerBoard[attack[0]][attack[1]] = -1;
+                } else {
+                    battleship.playerBoard[attack[0]][attack[1]] = -2;
+                }
+                battleship.lastAttack = attack;
+
+                let store = JSON.parse(localStorage.getItem(battleship.id));
+                store['playerBoard'] = battleship.playerBoard;
+                localStorage.setItem(battleship.id, JSON.stringify(store));
+            }
+
         }
     }
     xhr.open('POST', '/requestAttack?game=' + battleship.id + '&player=' + player.id);
@@ -190,7 +189,7 @@ function start() {
     xhr.send(JSON.stringify(data));
 
     postAttack();
-    setInterval(postAttack, 100);
+    setInterval(postAttack, 5000);
 }
 
 var playerSketch = (can) => {
