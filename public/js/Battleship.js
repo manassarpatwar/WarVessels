@@ -9,7 +9,6 @@ class Battleship{
         this.ready = false;
         this.lastAttack = null;
 
-        this.offset = {};
     }
 
 
@@ -39,12 +38,19 @@ class Battleship{
 
         let pieceCoordinates = piece.coords.map(([i,j]) => [i+x, j+y]);
 
+        //Out of bounds check
         for(let p of pieceCoordinates){
             if(p[0] > this.size || p[1] > this.size)
                 return false;
         }
+
+        //Other pieces overlap check
         for(let p of pieceCoordinates){
-            if(this.playerBoard[p[1]][p[0]] > 0)
+            if(this.playerBoard[p[1]] === undefined){
+                return false;
+            }else if(this.playerBoard[p[1]][p[0]] == undefined){
+                return false;
+            }else if(this.playerBoard[p[1]][p[0]] > 0)
                 return false;
         }
 

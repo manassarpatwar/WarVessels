@@ -25,11 +25,13 @@ class Piece{
 
         this.el.mousePressed((e) => {
             e.preventDefault();
-            if (e.touches) { e = e.touches[0]; }
-            selectedPiece = this;
-            this.isDragging = true;
-            this.startPosition = {x: e.clientX, y: e.clientY};
-            this.currentPosition = this.transform();
+            if(this.el.elt.classList.contains('interactable')){
+                if (e.touches) { e = e.touches[0]; }
+                selectedPiece = this;
+                this.isDragging = true;
+                this.startPosition = {x: e.clientX, y: e.clientY};
+                this.currentPosition = this.transform();
+            }
         });
 
     }
@@ -74,10 +76,16 @@ class Piece{
         return this.coords.length;
     }
 
-    rotate(){
-        this.rotation = (this.rotation+1)%2;
-        this.coords = this.coords.map(([i, j]) => ([j, i]));
-
+    rotate(r){
+        if(r == null){
+            this.rotation = (this.rotation+1)%2;
+            this.coords = this.coords.map(([i, j]) => ([j, i]));
+        }else{
+            this.rotation = r;
+            for(let i = 0; i < length; i++){
+                this.coords[i] = [i*r, i*r];
+            }
+        }
         this.transform(null, null, this.rotation*90);
     }
 } 

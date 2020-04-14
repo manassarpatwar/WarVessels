@@ -16,6 +16,9 @@ main{
   width: 100vw;
 }
 
+#player{
+  position: relative;
+}
 
 #game{
   position: absolute;
@@ -73,7 +76,7 @@ button{
   }
 
   #turn{
-    top: 10px;
+    top: 30px;
   }
 
   #board div{
