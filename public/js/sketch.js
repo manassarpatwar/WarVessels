@@ -11,7 +11,7 @@ function setup() {
     createCanvas(0, 0);
     select('#game').style('height', windowHeight + 'px');
 
-    boardWidth = Math.max(windowWidth * 0.25, 250)
+    boardWidth = Math.max(windowWidth * 0.25, 225)
 
     battleship = new Battleship(gameID, 10, boardWidth);
     player = new Player(playerID, battleship.cellSize);
@@ -190,7 +190,7 @@ function start() {
     xhr.send(JSON.stringify(data));
 
     postAttack();
-    setInterval(postAttack, 2000);
+    setInterval(postAttack, 100);
 }
 
 var playerSketch = (can) => {
