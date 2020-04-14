@@ -13,7 +13,7 @@ function setup() {
     select('#game').style('height', windowHeight + 'px');
     board = select('#board');
 
-    boardWidth = windowWidth < 600 ? 0.55*windowWidth : Math.min(350, 0.4*windowWidth);
+    boardWidth = windowWidth < 600 ? 0.6 * windowWidth : Math.min(350, 0.4 * windowWidth);
 
     battleship = new Battleship(gameID, 10, boardWidth);
     player = new Player(playerID, battleship.cellSize);
@@ -43,9 +43,9 @@ function setup() {
         if (battleship.ready) {
             start();
         }
-        if(player.turn && battleship.started){
+        if (player.turn && battleship.started) {
             turn.html('Your turn');
-        }else if(!player.turn && battleship.started){
+        } else if (!player.turn && battleship.started) {
             turn.html('Their turn');
         }
         if (keys.includes('pieces')) {
@@ -157,7 +157,7 @@ function postAttack() {
                 var json = JSON.parse(xhr.responseText);
                 console.log(json);
                 let attack = json['attack'];
-                if(json['ready'] && !json['started']){
+                if (json['ready'] && !json['started']) {
                     playerReady.turn = true;
                     turn.html('Attack to start playing');
                 }
@@ -173,11 +173,11 @@ function postAttack() {
                         battleship.playerBoard[attack[0]][attack[1]] = -2;
                     }
                     result = battleship.done();
-                    if(battleship.finished){
+                    if (battleship.finished) {
                         setTimeout(() => {
                             board.style('display', 'none');
                             turn.style('font-size', '40px');
-                            turn.html('You '+(result == 1 ? 'won!' : 'lost!'));
+                            turn.html('You ' + (result == 1 ? 'won!' : 'lost!'));
                             localStorage.removeItem(battleship.id);
                         }, 1000);
                     }
@@ -323,6 +323,10 @@ var opponentSketch = (can) => {
                     game: gameID
                 }
 
+                battleship.started = true;
+                player.turn = false;
+                turn.html('Their turn');
+
                 var xhr = new XMLHttpRequest();
                 xhr.open('POST', '/attack', true);
                 xhr.onreadystatechange = function () {
@@ -331,17 +335,15 @@ var opponentSketch = (can) => {
                         let hit = json['hit']
                         let value = hit ? 1 : -1;
                         battleship.opponentBoard[attack[0]][attack[1]] = value;
-                        battleship.started = true;
-                        player.turn = false;
-                        turn.html('Their turn');
+
                         player.addAttack(attack);
 
                         result = battleship.done();
-                        if(battleship.finished){
+                        if (battleship.finished) {
                             setTimeout(() => {
                                 board.style('display', 'none');
                                 turn.style('font-size', '40px');
-                                turn.html('You '+(result == 1 ? 'won!' : 'lost!'));
+                                turn.html('You ' + (result == 1 ? 'won!' : 'lost!'));
                                 localStorage.removeItem(battleship.id);
                             }, 1000);
                         }
