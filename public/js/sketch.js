@@ -10,7 +10,6 @@ var selectedPiece;
 var board;
 
 
-var attackIntervalID;
 var bg;
 var readyBtn;
 
@@ -251,8 +250,6 @@ function postAttack() {
         }
         xhr.open('POST', '/requestAttack?game=' + battleship.id + '&player=' + player.id);
         xhr.send();
-    }else{
-        clearInterval(attackIntervalID);
     }
 }
 
@@ -269,7 +266,7 @@ function start() {
     xhr.send(JSON.stringify(data));
 
     postAttack();
-    attackIntervalID = setInterval(postAttack, 2000);
+    setInterval(postAttack, 2000);
 }
 
 var playerSketch = (canvas) => {
@@ -494,8 +491,6 @@ var opponentSketch = (canvas) => {
                         player.turn = false;
                         html(turn, 'Their turn');
                         player.addAttack(attack);
-
-                        attackIntervalID = setInterval(postAttack, 2000);
 
                         result = battleship.done();
                         if (battleship.finished) {
