@@ -14,7 +14,7 @@ html, body{
   font-family: NunitoSans;
   background: #eee;
   width: 100vw;
-    height: 100vh;
+
     background: linear-gradient(270deg, #adcbf5, #a793f7);
 
     -webkit-animation: backgroundAnimate 120s ease infinite;
@@ -126,7 +126,6 @@ main{
 
 #center{
   width: 100vw;
-  height: inherit;
   display: flex;
   justify-content: center;
   align-items: center;

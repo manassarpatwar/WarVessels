@@ -34,7 +34,7 @@
 
 </body>
 <script>
-
+    document.getElementById('center').style.height = window.innerHeight + 'px';
     let title = document.getElementById('title');
     let share = document.getElementById('share');
     let link = document.getElementById('link');
@@ -62,7 +62,7 @@
 
 
     function play() {
-        window.location.href = '../play/' + game;
+        window.location.href = 'https://btlshp-js.herokuapp.com/play/' + game;
     }
 
     function copy() {
