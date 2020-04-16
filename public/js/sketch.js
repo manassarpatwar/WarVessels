@@ -39,7 +39,7 @@ function setup() {
     readyBtn = select('#readyBtn');
 
     let smallSize = window.innerWidth < 600 ;
-    boardWidth = smallSize ? 0.45 * window.innerHeight : Math.min(350, 0.4 * window.innerWidth);
+    boardWidth = smallSize ? 0.42 * window.innerHeight : Math.min(350, 0.4 * window.innerWidth);
 
     battleship = new Battleship(gameID, 10, boardWidth);
     player = new Player(playerID, battleship.cellSize);
