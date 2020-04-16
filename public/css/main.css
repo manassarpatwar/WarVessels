@@ -9,6 +9,7 @@ html, body{
   z-index: 3;
   position: absolute;
   transform: translate(0px, 0px);
+  opacity: 0.9;
 }
 
 .loadingImg{

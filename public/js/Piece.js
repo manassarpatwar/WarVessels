@@ -12,8 +12,8 @@ class Piece{
         this.height = 0.92*length*cellSize;
         this.transform(0,0,this.rotation*90);
 
-        this.el.style('height', this.height+'px');
-        this.el.style('width' , this.width+'px');
+        this.el.style.height = this.height+'px';
+        this.el.style.width = this.width+'px';
 
         this.dragged = false;
         this.isDragging = false;
@@ -23,17 +23,20 @@ class Piece{
 
         this.ready = false;
 
-        this.el.mousePressed((e) => {
-            e.preventDefault();
-            if(this.el.elt.classList.contains('interactable')){
-                if (e.touches) { e = e.touches[0]; }
-                selectedPiece = this;
-                this.isDragging = true;
-                this.startPosition = {x: e.clientX, y: e.clientY};
-                this.currentPosition = this.transform();
-            }
-        });
+        this.el.addEventListener('mousedown', (e) => {this.startDrag(e)});
+        this.el.addEventListener('touchstart', (e) => {this.startDrag(e)});
 
+    }
+
+    startDrag(e) {
+        e.preventDefault();
+        if(this.el.classList.contains('interactable')){
+            if (e.touches) { e = e.touches[0]; }
+            selectedPiece = this;
+            this.isDragging = true;
+            this.startPosition = {x: e.clientX, y: e.clientY};
+            this.currentPosition = this.transform();
+        }
     }
 
     getPiecePlace(){
@@ -50,6 +53,14 @@ class Piece{
         return data;
     }
 
+    getCenter(){
+        let data = this.getPiecePlace();
+        data.x += this.height/2*this.rotation+this.width/2*(1-this.rotation);
+        data.y += this.width/2*this.rotation+this.height/2*(1-this.rotation);
+
+        return data;
+    }
+
     fit(place, cellSize){
         let fitBuffer = this.getFitBuffer();
         let center = {x : (cellSize-this.width)/2, y: (cellSize*this.getLength()-this.height)/2}
@@ -63,12 +74,12 @@ class Piece{
     }
 
     transform(x, y, r, el = this.el){
-        let d = el.style('transform').split(',').map(d => parseInt(d));
+        let d = getComputedStyle(el).transform.split(',').map(d => parseInt(d));
 
         x = x == null ? d[4] : x;
         y = y == null ? d[5] : y;
         r = r == null ? Math.round(Math.asin(d[1]) * (180/Math.PI)) : r;
-        el.style('transform', "translate("+x+"px, "+y+"px) rotate("+r+"deg)");
+        el.style.transform =  "translate("+x+"px, "+y+"px) rotate("+r+"deg)";
         return {x: x, y: y, r: r};
     };
 

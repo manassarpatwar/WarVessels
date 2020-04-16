@@ -5,7 +5,7 @@ class Player {
         this.ships = [];
         this.nextPiece = 0;
         this.dragged = [];
-        console.log(cellSize);
+
         this.pieces = {
             'patrol': new Piece(2, 'patrol', cellSize),
             'submarine': new Piece(3, 'submarine', cellSize),
@@ -14,6 +14,7 @@ class Player {
             'carrier': new Piece(5, 'carrier', cellSize, 1)
         }
         this.turn = false;
+        this.turnComplete = false;
     }
 
     addAttack([x, y]) {
