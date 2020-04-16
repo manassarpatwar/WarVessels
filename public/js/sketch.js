@@ -39,7 +39,7 @@ function setup() {
     readyBtn = select('#readyBtn');
 
     let smallSize = window.innerWidth < 600 ;
-    boardWidth = smallSize ? 0.6 * window.innerWidth : Math.min(350, 0.4 * window.innerWidth);
+    boardWidth = smallSize ? 0.45 * window.innerHeight : Math.min(350, 0.4 * window.innerWidth);
 
     battleship = new Battleship(gameID, 10, boardWidth);
     player = new Player(playerID, battleship.cellSize);
@@ -245,10 +245,11 @@ function postAttack() {
                     store['turn'] = player.turn;
                     localStorage.setItem(battleship.id, JSON.stringify(store));
                 }
+                setTimeout(postAttack, 2000);
 
             }
         }
-        xhr.open('POST', '/requestAttack?game=' + battleship.id + '&player=' + player.id);
+        xhr.open('POST', '/requestAttack?game=' + battleship.id + '&player=' + player.id, true);
         xhr.send();
     }
 }
@@ -266,7 +267,7 @@ function start() {
     xhr.send(JSON.stringify(data));
 
     postAttack();
-    setInterval(postAttack, 2000);
+    setTimeout(postAttack, 2000);
 }
 
 var playerSketch = (canvas) => {
@@ -460,7 +461,6 @@ var opponentSketch = (canvas) => {
     }
 
     mouseReleased = (e) => {
-        console.log(e);
         if (e === undefined)
             return;
 
@@ -470,12 +470,10 @@ var opponentSketch = (canvas) => {
             if (!battleship.attackOK(attack[0], attack[1], player.attack))
                 return
 
-
-            console.log("aaa")
             if (player.turn || !battleship.started) {
+                battleship.started = true;
                 player.turn = false;
                 html(turn, 'Their turn');
-                battleship.started = true;
 
                 let data = {
                     player: player.id,
@@ -491,6 +489,8 @@ var opponentSketch = (canvas) => {
                         let hit = json['hit']
                         let value = hit ? 1 : -1;
                         battleship.opponentBoard[attack[0]][attack[1]] = value;
+
+                        postAttack();
 
                         result = battleship.done();
                         if (battleship.finished) {

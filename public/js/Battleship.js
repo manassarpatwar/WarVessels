@@ -30,6 +30,10 @@ class Battleship{
             return false;
         }
 
+        if(this.opponentBoard[x][y] != 0){
+            return false;
+        }
+
         return true;
     }
 

@@ -47,20 +47,20 @@ app.use(session({ secret: 'XASDASDA' }));
 app.use(express.static(path.join(__dirname, 'public')))
 	.set('views', path.join(__dirname, 'views'))
 	.set('view engine', 'ejs')
-	.get('/', (req, res) => res.redirect('/index'))
-	.get('/index', (req, res) => res.render('pages/index'))
+	.get('/', (req, res) => res.render('pages/index'))
 	.listen(PORT, () => console.log(`Listening on ${PORT}`))
 
 
 app.post('/init', (req, res, next) => {
 	let sessionGame = req.body['game'];
+	ssn = req.session;
 	let gameExists = false;
 	if (sessionGame != null) {
 		gameExists = Object.keys(gameState).includes(sessionGame);
 	}
-	const game = gameExists ? sessionGame :  uuidv4();
+	const game = (gameExists && ssn.player) ? sessionGame : uuidv4();
 
-	if(!gameExists){
+	if (!(gameExists && ssn.player)){
 		gameState[game] = {};
 		gameState[game]['started'] = false;
 		gameState[game]['time'] = Date.now();
@@ -84,11 +84,11 @@ app.get('/play/:game', (req, res, next) => {
 			ssn.player = player;
 			res.render('pages/index_multiplayer', { game: game, playerID: ssn.player });
 		} else {
-			res.status(404).send('404: Page not Found');
+			res.redirect('/')
 		}
 	} else {
 		//Link to game does not exist
-		res.status(404).send('404: Page not Found');
+		res.redirect('/')
 	}
 });
 
@@ -124,6 +124,7 @@ app.post('/attack', function (req, res) {
 	let game = req.body['game'];
 	let player = req.body['player'];
 	let attack = req.body['attack'];
+	let totalPieceLength = req.body['totalPieceLength'];
 	let hit = null;
 
 	gameState[game]['started'] = true;

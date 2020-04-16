@@ -12,7 +12,7 @@
     <link rel="stylesheet" type="text/css" href="css/main.css" />
     <link rel="stylesheet" type="text/css" href="css/balloon.css" />
 
-    <script language="javascript" type="text/javascript" src="js/helpers.js"></script>
+    <script language="javascript" type="text/javascript" src="js/clipboard.js"></script>
 </head>
 
 <body>
@@ -66,28 +66,9 @@
     }
 
     function copy() {
-        var range, selection;
-        if(navigator.userAgent.match(/ipad|iphone/i)){
-            range = document.createRange();
-            range.selectNodeContents(textArea);
-            selection = window.getSelection();
-            selection.removeAllRanges();
-            selection.addRange(range);
-            textArea.setSelectionRange(0, 999999);
-
-            link.contentEditable = oldContentEditable;
-            link.readOnly = oldReadOnly;
-        }else{
-            link.select();
-        }
-
-        try {
-            var successful = document.execCommand('copy');
-            copyBtn.setAttribute('data-balloon-visible', '');
-            setTimeout(() => copyBtn.removeAttribute('data-balloon-visible'), 2000);
-        } catch (err) {
-
-        }
+        Clipboard.copy(link.getAttribute('value'));
+        copyBtn.setAttribute('data-balloon-visible', '');
+        setTimeout(() => copyBtn.removeAttribute('data-balloon-visible'), 2000);
     };
 </script>
 
