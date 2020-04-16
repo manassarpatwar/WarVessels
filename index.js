@@ -3,12 +3,8 @@ const session = require('express-session');
 const path = require('path')
 const { v4: uuidv4 } = require('uuid');
 const PORT = process.env.PORT || 5000
-const redirectToHTTPS = require('express-http-to-https').redirectToHTTPS
 
 var app = express();
- 
-// Don't redirect if the hostname is `localhost:port` or the route is `/insecure`
-app.use(redirectToHTTPS([/localhost:(\d{4})/], 301));
 
 var ssn;
 
