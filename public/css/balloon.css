@@ -11,8 +11,8 @@
     [aria-label][data-balloon-pos]:after {
       opacity: 0;
       pointer-events: none;
-      transition: all .18s ease-out .18s;
-      transition-delay: 0s;
+      transition: all .15s ease-out .18s;
+      transition-delay: 0.1s;
       text-indent: 0;
       font-weight: normal;
       font-style: normal;
@@ -36,7 +36,7 @@
       opacity: 0;
       pointer-events: none;
       transition: all .18s ease-out .18s;
-      transition-delay: 0s;
+      transition-delay: 0.1s;
       content: "";
       position: absolute;
       z-index: 10; }

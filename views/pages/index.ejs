@@ -38,7 +38,7 @@
     let title = document.getElementById('title');
     let share = document.getElementById('share');
     let link = document.getElementById('link');
-
+    let copyBtn = document.getElementById('copyBtn');
     let game;
 
     function init() {
@@ -54,6 +54,7 @@
                 game = json.game;
                 link.setAttribute('value', 'https://btlshp-js.herokuapp.com/play/' + game);
                 sessionStorage.setItem('game', game)
+                copy();
             }
         }
         xhr.send(JSON.stringify({ game: sessionGame }));
@@ -64,7 +65,7 @@
         window.location.href = 'https://btlshp-js.herokuapp.com/play/' + game;
     }
 
-    function copy(btn) {
+    function copy() {
         link.focus();
         link.select();
 
@@ -88,8 +89,10 @@
         try {
             var successful = document.execCommand('copy');
             var msg = successful ? 'successful' : 'unsuccessful';
-            btn.setAttribute('data-balloon-visible', '');
-            setTimeout(() => btn.removeAttribute('data-balloon-visible'), 2000);
+            copyBtn.setAttribute('data-balloon-visible', '');
+            setTimeout(() => copyBtn.removeAttribute('data-balloon-visible'), 2000);
+            window.getSelection().removeAllRanges()
+            document.selection.empty()
         } catch (err) {
 
         }

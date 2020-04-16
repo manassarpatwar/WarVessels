@@ -473,6 +473,10 @@ var opponentSketch = (canvas) => {
 
             console.log("aaa")
             if (player.turn || !battleship.started) {
+                player.turn = false;
+                html(turn, 'Their turn');
+                player.addAttack(attack);
+
                 let data = {
                     player: player.id,
                     attack: attack,
@@ -488,9 +492,6 @@ var opponentSketch = (canvas) => {
                         let value = hit ? 1 : -1;
                         battleship.opponentBoard[attack[0]][attack[1]] = value;
                         battleship.started = true;
-                        player.turn = false;
-                        html(turn, 'Their turn');
-                        player.addAttack(attack);
 
                         result = battleship.done();
                         if (battleship.finished) {
@@ -507,7 +508,6 @@ var opponentSketch = (canvas) => {
                         store['started'] = battleship.started;
                         localStorage.setItem(battleship.id, JSON.stringify(store));
 
-                        updateOpponent = true;
                         waterWave.touchWater(Math.floor(e.clientX - canvas.offsetLeft), Math.floor(e.clientY - canvas.offsetTop), 1000);
                     }
                 }
