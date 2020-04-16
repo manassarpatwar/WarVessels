@@ -7,6 +7,8 @@
     <meta name='author' content="Manas Sarpatwar">
     <meta name="description" content="Battleship in browser">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preload" href="/fonts/nunito-sans.extralight.ttf" as="font" crossorigin="anonymous" />
+    <link rel="preload" href="/fonts/nunito-sans.light.ttf" as="font" crossorigin="anonymous" />
     <link rel="stylesheet" type="text/css" href="css/main.css" />
     <link rel="stylesheet" type="text/css" href="css/balloon.css" />
 
@@ -24,7 +26,7 @@
                 <label style='margin: 15px 0 5px 0'>Share game link:<button id="copyBtn" onclick="copy(this)"
                         aria-label="copied!" data-balloon-pos="up"><img id="copyImg" src="../img/copy.png" width="32"
                             height="32"></button></label>
-                <input readonly='true' style='margin: 15px 0 30px 0' id="link">
+                <input contenteditable = "false" readonly='true' style='margin: 15px 0 30px 0' id="link">
                 <button onclick="play()" class="button" id="play">Play</button>
             </div>
         </div>
@@ -54,7 +56,7 @@
                 sessionStorage.setItem('game', game)
             }
         }
-        xhr.send(JSON.stringify({game: sessionGame}));
+        xhr.send(JSON.stringify({ game: sessionGame }));
     }
 
 
@@ -63,9 +65,26 @@
     }
 
     function copy(btn) {
-
         link.focus();
         link.select();
+
+        var oldContentEditable = link.contentEditable,
+            oldReadOnly = link.readOnly,
+            range = document.createRange();
+
+        link.contentEditable = true;
+        link.readOnly = false;
+        range.selectNodeContents(link);
+
+        var s = window.getSelection();
+        s.removeAllRanges();
+        s.addRange(range);
+
+        link.setSelectionRange(0, 999999); // A big number, to cover anything that could be inside the element.
+
+        link.contentEditable = oldContentEditable;
+        link.readOnly = oldReadOnly;
+
         try {
             var successful = document.execCommand('copy');
             var msg = successful ? 'successful' : 'unsuccessful';

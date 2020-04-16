@@ -148,14 +148,6 @@ button{
     flex-direction: column-reverse;
   }
 
-  button{
-    font-size: 18px;
-  }
-
-  #turn{
-    font-size: 18px;
-  }
-
   #board div{
     margin: 1px 0;
   }
