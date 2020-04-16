@@ -144,9 +144,12 @@ function windowResized() {
 }
 
 function update() {
-    selectedPiece.isDragging = true;
-    if (selectedPiece)
+    if (selectedPiece){
+        if(selectedPiece.isDragging){
+            requestAnimationFrame(update);
+        }
         selectedPiece.transform(selectedPiece.currentPosition.x + selectedPiece.delta.x, selectedPiece.currentPosition.y + selectedPiece.delta.y);
+    }
 }
 
 function mouseDragged(e) {
@@ -158,10 +161,6 @@ function mouseDragged(e) {
         dx = (e.clientX - selectedPiece.startPosition.x);
         dy = (e.clientY - selectedPiece.startPosition.y);
         selectedPiece.delta = { x: dx, y: dy };
-        if (selectedPiece.isDragging) {
-            selectedPiece.isDragging = false;            // no need to call rAF up until next frame
-            requestAnimationFrame(update); // request 60fps animation
-        };
     }
 }
 
@@ -502,8 +501,4 @@ var opponentSketch = (canvas) => {
 
     opponentSketch.mouseReleased = mouseReleased;
 }
-
-
-// new p5(playerSketch, "player");
-// new p5(opponentSketch, "opponent");
 
