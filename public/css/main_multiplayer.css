@@ -1,0 +1,162 @@
+@font-face {
+  font-family: NunitoSans;
+  src: url(../fonts/nunito-sans.extralight.ttf);
+}
+
+@font-face {
+  font-family: NunitoSansBold;
+  src: url(../fonts/nunito-sans.light.ttf);
+}
+
+html, body{
+  margin: 0;
+  padding: 0;
+  font-family: NunitoSans;
+  background: #eee;
+  width: 100vw;
+
+  -webkit-animation: backgroundAnimate 120s ease infinite;
+  -moz-animation: backgroundAnimate 120s ease infinite;
+  animation: backgroundAnimate 120s ease infinite;
+}
+
+@-webkit-keyframes backgroundAnimate {
+  0% {
+      background-position: 0% 50%
+  }
+
+  50% {
+      background-position: 100% 50%
+  }
+
+  100% {
+      background-position: 0% 50%
+  }
+}
+
+@-moz-keyframes backgroundAnimate {
+  0% {
+      background-position: 0% 50%
+  }
+
+  50% {
+      background-position: 100% 50%
+  }
+
+  100% {
+      background-position: 0% 50%
+  }
+}
+
+@keyframes backgroundAnimate {
+  0% {
+      background-position: 0% 50%
+  }
+
+  50% {
+      background-position: 100% 50%
+  }
+
+  100% {
+      background-position: 0% 50%
+  }
+}
+
+.noDisplay{
+  display: none;
+}
+
+.piece{
+  z-index: 3;
+  position: absolute;
+  transform: translate(0px, 0px);
+  opacity: 0.9;
+}
+
+.loadingImg{
+  display: none;
+}
+
+main{
+  position: relative;
+  width: 100vw;
+}
+
+#player{
+  position: relative;
+}
+
+#game{
+  position: absolute;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+
+#turn{
+  font-size: 20px; 
+  text-align: center;
+  font-family: NunitoSansBold;
+  margin: .1rem;
+  padding: .75rem;
+}
+
+.buttons{
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1;
+}
+
+button{
+  font-family: NunitoSansBold;
+}
+
+.button{
+  box-sizing: inherit;
+  background-color: #222;
+  margin: .1rem;
+  padding: .75rem;
+  color: #fff;
+  text-align: center;
+  border-radius: .1875rem;
+  font-size: 18px;
+  outline: none;
+  border: none;
+}
+
+.button:hover{
+  background-color: #eee;
+  color: #222;
+}
+
+#board{
+  display: flex;
+  flex-direction: row;
+}
+
+#board div{
+  margin: 0 20px;
+}
+
+
+@media only screen and (max-width: 600px) {
+  #board{
+    flex-direction: column-reverse;
+  }
+
+  button{
+    font-size: 18px;
+  }
+
+  #turn{
+    font-size: 18px;
+  }
+
+  #board div{
+    margin: 1px 0;
+  }
+}

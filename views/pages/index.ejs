@@ -8,60 +8,9 @@
     <meta name="description" content="Battleship in browser">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="css/main.css" />
+    <link rel="stylesheet" type="text/css" href="css/balloon.css" />
 
     <script language="javascript" type="text/javascript" src="js/helpers.js"></script>
-    <style>
-        body {
-            background: linear-gradient(270deg, #adcbf5, #a793f7);
-            background-size: 400% 400%;
-
-            -webkit-animation: AnimationName 120s ease infinite;
-            -moz-animation: AnimationName 120s ease infinite;
-            animation: AnimationName 120s ease infinite;
-        }
-
-        @-webkit-keyframes AnimationName {
-            0% {
-                background-position: 0% 50%
-            }
-
-            50% {
-                background-position: 100% 50%
-            }
-
-            100% {
-                background-position: 0% 50%
-            }
-        }
-
-        @-moz-keyframes AnimationName {
-            0% {
-                background-position: 0% 50%
-            }
-
-            50% {
-                background-position: 100% 50%
-            }
-
-            100% {
-                background-position: 0% 50%
-            }
-        }
-
-        @keyframes AnimationName {
-            0% {
-                background-position: 0% 50%
-            }
-
-            50% {
-                background-position: 100% 50%
-            }
-
-            100% {
-                background-position: 0% 50%
-            }
-        }
-    </style>
 </head>
 
 <body>
@@ -72,8 +21,10 @@
         </div>
         <div id="share" class="noDisplay">
             <div id=shareBox>
-                <label style = 'margin: 15px 0 5px 0'>Share game link:</label>
-                <input readonly='true' style = 'margin: 5px 0 15px 0' id="link">
+                <label style='margin: 15px 0 5px 0'>Share game link:<button id="copyBtn" onclick="copy(this)"
+                        aria-label="copied!" data-balloon-pos="up"><img id="copyImg" src="../img/copy.png" width="32"
+                            height="32"></button></label>
+                <input readonly='true' style='margin: 15px 0 30px 0' id="link">
                 <button onclick="play()" class="button" id="play">Play</button>
             </div>
         </div>
@@ -81,38 +32,49 @@
 
 </body>
 <script>
+    document.getElementById('center').style.height = window.innerHeight + 'px';
     let title = document.getElementById('title');
     let share = document.getElementById('share');
     let link = document.getElementById('link');
-    let game;
-    function init() {
 
+    let game;
+
+    function init() {
+        let sessionGame = sessionStorage.getItem('game');
         var xhr = new XMLHttpRequest();
         xhr.open('POST', '/init', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.onreadystatechange = function () {
             if (xhr.readyState == XMLHttpRequest.DONE) {
                 var json = JSON.parse(xhr.responseText);
                 title.classList.add('noDisplay')
                 share.classList.remove('noDisplay')
                 game = json.game;
-                link.setAttribute('value', 'https://btlshp-js.herokuapp.com/play/'+game);
+                link.setAttribute('value', 'https://btlshp-js.herokuapp.com/play/' + game);
+                sessionStorage.setItem('game', game)
             }
         }
-        xhr.send(null);
-
+        xhr.send(JSON.stringify({game: sessionGame}));
     }
+
 
     function play() {
-        let data = {
-            game: game
-        }
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', '/start', true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.send(JSON.stringify(data));
-
-        window.location.href = 'https://btlshp-js.herokuapp.com/play/' + game;
+        window.location.href = '../play/' + game;
     }
+
+    function copy(btn) {
+
+        link.focus();
+        link.select();
+        try {
+            var successful = document.execCommand('copy');
+            var msg = successful ? 'successful' : 'unsuccessful';
+            btn.setAttribute('data-balloon-visible', '');
+            setTimeout(() => btn.removeAttribute('data-balloon-visible'), 2000);
+        } catch (err) {
+
+        }
+    };
 </script>
 
 </html>

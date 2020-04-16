@@ -14,22 +14,22 @@ var gameState = require('./game.json');
 gameState['changed'] = false;
 
 var maxAge = (1000 * 1) *//s
-			(60 * 1)* //m
-			(60 * 0.5) //h remove game from gameState after 30 mins of initialization
+	(60 * 1) * //m
+	(60 * 0.5) //h remove game from gameState after 30 mins of initialization
 
 async function write() {
 	var currentTime = Date.now()
 	const items = Object.keys(gameState);
 
 	for (let i of items) {
-		if(gameState[i]['time'] !== undefined){
+		if (gameState[i]['time'] !== undefined) {
 			let timestamp = gameState[i]['time'];
 			if ((currentTime - timestamp) > maxAge) {
 				delete gameState[i];
 			}
 		}
 	}
-	if(gameState['changed']){
+	if (gameState['changed']) {
 		console.log("writing...");
 		fs.writeFile("./game.json", JSON.stringify(gameState), function (err) {
 			if (err) {
@@ -51,17 +51,23 @@ app.use(express.static(path.join(__dirname, 'public')))
 	.get('/index', (req, res) => res.render('pages/index'))
 	.listen(PORT, () => console.log(`Listening on ${PORT}`))
 
-app.post('/init', (req, res, next) => {
-	const game = uuidv4();
-	res.send({ game: game });
-})
 
-app.post('/start', (req, res, next) => {
-	let game = req.body['game'];
-	gameState[game] = {};
-	gameState[game]['started'] = false;
-	gameState[game]['time'] = Date.now();
-	gameState[game]['players'] = {};
+app.post('/init', (req, res, next) => {
+	let sessionGame = req.body['game'];
+	let gameExists = false;
+	if (sessionGame != null) {
+		gameExists = Object.keys(gameState).includes(sessionGame);
+	}
+	const game = gameExists ? sessionGame :  uuidv4();
+
+	if(!gameExists){
+		gameState[game] = {};
+		gameState[game]['started'] = false;
+		gameState[game]['time'] = Date.now();
+		gameState[game]['players'] = {};
+	}
+
+	res.send({ game: game });
 })
 
 app.get('/play/:game', (req, res, next) => {
@@ -90,7 +96,7 @@ app.post('/ready', function (req, res) {
 	ssn = req.session;
 	let game = req.body['game'];
 	let playerBoard = req.body['playerBoard'];
-	
+
 	gameState[game]['players'][ssn.player] = {};
 	gameState[game]['players'][ssn.player]['playerBoard'] = playerBoard;
 	gameState[game]['players'][ssn.player]['attack'] = [];
@@ -127,7 +133,7 @@ app.post('/attack', function (req, res) {
 	hit = opponent['playerBoard'][attack[0]][attack[1]] > 0;
 	attack[2] = hit;
 	gameState[game]['players'][player]['attack'] = attack;
-	gameState[game]['lastAttack'] = {player: player, attack : attack};
+	gameState[game]['lastAttack'] = { player: player, attack: attack };
 	gameState['changed'] = true;
 
 	res.send({ hit: hit });

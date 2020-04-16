@@ -10,8 +10,9 @@ var selectedPiece;
 var board;
 
 
-
+var attackIntervalID;
 var bg;
+var readyBtn;
 
 function preload(url, callback) {
     let img = new Image();
@@ -36,17 +37,26 @@ function createCanvas(canvasId) {
 function setup() {
     select('#game').style.height = window.innerHeight + 'px';
     board = select('#board');
+    readyBtn = select('#readyBtn');
 
-    boardWidth = window.innerWidth < 600 ? 0.6 * window.innerWidth : Math.min(350, 0.4 * window.innerWidth);
+    let smallSize = window.innerWidth < 600 ;
+    boardWidth = smallSize ? 0.6 * window.innerWidth : Math.min(350, 0.4 * window.innerWidth);
 
     battleship = new Battleship(gameID, 10, boardWidth);
     player = new Player(playerID, battleship.cellSize);
     Object.values(player.pieces).map(x => x.el.classList.remove('loadingImg'));
     let cellSize = battleship.cellSize;
     let carrier = player.pieces['carrier']
-    carrier.transform(carrier.height / 2 - cellSize / 4, 3 * (boardWidth + cellSize) / 4 + carrier.width / 4);
     let btlshp = player.pieces['battleship']
-    btlshp.transform(boardWidth / 2 + btlshp.height / 2 - cellSize / 4, 3 * boardWidth / 4 + cellSize + btlshp.width / 2);
+    if(smallSize){
+        carrier.rotate();
+        btlshp.rotate();
+        carrier.transform(boardWidth+cellSize/4-carrier.width/8, boardWidth - carrier.height-cellSize/5);
+        btlshp.transform(boardWidth+cellSize/4, boardWidth / 2 - btlshp.height-cellSize/4);
+    }else{
+        carrier.transform(carrier.height / 2 - cellSize / 4, 3 * (boardWidth + cellSize) / 4 + carrier.width / 4);
+        btlshp.transform(boardWidth / 2 + btlshp.height / 2 - cellSize / 4, 3 * boardWidth / 4 + cellSize + btlshp.width / 2);
+    }
     let destroyer = player.pieces['destroyer'];
     destroyer.transform(-cellSize, 3 * boardWidth / 4 - cellSize + destroyer.height / 4);
     let submarine = player.pieces['submarine'];
@@ -149,6 +159,8 @@ function playerReady() {
     battleship.ready = true;
     store['ready'] = true;
     localStorage.setItem(gameID, JSON.stringify(store));
+    readyBtn.classList.add('noDisplay');
+    turn.classList.remove('noDisplay');
     start();
 }
 
@@ -239,6 +251,8 @@ function postAttack() {
         }
         xhr.open('POST', '/requestAttack?game=' + battleship.id + '&player=' + player.id);
         xhr.send();
+    }else{
+        clearInterval(attackIntervalID);
     }
 }
 
@@ -255,7 +269,7 @@ function start() {
     xhr.send(JSON.stringify(data));
 
     postAttack();
-    setInterval(postAttack, 2000);
+    attackIntervalID = setInterval(postAttack, 2000);
 }
 
 var playerSketch = (canvas) => {
@@ -371,7 +385,8 @@ var playerSketch = (canvas) => {
                         ready = false;
                 }
                 if (ready) {
-                    html(turn, 'Ready?');
+                    readyBtn.classList.remove('noDisplay');
+                    turn.classList.add('noDisplay');
                 }
 
 
@@ -479,6 +494,8 @@ var opponentSketch = (canvas) => {
                         player.turn = false;
                         html(turn, 'Their turn');
                         player.addAttack(attack);
+
+                        attackIntervalID = setInterval(postAttack, 2000);
 
                         result = battleship.done();
                         if (battleship.finished) {

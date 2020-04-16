@@ -1,23 +1,109 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300&display=swap');
+@font-face {
+    font-family: NunitoSans;
+    src: url(../fonts/nunito-sans.extralight.ttf);
+}
+
+@font-face {
+    font-family: NunitoSansBold;
+    src: url(../fonts/nunito-sans.light.ttf);
+}
 
 html, body{
   margin: 0;
   padding: 0;
-  font-family: 'Nunito Sans', sans-serif;
+  font-family: NunitoSans;
   background: #eee;
   width: 100vw;
-  height: 100vh;
+
+    background: linear-gradient(270deg, #adcbf5, #a793f7);
+
+    -webkit-animation: backgroundAnimate 120s ease infinite;
+    -moz-animation: backgroundAnimate 120s ease infinite;
+    animation: backgroundAnimate 120s ease infinite;
 }
 
-.piece{
-  z-index: 3;
-  position: absolute;
-  transform: translate(0px, 0px);
-  opacity: 0.9;
+@-webkit-keyframes backgroundAnimate {
+    0% {
+        background-position: 0% 50%
+    }
+
+    50% {
+        background-position: 100% 50%
+    }
+
+    100% {
+        background-position: 0% 50%
+    }
 }
 
-.loadingImg{
-  display: none;
+@-moz-keyframes backgroundAnimate {
+    0% {
+        background-position: 0% 50%
+    }
+
+    50% {
+        background-position: 100% 50%
+    }
+
+    100% {
+        background-position: 0% 50%
+    }
+}
+
+@keyframes backgroundAnimate {
+    0% {
+        background-position: 0% 50%
+    }
+
+    50% {
+        background-position: 100% 50%
+    }
+
+    100% {
+        background-position: 0% 50%
+    }
+}
+
+@-webkit-keyframes backgroundAnimate {
+  0% {
+      background-position: 0% 50%
+  }
+
+  50% {
+      background-position: 100% 50%
+  }
+
+  100% {
+      background-position: 0% 50%
+  }
+}
+
+@-moz-keyframes backgroundAnimate {
+  0% {
+      background-position: 0% 50%
+  }
+
+  50% {
+      background-position: 100% 50%
+  }
+
+  100% {
+      background-position: 0% 50%
+  }
+}
+
+@keyframes backgroundAnimate {
+  0% {
+      background-position: 0% 50%
+  }
+
+  50% {
+      background-position: 100% 50%
+  }
+
+  100% {
+      background-position: 0% 50%
+  }
 }
 
 main{
@@ -25,39 +111,21 @@ main{
   width: 100vw;
 }
 
-#player{
-  position: relative;
+#copyImg{
+    transform: translate(5px, 5px);
+    cursor: pointer;
 }
 
-#game{
-  position: absolute;
-  width: 100vw;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-}
-
-
-#turn{
-  font-size: 20px; 
-  text-align: center;
-}
-
-.buttons{
-  position: absolute;
-  left: 0;
-  top: 0;
-  z-index: 1;
-}
-
-button{
-  font-family: 'Nunito Sans', sans-serif;
+#copyBtn{
+    background: none;
+    border: none;
+    outline: none;
+    margin: 0;
+    padding: 0;
 }
 
 #center{
   width: 100vw;
-  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -67,6 +135,7 @@ button{
 .noDisplay{
   display: none;
 }
+
 #shareBox{
   display: flex;
   flex-direction: column;
@@ -75,17 +144,20 @@ button{
   background: #eee;
   border-radius: 3px;
   box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22);
-  font-size: 20px;
+  font-size: 25px;
 }
 
+
+
 #link{
-  font-size: 15px;
+    font-family: NunitoSans;
+  font-size: 20px;
   background: #eee;
   border:  none;
   outline: none;
 }
 
-#center button{
+#center .button{
   font-size: 30px;
 }
 
@@ -100,37 +172,18 @@ button{
   font-size: 18px;
   outline: none;
   border: none;
+  font-family: NunitoSansBold;
 }
 
-.button:hover, .flick{
+.button:hover{
   background-color: #eee;
   color: #222;
 }
 
-#board{
-  display: flex;
-  flex-direction: row;
-}
-
-#board div{
-  margin: 0 20px;
-}
-
-
 @media only screen and (max-width: 600px) {
-  #board{
-    flex-direction: column-reverse;
-  }
 
   button{
     font-size: 18px;
   }
 
-  #turn{
-    font-size: 18px;
-  }
-
-  #board div{
-    margin: 10px 0;
-  }
 }

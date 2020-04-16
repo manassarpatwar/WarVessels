@@ -36,6 +36,8 @@ class Piece{
             this.isDragging = true;
             this.startPosition = {x: e.clientX, y: e.clientY};
             this.currentPosition = this.transform();
+            readyBtn.classList.add('noDisplay');
+            turn.classList.remove('noDisplay');
             requestAnimationFrame(update);
         }
     }
