@@ -152,3 +152,9 @@ button{
     margin: 1px 0;
   }
 }
+
+@media only screen and (max-width: 400px) {
+  .button, #turn{
+    font-size: 18px;
+  }
+}

@@ -182,8 +182,12 @@ main{
 
 @media only screen and (max-width: 600px) {
 
-  button{
-    font-size: 18px;
-  }
+    #center{
+        font-size: 27px;
+    }
+
+    #center .button{
+        font-size: 25px;
+    }
 
 }
