@@ -13,7 +13,7 @@ var board;
 
 var bg;
 
-function preload(url, callback){
+function preload(url, callback) {
     let img = new Image();
     img.src = url;
     img.onload = callback;
@@ -89,7 +89,7 @@ function setup() {
     bg = preload('../img/bg.png', () => {
         playerCanvas = createCanvas('playerCanvas');
         opponentCanvas = createCanvas('opponentCanvas');
-    
+
         playerSketch(playerCanvas);
         opponentSketch(opponentCanvas);
 
@@ -133,7 +133,7 @@ function playerReady() {
             ready = false;
     }
     if (!ready) {
-        turn.html('Please place all pieces');
+        html(turn, 'Please place all pieces');
         return;
     }
 
@@ -161,8 +161,8 @@ function windowResized() {
 }
 
 function update() {
-    if (selectedPiece){
-        if(selectedPiece.isDragging){
+    if (selectedPiece) {
+        if (selectedPiece.isDragging) {
             requestAnimationFrame(update);
         }
         selectedPiece.transform(selectedPiece.currentPosition.x + selectedPiece.delta.x, selectedPiece.currentPosition.y + selectedPiece.delta.y);
@@ -219,14 +219,14 @@ function postAttack() {
                     } else {
                         battleship.playerBoard[attack[0]][attack[1]] = -2;
                     }
-                    playerSketch.touchWater(attack[1]*battleship.cellSize+battleship.cellSize/2, attack[0]*battleship.cellSize+battleship.cellSize/2)
+                    playerSketch.touchWater(attack[1] * battleship.cellSize + battleship.cellSize / 2, attack[0] * battleship.cellSize + battleship.cellSize / 2)
 
                     result = battleship.done();
                     if (battleship.finished) {
                         setTimeout(() => {
                             board.style.display = 'none';
                             turn.style.fontSize = '40px';
-                            turn.html('You ' + (result == 1 ? 'won!' : 'lost!'));
+                            html(turn, 'You ' + (result == 1 ? 'won!' : 'lost!'));
                             localStorage.removeItem(battleship.id);
                         }, 1000);
                     }
@@ -250,7 +250,7 @@ function start() {
     }
 
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', '/start', true);
+    xhr.open('POST', '/ready', true);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(JSON.stringify(data));
 
@@ -365,6 +365,16 @@ var playerSketch = (canvas) => {
                 releasedPiece.boardCoords = pieceCoordinates;
                 releasedPiece.ready = true;
 
+                let ready = true;
+                for (let p of Object.values(player.pieces)) {
+                    if (!p.ready)
+                        ready = false;
+                }
+                if (ready) {
+                    html(turn, 'Ready?');
+                }
+
+
             }
         }
     }
@@ -427,23 +437,23 @@ var opponentSketch = (canvas) => {
                     } else if (battleship.opponentBoard[i][j] < 0) {
                         ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
                         ctx.fill();
-                    }else {
+                    } else {
                         ctx.stroke();
                     }
                 }
             }
 
-        }   
+        }
         requestAnimationFrame(showOpponent);
     }
 
     mouseReleased = (e) => {
         console.log(e);
-        if(e === undefined)
+        if (e === undefined)
             return;
 
         if (battleship.ready) {
-            let attack = [Math.floor((e.clientY-canvas.offsetTop) / canvas.width * battleship.size), Math.floor((e.clientX-canvas.offsetLeft) / canvas.height * battleship.size)];
+            let attack = [Math.floor((e.clientY - canvas.offsetTop) / canvas.width * battleship.size), Math.floor((e.clientX - canvas.offsetLeft) / canvas.height * battleship.size)];
 
             if (!battleship.attackOK(attack[0], attack[1], player.attack))
                 return
@@ -486,7 +496,7 @@ var opponentSketch = (canvas) => {
                         localStorage.setItem(battleship.id, JSON.stringify(store));
 
                         updateOpponent = true;
-                        waterWave.touchWater(Math.floor(e.clientX-canvas.offsetLeft), Math.floor(e.clientY-canvas.offsetTop), 1000);
+                        waterWave.touchWater(Math.floor(e.clientX - canvas.offsetLeft), Math.floor(e.clientY - canvas.offsetTop), 1000);
                     }
                 }
                 xhr.setRequestHeader('Content-Type', 'application/json');

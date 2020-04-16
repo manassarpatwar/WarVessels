@@ -1,34 +1,118 @@
 <!DOCTYPE html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>Battleship</title>
-        <meta name = 'author' content = "Manas Sarpatwar">
-        <meta name="description" content="Battleship in browser">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" type="text/css" href="css/main.css" />
-        <!-- <script language="javascript" type="text/javascript" src="js/p5.js"></script>
-        <script language="javascript" type="text/javascript" src="js/p5.dom.js"></script>
-        <script language="javascript" type="text/javascript" src="js/sketch.js"></script>
-        <script language="javascript" type="text/javascript" src="js/Battleship.js"></script>
-        <script language="javascript" type="text/javascript" src="js/Piece.js"></script> -->
-        <script language="javascript" type="text/javascript" src="js/helpers.js"></script>
-        
-    </head>
-    <body>
-        <button onclick = "init()" class = "button" id = "multiplayer">Multiplayer</button>
-        <!-- <main>
-            <div id = "board">
-                <div id = "player"></div>
-                <div id = "opponent"></div>
-            </div>
-        </main> -->
-    </body>
-    <script>
-        async function init(){
-            var json = await request('POST', '/init', null, true)
 
-            window.location.href = '../play/'+json.game;
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Battleship</title>
+    <meta name='author' content="Manas Sarpatwar">
+    <meta name="description" content="Battleship in browser">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="css/main.css" />
+
+    <script language="javascript" type="text/javascript" src="js/helpers.js"></script>
+    <style>
+        body {
+            background: linear-gradient(270deg, #adcbf5, #a793f7);
+            background-size: 400% 400%;
+
+            -webkit-animation: AnimationName 120s ease infinite;
+            -moz-animation: AnimationName 120s ease infinite;
+            animation: AnimationName 120s ease infinite;
         }
-    </script>
+
+        @-webkit-keyframes AnimationName {
+            0% {
+                background-position: 0% 50%
+            }
+
+            50% {
+                background-position: 100% 50%
+            }
+
+            100% {
+                background-position: 0% 50%
+            }
+        }
+
+        @-moz-keyframes AnimationName {
+            0% {
+                background-position: 0% 50%
+            }
+
+            50% {
+                background-position: 100% 50%
+            }
+
+            100% {
+                background-position: 0% 50%
+            }
+        }
+
+        @keyframes AnimationName {
+            0% {
+                background-position: 0% 50%
+            }
+
+            50% {
+                background-position: 100% 50%
+            }
+
+            100% {
+                background-position: 0% 50%
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="center">
+        <div id="title">
+            Battleship
+            <button onclick="init()" class="button" id="multiplayer">Multiplayer</button>
+        </div>
+        <div id="share" class="noDisplay">
+            <div id=shareBox>
+                <label style = 'margin: 15px 0 5px 0'>Share game link:</label>
+                <input readonly='true' style = 'margin: 5px 0 15px 0' id="link">
+                <button onclick="play()" class="button" id="play">Play</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+<script>
+    let title = document.getElementById('title');
+    let share = document.getElementById('share');
+    let link = document.getElementById('link');
+    let game;
+    function init() {
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/init', true);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == XMLHttpRequest.DONE) {
+                var json = JSON.parse(xhr.responseText);
+                title.classList.add('noDisplay')
+                share.classList.remove('noDisplay')
+                game = json.game;
+                link.setAttribute('value', 'https://btlshp-js.herokuapp.com/play/'+game);
+            }
+        }
+        xhr.send(null);
+
+    }
+
+    function play() {
+        let data = {
+            game: game
+        }
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/start', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify(data));
+
+        window.location.href = '../play/' + game;
+    }
+</script>
+
 </html>

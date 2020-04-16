@@ -3,8 +3,13 @@ const session = require('express-session');
 const path = require('path')
 const { v4: uuidv4 } = require('uuid');
 const PORT = process.env.PORT || 5000
+const redirectToHTTPS = require('express-http-to-https').redirectToHTTPS
 
-var app = express()
+var app = express();
+ 
+// Don't redirect if the hostname is `localhost:port` or the route is `/insecure`
+app.use(redirectToHTTPS([/localhost:(\d{4})/], 301));
+
 var ssn;
 
 const fs = require('fs');
@@ -52,11 +57,15 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 app.post('/init', (req, res, next) => {
 	const game = uuidv4();
+	res.send({ game: game });
+})
+
+app.post('/start', (req, res, next) => {
+	let game = req.body['game'];
 	gameState[game] = {};
 	gameState[game]['started'] = false;
 	gameState[game]['time'] = Date.now();
 	gameState[game]['players'] = {};
-	res.send({ game: game });
 })
 
 app.get('/play/:game', (req, res, next) => {
@@ -81,7 +90,7 @@ app.get('/play/:game', (req, res, next) => {
 	}
 });
 
-app.post('/start', function (req, res) {
+app.post('/ready', function (req, res) {
 	ssn = req.session;
 	let game = req.body['game'];
 	let playerBoard = req.body['playerBoard'];
