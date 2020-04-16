@@ -10,6 +10,18 @@ var selectedPiece;
 var board;
 
 
+
+var bg;
+
+function preload(url, callback){
+    let img = new Image();
+    img.src = url;
+    img.onload = callback;
+    return img;
+}
+
+
+
 window.onload = setup;
 
 function createCanvas(canvasId) {
@@ -74,11 +86,16 @@ function setup() {
         localStorage.setItem(battleship.id, JSON.stringify({ 'ready': false, 'time': Date.now() }));
     }
 
-    playerCanvas = createCanvas('playerCanvas');
-    opponentCanvas = createCanvas('opponentCanvas');
+    bg = preload('../img/bg.png', () => {
+        playerCanvas = createCanvas('playerCanvas');
+        opponentCanvas = createCanvas('opponentCanvas');
+    
+        playerSketch(playerCanvas);
+        opponentSketch(opponentCanvas);
 
-    playerSketch(playerCanvas);
-    opponentSketch(opponentCanvas);
+        playerSketch.setup();
+        opponentSketch.setup();
+    })
 
     document.addEventListener('touchend', mouseUp);
     document.addEventListener('mouseup', mouseUp);
@@ -244,19 +261,11 @@ function start() {
 var playerSketch = (canvas) => {
     let cellSize;
     let waterWave;
-    let bg;
     let ctx;
-
-    preload = () => {
-        bg = new Image();
-        bg.src = '../img/bg.png';
-        bg.onload = setup;
-
-    }
 
     setup = () => {
         cellSize = (canvas.width - 2) / battleship.size;
-
+        console.log(bg.width)
         bg.width = canvas.width;
         bg.height = canvas.height;
 
@@ -268,8 +277,6 @@ var playerSketch = (canvas) => {
 
         showPlayer(true);
     }
-
-    preload();
 
 
     touchWater = (x, y) => {
@@ -363,21 +370,14 @@ var playerSketch = (canvas) => {
     }
     playerSketch.mouseReleased = mouseReleased;
     playerSketch.touchWater = touchWater;
+    playerSketch.setup = setup;
 
 }
 
 var opponentSketch = (canvas) => {
     let cellSize;
     let waterWave;
-    let bg;
     let ctx;
-
-    preload = () => {
-        bg = new Image();
-        bg.src = '../img/bg.png';
-        bg.onload = setup;
-
-    }
 
     setup = () => {
         cellSize = (canvas.width - 2) / battleship.size;
@@ -393,8 +393,6 @@ var opponentSketch = (canvas) => {
 
         showOpponent(true);
     }
-
-    preload();
 
     showOpponent = (show = false) => {
         if (!waterWave.done() || show) {
@@ -500,5 +498,6 @@ var opponentSketch = (canvas) => {
     }
 
     opponentSketch.mouseReleased = mouseReleased;
+    opponentSketch.setup = setup;
 }
 
