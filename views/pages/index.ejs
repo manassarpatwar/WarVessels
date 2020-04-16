@@ -26,7 +26,7 @@
                 <label style='margin: 15px 0 5px 0'>Share game link:<button id="copyBtn" onclick="copy(this)"
                         aria-label="copied!" data-balloon-pos="up"><img id="copyImg" src="../img/copy.png" width="32"
                             height="32"></button></label>
-                <input contenteditable = "false" readonly='true' style='margin: 15px 0 30px 0' id="link">
+                <input contenteditable="true" readonly='true' style='margin: 15px 0 30px 0' id="link">
                 <button onclick="play()" class="button" id="play">Play</button>
             </div>
         </div>
@@ -66,33 +66,25 @@
     }
 
     function copy() {
-        link.focus();
-        link.select();
-
-        var oldContentEditable = link.contentEditable,
-            oldReadOnly = link.readOnly,
+        var range, selection;
+        if(navigator.userAgent.match(/ipad|iphone/i)){
             range = document.createRange();
+            range.selectNodeContents(textArea);
+            selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            textArea.setSelectionRange(0, 999999);
 
-        link.contentEditable = true;
-        link.readOnly = false;
-        range.selectNodeContents(link);
-
-        var s = window.getSelection();
-        s.removeAllRanges();
-        s.addRange(range);
-
-        link.setSelectionRange(0, 999999); // A big number, to cover anything that could be inside the element.
-
-        link.contentEditable = oldContentEditable;
-        link.readOnly = oldReadOnly;
+            link.contentEditable = oldContentEditable;
+            link.readOnly = oldReadOnly;
+        }else{
+            link.select();
+        }
 
         try {
             var successful = document.execCommand('copy');
-            var msg = successful ? 'successful' : 'unsuccessful';
             copyBtn.setAttribute('data-balloon-visible', '');
             setTimeout(() => copyBtn.removeAttribute('data-balloon-visible'), 2000);
-            window.getSelection().removeAllRanges()
-            document.selection.empty()
         } catch (err) {
 
         }

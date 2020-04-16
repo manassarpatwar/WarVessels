@@ -475,7 +475,7 @@ var opponentSketch = (canvas) => {
             if (player.turn || !battleship.started) {
                 player.turn = false;
                 html(turn, 'Their turn');
-                player.addAttack(attack);
+                battleship.started = true;
 
                 let data = {
                     player: player.id,
@@ -484,14 +484,13 @@ var opponentSketch = (canvas) => {
                 }
 
                 var xhr = new XMLHttpRequest();
-                xhr.open('POST', '/attack', false);
+                xhr.open('POST', '/attack', true);
                 xhr.onreadystatechange = function () {
                     if (xhr.readyState == XMLHttpRequest.DONE) {
                         var json = JSON.parse(xhr.responseText);
                         let hit = json['hit']
                         let value = hit ? 1 : -1;
                         battleship.opponentBoard[attack[0]][attack[1]] = value;
-                        battleship.started = true;
 
                         result = battleship.done();
                         if (battleship.finished) {
