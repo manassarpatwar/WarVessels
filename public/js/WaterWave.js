@@ -1,134 +1,107 @@
 class WaterWave {
-    constructor(width, height, inPixels) {
+    constructor(width, height, ctx) {
         this.current = [];
         this.previous = [];
-        this.dampening = 0.9;
-        this.lightRefraction = 9;
-        this.lightReflection = 0.1;
-        this.inPixels = inPixels;
-        this.clipping = 40;
+
         this.width = width;
         this.height = height;
 
-        for (let x = 0; x < this.width; x++) {
-            this.current[x] = [];
-            this.previous[x] = [];
-            for (let y = 0; y < this.height; y++) {
-                this.current[x][y] = 0;
-                this.previous[x][y] = 0;
-            }
+        this.oldind = this.width;
+        this.newind = this.width * (this.height + 3);
+        this.half_width = this.width >> 1;
+        this.half_height = this.height >> 1;
+        this.size = this.width * (this.height + 2) * 2,
+
+        this.riprad = 2;
+        this.mapind;
+
+        this.ctx = ctx;
+        this.texture = this.ctx.getImageData(0, 0, this.width, this.height);
+        this.ripple = this.ctx.getImageData(0, 0, this.width, this.height);
+
+        for (var i = 0; i < this.size; i++) {
+            this.previous[i] = this.current[i] = 0;
         }
 
-        this.evolutionThreshold = 0.05;
-
-
-        this.length = 0;
-        this.prevLength = 0;
 
     }
 
-    init() {
-        this.prevLength = this.length;
-        this.length = this.getLength();
+    render() {
+        this.texture = this.ctx.getImageData(0, 0, this.width, this.height);
+        this.newFrame();
+        this.ctx.putImageData(this.ripple, 0, 0);
+    
     }
 
-    getLength() {
-        return this.width * this.height
-    }
+    newFrame() {
+        var i, a, b, data, cur_pixel, new_pixel, old_data;
 
-    render(x, y) {
+        //swapping
+        i = this.oldind;
+        this.oldind = this.newind;
+        this.newind = i;
 
-        // Handle borders correctly
-        var val = (x == 0 ? 0 : this.previous[x - 1][y]) +
-            (x == this.width - 1 ? 0 : this.previous[x + 1][y]) +
-            (y == 0 ? 0 : this.previous[x][y - 1]) +
-            (y == this.height - 1 ? 0 : this.previous[x][y + 1]);
-
-        val += (x == 0 || y == 0 ? 0 : this.previous[x - 1][y - 1]) +
-                (x == 0 || y == this.height-1 ? 0 :this.previous[x - 1][y + 1]) +
-                (x == this.width-1 || y == 0 ? 0 :this.previous[x + 1][y - 1]) +
-                (x == this.width-1 || y == this.height-1 ? 0 :this.previous[x + 1][y + 1]);
-
-        val = ((val / 4.0) - this.current[x][y]) * this.dampening;
-
-        if (val > this.clipping) val = this.clipping;
-        if (val < -this.clipping) val = -this.clipping;
-
-        if (Math.abs(val) < this.evolutionThreshold) {
-            this.evolving = false;
-            val = 0;
-            this.length--;
-        }
-
-        this.current[x][y] = val;
+        i = 0;
+        this.mapind = this.oldind;
 
 
-        // console.log(x,y );
-        var strength = this.previous[x][y];
+        for (var y = 0; y < this.height; y++) {
+            for (var x = 0; x < this.width; x++) {
+                data = (this.current[this.mapind - this.width] +
+                    this.current[this.mapind + this.width] +
+                    this.current[this.mapind - 1] +
+                    this.current[this.mapind + 1]) >> 1;
+                
+                data -= this.current[this.newind + i];
+                data -= data >> 5;
+            
+
+                this.current[this.newind + i] = data;
 
 
-        // var strength = getWater(x, y, can.width, can.height);
+                data = 1024 - data;
+                old_data = this.previous[i];
+                this.previous[i] = data;
 
-        // Refraction of light in water
-        var refraction = Math.round(strength * this.lightRefraction);
+                if (old_data != data) {
+                    //offsets
+                    a = (((x - this.half_width) * data / 1024) << 0) + this.half_width;
+                    b = (((y - this.half_height) * data / 1024) << 0) + this.half_height;
 
-        var xPix = x + refraction;
-        var yPix = y + refraction;
+                    //bounds check
+                    if (a >= this.width) a = this.width - 1;
+                    if (a < 0) a = 0;
+                    if (b >= this.height) b = this.height - 1;
+                    if (b < 0) b = 0;
 
-        if (xPix < 0) xPix = 0;
-        if (yPix < 0) yPix = 0;
-        if (xPix > this.width - 1) xPix = this.width - 1;
-        if (yPix > this.height - 1) yPix = this.height - 1;
+                    new_pixel = (a + (b * this.width)) * 4;
+                    cur_pixel = i * 4;
 
-        // Get the pixel from input
-        var iPix = ((yPix * this.width) + xPix) * 4;
-        var red = this.inPixels[iPix];
-        var green = this.inPixels[iPix + 1];
-        var blue = this.inPixels[iPix + 2];
-
-        // Set the pixel to output
-        strength *= this.lightReflection;
-        strength += 1.0;
-
-        return { red: red, green: green, blue: blue, strength: strength };
-
-    }
-
-    swap() {
-        let temp = this.previous;
-        this.previous = this.current;
-        this.current = temp;
-    }
-
-    touchWater(x, y, pressure, array2d = [[0.5, 1.0, 0.5], [1.0, 1.0, 1.0], [0.5, 1.0, 0.5]]) {
-        this.prevLength = 0;
-        this.length = this.getLength();
-
-        // Place the array2d in the center of the mouse position
-        if (array2d.length > 4 || array2d[0].length > 4) {
-            x -= array2d.length / 2;
-            y -= array2d[0].length / 2;
-        }
-
-        if (x < 0) x = 0;
-        if (y < 0) y = 0;
-        if (x > this.width) x = this.width;
-        if (y > this.height) y = this.height;
-
-        // Big pixel block
-        for (var i = 0; i < array2d.length; i++) {
-            for (var j = 0; j < array2d[0].length; j++) {
-
-                if (x + i >= 0 && y + j >= 0 && x + i <= this.width - 1 && y + j <= this.height - 1) {
-                    this.previous[x + i][y + j] = array2d[i][j] * pressure;
+                    this.ripple.data[cur_pixel] = this.texture.data[new_pixel];
+                    this.ripple.data[cur_pixel + 1] = this.texture.data[new_pixel + 1];
+                    this.ripple.data[cur_pixel + 2] = this.texture.data[new_pixel + 2];
                 }
 
+                ++this.mapind;
+                ++i;
+            }
+        }
+    }
+
+    touchWater(dx, dy) {
+
+        dx <<= 0;
+        dy <<= 0;
+
+        for (var j = dy - this.riprad; j < dy + this.riprad; j++) {
+            for (var k = dx - this.riprad; k < dx + this.riprad; k++) {
+                this.current[this.oldind + (j * this.width) + k] += 512;
             }
         }
     }
 
     done() {
-        return this.length == 0 && this.prevLength == 0;
+        return this.current.filter(x => x != 0).length == 0;
     }
 
 }
