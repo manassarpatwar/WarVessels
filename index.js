@@ -62,9 +62,10 @@ app.post('/init', (req, res, next) => {
 
 	if (!(gameExists && ssn.player)){
 		gameState[game] = {};
-		gameState[game]['started'] = false;
 		gameState[game]['time'] = Date.now();
 		gameState[game]['players'] = {};
+		gameState[game]['lastAttack'] = null;
+		gameState['changed'] = true;
 	}
 
 	res.send({ game: game });
@@ -103,16 +104,27 @@ app.post('/ready', function (req, res) {
 	gameState['changed'] = true;
 });
 
+app.post('/playAgain',function (req, res) {
+	let game = req.body['game'];
+	if(gameState[game]['lastAttack'] != null){
+		gameState[game] = {};
+		gameState[game]['time'] = Date.now();
+		gameState[game]['players'] = {};
+		gameState[game]['lastAttack'] = null;
+		gameState['changed'] = true;
+	}
+});
+
 app.post('/requestAttack', function (req, res) {
-	let queries = req.query;
-	let game = queries.game;
-	let player = queries.player;
-	// console.log(gameState);
+	let game = req.body['game'];
+	let player = req.body['player'];
+
 	if (gameState[game] !== undefined) {
 		if (Object.keys(gameState[game]['players']).length > 1) { //There are 2 players
 			let lastAttack = gameState[game]['lastAttack'];
 			let attack = lastAttack == null ? null : (lastAttack['player'] == player ? null : lastAttack['attack']);
-			let started = gameState[game]['started'];
+			let started = lastAttack != null;
+			
 			res.send({ attack: attack, ready: true, started: started });
 		} else
 			res.send({ attack: null, ready: false, started: false });
@@ -124,18 +136,18 @@ app.post('/attack', function (req, res) {
 	let game = req.body['game'];
 	let player = req.body['player'];
 	let attack = req.body['attack'];
-	let totalPieceLength = req.body['totalPieceLength'];
-	let hit = null;
 
-	gameState[game]['started'] = true;
+	let hit = null;
 	let opponent = Object.fromEntries(Object.entries(gameState[game]['players']).filter(([k, v]) => k != player));
 	let opponentID = Object.keys(opponent)[0]
 	opponent = opponent[opponentID];
-	hit = opponent['playerBoard'][attack[0]][attack[1]] > 0;
-	attack[2] = hit;
-	gameState[game]['players'][player]['attack'] = attack;
-	gameState[game]['lastAttack'] = { player: player, attack: attack };
-	gameState['changed'] = true;
+	if(gameState[game]['lastAttack'] == null || opponentID !== player){
+		hit = opponent['playerBoard'][attack[0]][attack[1]] > 0;
+		attack[2] = hit;
+		gameState[game]['players'][player]['attack'] = attack;
+		gameState[game]['lastAttack'] = { player: player, attack: attack };
+		gameState['changed'] = true;
+	}
 
 	res.send({ hit: hit });
 })

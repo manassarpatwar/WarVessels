@@ -12,6 +12,10 @@ class Battleship{
 
     }
 
+    hitsLeft(){
+        return Player.totalPieceLength - this.opponentBoard.flat().filter(x => x == 1).length;
+    }
+
     done(){
         let won = this.opponentBoard.flat().filter(x => x == 1).length == Player.totalPieceLength;
         let lost = this.playerBoard.flat().filter(x => x == -1).length == Player.totalPieceLength;

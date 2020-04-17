@@ -67,11 +67,15 @@ html, body{
   display: none;
 }
 
-.piece{
+#board #player .piece{
   z-index: 3;
   position: absolute;
   transform: translate(0px, 0px);
   opacity: 0.9;
+  margin: 0;
+  padding: 0;
+  background-size: 100% 100%;
+  background-position: center;
 }
 
 .loadingImg{
@@ -116,6 +120,12 @@ button{
   font-family: NunitoSansBold;
 }
 
+#info{
+  padding: 20px 0;
+  display: flex;
+  flex-direction: column;
+}
+
 .button{
   box-sizing: inherit;
   background-color: #222;
@@ -124,7 +134,7 @@ button{
   color: #fff;
   text-align: center;
   border-radius: .1875rem;
-  font-size: 18px;
+  font-size: 20px;
   outline: none;
   border: none;
 }
@@ -143,6 +153,26 @@ button{
   margin: 0 20px;
 }
 
+#patrol{
+  background: url("../../img/ships/png/patrol.png");
+}
+
+#carrier{
+  background: url("../../img/ships/png/carrier.png");
+}
+
+#battleship{
+  background: url("../../img/ships/png/battleship.png");
+}
+
+#submarine{
+  background: url("../../img/ships/png/submarine.png");
+}
+
+#destroyer{
+  background: url("../../img/ships/png/destroyer.png");
+}
+
 
 @media only screen and (max-width: 600px) {
   #board{
@@ -151,6 +181,10 @@ button{
 
   #board div{
     margin: 1px 0;
+  }
+
+  #info{
+    padding: 0;
   }
 }
 

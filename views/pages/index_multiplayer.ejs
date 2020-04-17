@@ -22,21 +22,22 @@
 <body>
     <main>
         <div id="game">
-            <div>
-                <button id = "readyBtn" onclick="playerReady()" class="button noDisplay" id="multiplayer">Ready</button>
+            <div id="info">
+                <button id="readyBtn" onclick="playerReady()" class="button noDisplay">Ready</button>
                 <p id="turn"></p>
+                <button id="playAgainBtn" onclick="playAgain()" class="button noDisplay">Play again?</button>
             </div>
             <div id="board">
                 <div id="player">
-                    <img id="patrol" draggable="false" class="interactable piece loadingImg" src="../../img/ships/png/patrol.png">
-                    <img id="submarine" draggable="false" class="interactable piece loadingImg" src="../../img/ships/png/submarine.png">
-                    <img id="battleship" draggable="false" class="interactable piece loadingImg" src="../../img/ships/png/battleship.png">
-                    <img id="carrier" draggable="false" class="interactable piece loadingImg" src="../../img/ships/png/carrier.png">
-                    <img id="destroyer" draggable="false" class="interactable piece loadingImg" src="../../img/ships/png/destroyer.png">
-                    <canvas id = "playerCanvas"></canvas>
+                    <div id="patrol" draggable="false" class="interactable piece loadingImg"></div>
+                    <div id="submarine" draggable="false" class="interactable piece loadingImg"></div>
+                    <div id="battleship" draggable="false" class="interactable piece loadingImg"></div>
+                    <div id="carrier" draggable="false" class="interactable piece loadingImg"></div>
+                    <div id="destroyer" draggable="false" class="interactable piece loadingImg"></div>
+                    <canvas id="playerCanvas"></canvas>
                 </div>
                 <div id="opponent">
-                    <canvas id = "opponentCanvas"></canvas>
+                    <canvas id="opponentCanvas"></canvas>
                 </div>
             </div>
 
