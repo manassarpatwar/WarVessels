@@ -238,7 +238,7 @@ function postAttack() {
             // console.log(json);
             let attack = json['attack'];
             if (json['ready'] && !json['started'] && !player.turn) {
-                playerReady.turn = true;
+                player.turn = true;
                 html(turn, 'Attack to start playing');
             }
 
