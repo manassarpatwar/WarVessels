@@ -57,7 +57,7 @@ class WaterWave {
                     (x == this.height-1 ? 0 : this.current[this.mapind + 1])) >> 2;
                 
                 data -= this.current[this.newind + i];
-                data -= data >> 25;
+                data -= data >> 5;
             
 
                 this.current[this.newind + i] = data;
