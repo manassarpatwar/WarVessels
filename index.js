@@ -43,6 +43,15 @@ async function write() {
 setInterval(write, 15000);
 
 app.use(express.json());
+app.use(function (req, res, next) {
+	if (req.secure) {
+		// request was via https, so do no special handling
+		next();
+	} else {
+		// request was via http, so redirect to https
+		res.redirect('https://' + req.headers.host + req.url);
+	}
+});
 app.use(session({ secret: 'XASDASDA' }));
 app.use(express.static(path.join(__dirname, 'public')))
 	.set('views', path.join(__dirname, 'views'))
@@ -60,7 +69,7 @@ app.post('/init', (req, res, next) => {
 	}
 	const game = (gameExists && ssn.player) ? sessionGame : uuidv4();
 
-	if (!(gameExists && ssn.player)){
+	if (!(gameExists && ssn.player)) {
 		gameState[game] = {};
 		gameState[game]['time'] = Date.now();
 		gameState[game]['players'] = {};
@@ -104,9 +113,9 @@ app.post('/ready', function (req, res) {
 	gameState['changed'] = true;
 });
 
-app.post('/playAgain',function (req, res) {
+app.post('/playAgain', function (req, res) {
 	let game = req.body['game'];
-	if(gameState[game]['lastAttack'] != null){
+	if (gameState[game]['lastAttack'] != null) {
 		gameState[game] = {};
 		gameState[game]['time'] = Date.now();
 		gameState[game]['players'] = {};
@@ -124,7 +133,7 @@ app.post('/requestAttack', function (req, res) {
 			let lastAttack = gameState[game]['lastAttack'];
 			let attack = lastAttack == null ? null : (lastAttack['player'] == player ? null : lastAttack['attack']);
 			let started = lastAttack != null;
-			
+
 			res.send({ attack: attack, ready: true, started: started });
 		} else
 			res.send({ attack: null, ready: false, started: false });
@@ -141,7 +150,7 @@ app.post('/attack', function (req, res) {
 	let opponent = Object.fromEntries(Object.entries(gameState[game]['players']).filter(([k, v]) => k != player));
 	let opponentID = Object.keys(opponent)[0]
 	opponent = opponent[opponentID];
-	if(gameState[game]['lastAttack'] == null || opponentID !== player){
+	if (gameState[game]['lastAttack'] == null || opponentID !== player) {
 		hit = opponent['playerBoard'][attack[0]][attack[1]] > 0;
 		attack[2] = hit;
 		gameState[game]['players'][player]['attack'] = attack;

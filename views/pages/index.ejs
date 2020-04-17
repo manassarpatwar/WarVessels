@@ -52,7 +52,7 @@
                 title.classList.add('noDisplay')
                 share.classList.remove('noDisplay')
                 game = json.game;
-                link.setAttribute('value', 'https://btlshp-js.herokuapp.com/play/' + game);
+                link.setAttribute('value', 'https://battleship-game-online.herokuapp.com/play/' + game);
                 sessionStorage.setItem('game', game)
                 copy();
             }
@@ -62,7 +62,7 @@
 
 
     function play() {
-        window.location.href = 'https://btlshp-js.herokuapp.com/play/' + game;
+        window.location.href = '../play/' + game;
     }
 
     function copy() {
