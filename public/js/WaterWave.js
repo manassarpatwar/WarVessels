@@ -47,13 +47,17 @@ class WaterWave {
 
         for (var y = 0; y < this.height; y++) {
             for (var x = 0; x < this.width; x++) {
-                data = (this.current[this.mapind - this.width] +
-                    this.current[this.mapind + this.width] +
-                    this.current[this.mapind - 1] +
-                    this.current[this.mapind + 1]) >> 1;
+                data = ((y == 0 ? 0 : this.current[this.mapind - this.width]) +
+                    (x == 0 || y == 0 ? 0 : this.current[this.mapind - this.width-1])+
+                    (x == this.width-1 ? 0 : this.current[this.mapind - this.width+1])+
+                    (y == this.height-1 ? 0 : this.current[this.mapind + this.width]) +
+                    (x == this.width-1 || y == this.height-1 ? 0 : this.current[this.mapind + this.width+1]) +
+                    (x == 0 || y == this.height - 1 ? 0 : this.current[this.mapind + this.width-1]) +
+                    (x == 0 ? 0 : this.current[this.mapind - 1]) +
+                    (x == this.height-1 ? 0 : this.current[this.mapind + 1])) >> 2;
                 
                 data -= this.current[this.newind + i];
-                data -= data >> 5;
+                data -= data >> 25;
             
 
                 this.current[this.newind + i] = data;
