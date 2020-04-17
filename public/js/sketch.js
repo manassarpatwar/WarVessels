@@ -237,7 +237,7 @@ function postAttack() {
             var json = JSON.parse(xhr.responseText);
             // console.log(json);
             let attack = json['attack'];
-            if (json['ready'] && !json['started'] && !player.turn) {
+            if (json['ready'] && !json['started'] && !battleship.started) {
                 player.turn = true;
                 html(turn, 'Attack to start playing');
             }
