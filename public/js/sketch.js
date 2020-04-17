@@ -489,7 +489,12 @@ function opponentSketch(canvas){
                 store['turn'] = player.turn;
                 store['started'] = battleship.started;
                 localStorage.setItem(battleship.id, JSON.stringify(store));
-                html(turn, 'Their turn');
+                let dots = 0;
+                let waitingDots = () => {
+                    html(turn, '.'.repeat((dots+1)%5+1))
+                    dots = (dots+1)%5;
+                }
+                let waiting = setInterval(waitingDots, 300);
 
                 let data = {
                     player: player.id,
@@ -507,7 +512,8 @@ function opponentSketch(canvas){
                         if (hit !== null) {
                             let value = hit ? 1 : -1;
                             battleship.opponentBoard[attack[0]][attack[1]] = value;
-
+                            clearInterval(waiting);
+                            html(turn, 'Their turn')
                             postAttack();
                             let store = JSON.parse(localStorage.getItem(battleship.id));
                             store['opponentBoard'] = battleship.opponentBoard;

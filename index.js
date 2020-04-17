@@ -138,9 +138,8 @@ app.post('/attack', function (req, res) {
 	let attack = req.body['attack'];
 
 	let hit = null;
-	let opponent = Object.fromEntries(Object.entries(gameState[game]['players']).filter(([k, v]) => k != player));
-	let opponentID = Object.keys(opponent)[0]
-	opponent = opponent[opponentID];
+	let opponentID = Object.keys(gameState[game]['players']).filter(k => k != player)[0];
+	let opponent = gameState[game]['players'][opponentID];
 	if(gameState[game]['lastAttack'] == null || opponentID !== player){
 		hit = opponent['playerBoard'][attack[0]][attack[1]] > 0;
 		attack[2] = hit;
