@@ -230,7 +230,6 @@ function postAttack() {
     let data = {
         player: player.id,
         game: battleship.id,
-        hits: battleship.hitsLeft()
     }
 
     var xhr = new XMLHttpRequest();
@@ -244,7 +243,6 @@ function postAttack() {
                 battleship.started = false;
                 html(turn, 'Attack to start playing');
             }
-
             if (attack !== null && json['started']) {
                 battleship.started = true;
                 player.turn = true;
@@ -491,13 +489,12 @@ function opponentSketch(canvas){
                 store['started'] = battleship.started;
                 localStorage.setItem(battleship.id, JSON.stringify(store));
 
-                    
-                html(turn, "<div class = 'dots'><div class='dot-pulse-before'></div><div class='dot-pulse'></div><div class='dot-pulse-after'></div></div>")
+                html(turn, "<div class='dot-pulse'><span>.</span><span>.</span><span>.</span></div>")
 
                 let data = {
                     player: player.id,
                     attack: attack,
-                    game: battleship.id,
+                    game: battleship.id
                 }
 
                 var self = this;
