@@ -23,11 +23,19 @@
         </div>
         <div id="share" class="noDisplay">
             <div id=shareBox>
-                <label style='margin: 15px 0 5px 0'>Share game link:<button id="copyBtn" onclick="copy(this)"
-                        aria-label="copied!" data-balloon-pos="up"><img id="copyImg" src="../img/copy.png" width="32"
-                            height="32"></button></label>
-                <input contenteditable="true" readonly='true' style='margin: 15px 0 30px 0' id="link">
-                <button onclick="play()" class="button" id="play">Play</button>
+                <div id="shareContent" class="noDisplay">
+                    <label style='margin: 15px 0 5px 0'>Share game link:<button id="copyBtn" onclick="copy(this)"
+                            aria-label="copied!" data-balloon-pos="up"><img id="copyImg" src="../img/copy.png" width="32"
+                                height="32"></button></label>
+                    <input contenteditable="true" readonly='true' style='margin: 15px 0 30px 0' id="link">
+                    <button onclick="play()" class="button" id="play">Play</button>
+                </div>
+                <div id="max-sessions" class="noDisplay">
+                    <p>Select from created game sessions</p>
+                    <div id='max-sessions-btns' style='margin: 0 0 40px 0'>
+
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -36,10 +44,18 @@
 <script>
     document.getElementById('center').style.height = window.innerHeight + 'px';
     let title = document.getElementById('title');
-    let share = document.getElementById('share');
+    let shareDiv = document.getElementById('share');
     let link = document.getElementById('link');
-    let copyBtn = document.getElementById('copyBtn');
     let game;
+
+    function share(g = game) {
+        title.classList.add('noDisplay')
+        shareDiv.classList.remove('noDisplay')
+        document.getElementById('shareContent').classList.remove('noDisplay');
+        document.getElementById('max-sessions').classList.add('noDisplay');
+        game = g;
+        link.setAttribute('value', 'https://battleship-game-online.herokuapp.com/play/' + game);
+    }
 
     function init() {
         var xhr = new XMLHttpRequest();
@@ -47,30 +63,22 @@
         xhr.onreadystatechange = function () {
             if (xhr.readyState == XMLHttpRequest.DONE) {
                 var json = JSON.parse(xhr.responseText);
-                if(!json.error){
+                if (!json.error) {
+                    share(json.game);
+                } else {
                     title.classList.add('noDisplay')
-                    share.classList.remove('noDisplay')
-                    game = json.game;
-                    link.setAttribute('value', 'https://battleship-game-online.herokuapp.com/play/' + game);
-                    copyBtn.click();
-                }else{
-                    title.classList.add('noDisplay')
-                    share.classList.remove('noDisplay')
+                    shareDiv.classList.remove('noDisplay');
                     let games = json.game;
                     let btns = [];
                     let i = 1;
                     console.log(games);
-                    for(let g of games){
-                        btns.push("<button onclick=\"play('"+g+"')\" class='button' style = 'width: 35px; height: 35px;' >"+i+"</button>");
+                    for (let g of games) {
+                        btns.push("<button onclick=\"share('" + g + "')\" class='button' style = 'width: 35px; height: 35px;' >" + i + "</button>");
                         i++;
                     }
-                    document.getElementById('shareBox').innerHTML = ["<div style ='display: flex; flex-direction: row; justify-content: center; align-items: center;'>",
-                        "<p>Select from created game sessions</p>",
-                        "</div>",
-                        "<div style = 'margin: 0 0 40px 0'>",
-                        btns.join(''),
-                        "</div>"].join('');
-                        
+                    document.getElementById('max-sessions').classList.remove('noDisplay');
+                    document.getElementById('max-sessions-btns').innerHTML = btns.join('');
+
                 }
             }
         }

@@ -136,7 +136,7 @@ main{
   display: none;
 }
 
-#shareBox{
+#shareBox, #shareContent{
   display: flex;
   flex-direction: column;
   text-align: center;
@@ -147,6 +147,9 @@ main{
   font-size: 25px;
 }
 
+#shareBox .noDisplay{
+    display: none;
+}
 
 
 #link{
