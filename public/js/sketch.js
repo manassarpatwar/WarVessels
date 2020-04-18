@@ -237,10 +237,11 @@ function postAttack() {
     xhr.onreadystatechange = function () {
         if (xhr.readyState == XMLHttpRequest.DONE) {
             var json = JSON.parse(xhr.responseText);
-            // console.log(json);
+
             let attack = json['attack'];
             if (json['ready'] && !json['started'] && !battleship.started) {
                 player.turn = true;
+                battleship.started = false;
                 html(turn, 'Attack to start playing');
             }
 
@@ -476,7 +477,7 @@ function opponentSketch(canvas){
         if (e === undefined)
             return;
 
-        if (battleship.ready) {
+        if (battleship.ready && battleship.started !== null) {
             let attack = [Math.floor((e.clientY - canvas.offsetTop) / canvas.width * battleship.size), Math.floor((e.clientX - canvas.offsetLeft) / canvas.height * battleship.size)];
 
             if (!battleship.attackOK(attack[0], attack[1], player.attack))
