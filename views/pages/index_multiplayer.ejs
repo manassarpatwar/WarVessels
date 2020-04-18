@@ -57,7 +57,7 @@
     }
 
     function tutorial() {
-        if(!battleship.ready && sessionStorage.getItem('tutorial') == null){
+        if (!battleship.ready && sessionStorage.getItem('tutorial') == null) {
             let turn = select('#turn');
             let callback = turn.innerHTML;
 
@@ -65,16 +65,20 @@
             let startTime = 0;
             if (!battleship.ready) {
                 html(turn, (is_touch_device() ? 'Tap' : 'Click') + ' on piece to rotate');
-
-                setTimeout(() => {
+            }
+            setTimeout(() => {
+                if (!battleship.ready) {
                     html(turn, 'Sink enemy ships by guessing');
-                }, 7500);
+                }
+            }, 7500);
 
-                setTimeout(() => {
+            setTimeout(() => {
+                if (!battleship.ready) {
                     html(turn, callback);
                     sessionStorage.setItem('tutorial', true)
-                }, 15000);
-            }
+                }
+            }, 15000);
+
         }
     }
 </script>
