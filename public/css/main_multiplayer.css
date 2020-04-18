@@ -1,17 +1,7 @@
-@font-face {
-  font-family: NunitoSans;
-  src: url(../fonts/nunito-sans.extralight.ttf);
-}
-
-@font-face {
-  font-family: NunitoSansBold;
-  src: url(../fonts/nunito-sans.light.ttf);
-}
-
 html, body{
   margin: 0;
   padding: 0;
-  font-family: NunitoSans;
+  font-family: 'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',Helvetica,Arial,sans-serif;
   background: #eee;
   width: 100vw;
   height: 100%; 
@@ -104,7 +94,7 @@ main{
 #turn{
   font-size: 20px; 
   text-align: center;
-  font-family: NunitoSansBold;
+  font-family: "Franklin Gothic Medium";
   margin: .1rem;
   padding: .75rem;
 }
@@ -118,7 +108,7 @@ main{
 
 
 button{
-  font-family: NunitoSansBold;
+  font-family: "Franklin Gothic Medium";
 }
 
 #info{
