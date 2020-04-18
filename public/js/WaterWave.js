@@ -22,11 +22,13 @@ class WaterWave {
         for (var i = 0; i < this.size; i++) {
             this.previous[i] = this.current[i] = 0;
         }
+        this.rippleLength = 0;
 
 
     }
 
     render() {
+        this.rippleLength = 0;
         this.texture = this.ctx.getImageData(0, 0, this.width, this.height);
         this.newFrame();
         this.ctx.putImageData(this.ripple, 0, 0);
@@ -61,9 +63,9 @@ class WaterWave {
             
 
                 this.current[this.newind + i] = data;
-
-
+                this.rippleLength += data != 0;
                 data = 1024 - data;
+
                 old_data = this.previous[i];
                 this.previous[i] = data;
 
@@ -93,7 +95,7 @@ class WaterWave {
     }
 
     touchWater(dx, dy) {
-
+        this.rippleLength = 0;
         dx <<= 0;
         dy <<= 0;
 
@@ -105,7 +107,7 @@ class WaterWave {
     }
 
     done() {
-        return this.current.filter(x => x != 0).length == 0;
+        return this.rippleLength == 0;
     }
 
 }

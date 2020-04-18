@@ -14,10 +14,11 @@ var gameState = require('./game.json');
 gameState['changed'] = false;
 
 var maxAge = (1000 * 1) *//s
-	(60 * 1) * //m
+	(60 * 1)*
 	(60 * 0.5) //h remove game from gameState after 30 mins of initialization
 
 async function write() {
+
 	var currentTime = Date.now()
 	const items = Object.keys(gameState);
 
@@ -52,23 +53,45 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 
 app.post('/init', (req, res, next) => {
-	let sessionGame = req.body['game'];
 	ssn = req.session;
-	let gameExists = false;
-	if (sessionGame != null) {
-		gameExists = Object.keys(gameState).includes(sessionGame);
-	}
-	const game = (gameExists && ssn.player) ? sessionGame : uuidv4();
+	var game = uuidv4();
 
-	if (!(gameExists && ssn.player)){
+	let create = true;
+	let error = false;
+	let games = [];
+	let numGames = 1;
+
+	if (ssn.player) {
+		let gameKeys = Object.keys(gameState);
+		for(let gameKey of gameKeys){
+			if(gameState[gameKey]['players'] !== undefined){
+				let playerKeys = Object.keys(gameState[gameKey]['players']);
+				let playerIsInGame = playerKeys.includes(ssn.player);
+				numGames += playerIsInGame;
+				if(playerIsInGame){
+					games.push(gameKey);
+				}
+			}
+		}
+		create = numGames < 4;
+	}else{
+		const player = uuidv4();
+		ssn.player = player;
+	}
+
+	if(create){
 		gameState[game] = {};
 		gameState[game]['time'] = Date.now();
 		gameState[game]['players'] = {};
+		gameState[game]['players'][ssn.player] = {};
 		gameState[game]['lastAttack'] = null;
 		gameState['changed'] = true;
+	}else{
+		error = true;
+		game = games;
 	}
 
-	res.send({ game: game });
+	res.send({ game: game, error: error });
 })
 
 app.get('/play/:game', (req, res, next) => {
@@ -104,9 +127,9 @@ app.post('/ready', function (req, res) {
 	gameState['changed'] = true;
 });
 
-app.post('/playAgain',function (req, res) {
+app.post('/playAgain', function (req, res) {
 	let game = req.body['game'];
-	if(gameState[game]['lastAttack'] != null){
+	if (gameState[game]['lastAttack'] !== null) {
 		gameState[game] = {};
 		gameState[game]['time'] = Date.now();
 		gameState[game]['players'] = {};
@@ -124,7 +147,7 @@ app.post('/requestAttack', function (req, res) {
 			let lastAttack = gameState[game]['lastAttack'];
 			let attack = lastAttack == null ? null : (lastAttack['player'] == player ? null : lastAttack['attack']);
 			let started = lastAttack != null;
-			
+
 			res.send({ attack: attack, ready: true, started: started });
 		} else
 			res.send({ attack: null, ready: false, started: false });
@@ -140,7 +163,7 @@ app.post('/attack', function (req, res) {
 	let hit = null;
 	let opponentID = Object.keys(gameState[game]['players']).filter(k => k != player)[0];
 	let opponent = gameState[game]['players'][opponentID];
-	if(gameState[game]['lastAttack'] == null || opponentID !== player){
+	if (gameState[game]['lastAttack'] == null || opponentID !== player) {
 		hit = opponent['playerBoard'][attack[0]][attack[1]] > 0;
 		attack[2] = hit;
 		gameState[game]['players'][player]['attack'] = attack;

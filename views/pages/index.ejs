@@ -42,27 +42,44 @@
     let game;
 
     function init() {
-        let sessionGame = sessionStorage.getItem('game');
         var xhr = new XMLHttpRequest();
         xhr.open('POST', '/init', true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.onreadystatechange = function () {
             if (xhr.readyState == XMLHttpRequest.DONE) {
                 var json = JSON.parse(xhr.responseText);
-                title.classList.add('noDisplay')
-                share.classList.remove('noDisplay')
-                game = json.game;
-                link.setAttribute('value', 'https://battleship-game-online.herokuapp.com/play/' + game);
-                sessionStorage.setItem('game', game)
-                copy();
+                if(!json.error){
+                    title.classList.add('noDisplay')
+                    share.classList.remove('noDisplay')
+                    game = json.game;
+                    link.setAttribute('value', 'https://battleship-game-online.herokuapp.com/play/' + game);
+                    copyBtn.click();
+                }else{
+                    title.classList.add('noDisplay')
+                    share.classList.remove('noDisplay')
+                    let games = json.game;
+                    let btns = [];
+                    let i = 1;
+                    console.log(games);
+                    for(let g of games){
+                        btns.push("<button onclick=\"play('"+g+"')\" class='button' style = 'width: 35px; height: 35px;' >"+i+"</button>");
+                        i++;
+                    }
+                    document.getElementById('shareBox').innerHTML = ["<div style ='display: flex; flex-direction: row; justify-content: center; align-items: center;'>",
+                        "<p>Select from created game sessions</p>",
+                        "</div>",
+                        "<div style = 'margin: 0 0 40px 0'>",
+                        btns.join(''),
+                        "</div>"].join('');
+                        
+                }
             }
         }
-        xhr.send(JSON.stringify({ game: sessionGame }));
+        xhr.send();
     }
 
 
-    function play() {
-        window.location.href = 'https://battleship-game-online.herokuapp.com/play/' + game;
+    function play(g = game) {
+        window.location.href = 'https://battleship-game-online.herokuapp.com/play/' + g;
     }
 
     function copy() {

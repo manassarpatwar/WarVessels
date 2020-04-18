@@ -348,18 +348,17 @@ function playerSketch(canvas){
     }
 
     this.show = () => {
+        this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+        this.ctx.drawImage(bg, 0, 0, bg.width, bg.height);
+        this.drawBoard();
+        this.waterWave.render();
+
         if(!this.waterWave.done()){
             this.showing = true;
             requestAnimationFrame( this.show);
         }else{
             this.showing = false;
         }
-
-        this.ctx.clearRect(0, 0, canvas.width, canvas.height);
-        this.ctx.drawImage(bg, 0, 0, bg.width, bg.height);
-        this.drawBoard();
-        this.waterWave.render();
-
     }
 
     this.mouseReleased = (e) => {
@@ -435,7 +434,9 @@ function opponentSketch(canvas){
         this.waterWave = new WaterWave(canvas.width, canvas.height, this.ctx);
 
         this.show();
+
     }
+
 
     this.drawBoard = () => {
         this.ctx.strokeStyle = 'rgba(255,255,255,0.15)'
@@ -458,18 +459,17 @@ function opponentSketch(canvas){
     }
 
     this.show = () => {
+        this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+        this.ctx.drawImage(bg, 0, 0, bg.width, bg.height);
+
+        this.drawBoard();
+        this.waterWave.render();
         if (!this.waterWave.done()){
             this.showing = true;
             requestAnimationFrame(this.show);
         }else{
             this.showing = false;
         }
-        this.ctx.clearRect(0, 0, canvas.width, canvas.height);
-        this.ctx.drawImage(bg, 0, 0, bg.width, bg.height);
-
-        this.drawBoard();
-        this.waterWave.render();
-
     }
 
     this.mouseReleased = (e) => {
