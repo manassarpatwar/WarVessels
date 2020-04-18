@@ -1,17 +1,16 @@
 @font-face {
     font-family: Logo;
     src: url(../fonts/fhull.ttf);
-  }
+}
 
-html, body{
-  margin: 0;
-  padding: 0;
-  font-family: 'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',Helvetica,Arial,sans-serif;
-  background: #eee;
-  width: 100vw;
-  font-weight: 300;
+html, body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background: #eee;
+    width: 100vw;
+    font-weight: 300;
     background: linear-gradient(270deg, #adcbf5, #a793f7);
-
     -webkit-animation: backgroundAnimate 120s ease infinite;
     -moz-animation: backgroundAnimate 120s ease infinite;
     animation: backgroundAnimate 120s ease infinite;
@@ -21,11 +20,9 @@ html, body{
     0% {
         background-position: 0% 50%
     }
-
     50% {
         background-position: 100% 50%
     }
-
     100% {
         background-position: 0% 50%
     }
@@ -35,11 +32,9 @@ html, body{
     0% {
         background-position: 0% 50%
     }
-
     50% {
         background-position: 100% 50%
     }
-
     100% {
         background-position: 0% 50%
     }
@@ -49,69 +44,61 @@ html, body{
     0% {
         background-position: 0% 50%
     }
-
     50% {
         background-position: 100% 50%
     }
-
     100% {
         background-position: 0% 50%
     }
 }
 
 @-webkit-keyframes backgroundAnimate {
-  0% {
-      background-position: 0% 50%
-  }
-
-  50% {
-      background-position: 100% 50%
-  }
-
-  100% {
-      background-position: 0% 50%
-  }
+    0% {
+        background-position: 0% 50%
+    }
+    50% {
+        background-position: 100% 50%
+    }
+    100% {
+        background-position: 0% 50%
+    }
 }
 
 @-moz-keyframes backgroundAnimate {
-  0% {
-      background-position: 0% 50%
-  }
-
-  50% {
-      background-position: 100% 50%
-  }
-
-  100% {
-      background-position: 0% 50%
-  }
+    0% {
+        background-position: 0% 50%
+    }
+    50% {
+        background-position: 100% 50%
+    }
+    100% {
+        background-position: 0% 50%
+    }
 }
 
 @keyframes backgroundAnimate {
-  0% {
-      background-position: 0% 50%
-  }
-
-  50% {
-      background-position: 100% 50%
-  }
-
-  100% {
-      background-position: 0% 50%
-  }
+    0% {
+        background-position: 0% 50%
+    }
+    50% {
+        background-position: 100% 50%
+    }
+    100% {
+        background-position: 0% 50%
+    }
 }
 
-main{
-  position: relative;
-  width: 100vw;
+main {
+    position: relative;
+    width: 100vw;
 }
 
-#copyImg{
+#copyImg {
     transform: translate(5px, 5px);
     cursor: pointer;
 }
 
-#copyBtn{
+#copyBtn {
     background: none;
     border: none;
     outline: none;
@@ -119,96 +106,92 @@ main{
     padding: 0;
 }
 
-#center{
-  width: 100vw;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 34px;
+#center {
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 34px;
 }
 
-.noDisplay{
-  display: none;
-}
-
-#shareBox, #shareContent{
-  display: flex;
-  flex-direction: column;
-  text-align: center;
-  width: 300px;
-  background: #eee;
-  border-radius: 3px;
-  box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22);
-  font-size: 25px;
-}
-
-#shareBox .noDisplay{
+.noDisplay {
     display: none;
 }
 
-#title{
+#shareBox, #shareContent {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    width: 300px;
+    background: #eee;
+    border-radius: 3px;
+    box-shadow: 0 19px 38px rgba(0, 0, 0, 0.30), 0 15px 12px rgba(0, 0, 0, 0.22);
+    font-size: 25px;
+}
+
+#shareBox .noDisplay {
+    display: none;
+}
+
+#title {
     display: flex;
     font-family: Logo;
     font-size: 60px;
     flex-direction: column;
 }
 
-#title .title-word{
+#title .title-word {
     display: flex;
     flex-direction: row;
 }
 
-#title .title-letters{
+#title .title-letters {
     margin: 0 -1px 0 -1px
 }
 
-#title.noDisplay{
+#title.noDisplay {
     display: none;
 }
 
-#link{
-  font-size: 20px;
-  background: #eee;
-  border:  none;
-  outline: none;
-  font-weight: 300;
+#link {
+    font-size: 20px;
+    background: #eee;
+    border: none;
+    outline: none;
+    font-weight: 300;
 }
 
-#center .button{
-  font-size: 30px;
+#center .button {
+    font-size: 30px;
 }
 
-.button{
-  box-sizing: inherit;
-  background-color: #222;
-  margin: .1rem;
-  padding: .75rem;
-  color: #fff;
-  text-align: center;
-  border-radius: .1875rem;
-  font-size: 18px;
-  outline: none;
-  border: none;
-  font-weight: 200;
+.button {
+    box-sizing: inherit;
+    background-color: #222;
+    margin: .1rem;
+    padding: .75rem;
+    color: #fff;
+    text-align: center;
+    border-radius: .1875rem;
+    font-size: 18px;
+    outline: none;
+    border: none;
+    font-weight: 200;
 }
 
-.button:hover{
-  background-color: #eee;
-  color: #222;
+.button:hover {
+    background-color: #eee;
+    color: #222;
 }
 
 @media only screen and (max-width: 600px) {
-
-    #title{
+    #title {
         font-size: 50px;
     }
-
-    #center{
+    #center {
         font-size: 27px;
     }
-
-    #center .button{
+    #center .button {
         font-size: 25px;
     }
-
 }

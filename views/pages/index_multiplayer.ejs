@@ -19,6 +19,7 @@
 
 <body>
     <main>
+
         <div id="game">
             <div id="info">
                 <button id="readyBtn" onclick="playerReady()" class="button noDisplay">Ready</button>
@@ -45,6 +46,37 @@
 <script>
     var gameID = "<%= game %>";
     var playerID = "<%= playerID %>";
+
+
+    setTimeout(() => {
+        tutorial();
+    }, 5000);
+
+    function is_touch_device() {
+        return 'ontouchstart' in window;
+    }
+
+    function tutorial() {
+        if(!battleship.ready && sessionStorage.getItem('tutorial') == null){
+            let turn = select('#turn');
+            let callback = turn.innerHTML;
+
+
+            let startTime = 0;
+            if (!battleship.ready) {
+                html(turn, (is_touch_device() ? 'Tap' : 'Click') + ' on piece to rotate');
+
+            }
+            setTimeout(() => {
+                html(turn, 'Sink enemy ships by guessing');
+            }, 7500);
+
+            setTimeout(() => {
+                html(turn, callback);
+                sessionStorage.setItem('tutorial', true)
+            }, 15000);
+        }
+    }
 </script>
 
 </html>
