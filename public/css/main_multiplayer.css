@@ -1,182 +1,239 @@
-html, body{
-  margin: 0;
-  padding: 0;
-  font-family: 'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',Helvetica,Arial,sans-serif;
-  font-weight: 200;
-  background: #eee;
-  width: 100vw;
-  height: 100%; 
-  overflow: hidden;
-  -webkit-animation: backgroundAnimate 120s ease infinite;
-  -moz-animation: backgroundAnimate 120s ease infinite;
-  animation: backgroundAnimate 120s ease infinite;
+html, body {
+	margin: 0;
+	padding: 0;
+	font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	font-weight: 300;
+	background: #eee;
+	width: 100vw;
+	height: 100%;
+	overflow: hidden;
+	-webkit-animation: backgroundAnimate 120s ease infinite;
+	-moz-animation: backgroundAnimate 120s ease infinite;
+	animation: backgroundAnimate 120s ease infinite;
 }
 
 @-webkit-keyframes backgroundAnimate {
-  0% {
-      background-position: 0% 50%
-  }
-
-  50% {
-      background-position: 100% 50%
-  }
-
-  100% {
-      background-position: 0% 50%
-  }
+	0% {
+		background-position: 0% 50%
+	}
+	50% {
+		background-position: 100% 50%
+	}
+	100% {
+		background-position: 0% 50%
+	}
 }
 
 @-moz-keyframes backgroundAnimate {
-  0% {
-      background-position: 0% 50%
-  }
-
-  50% {
-      background-position: 100% 50%
-  }
-
-  100% {
-      background-position: 0% 50%
-  }
+	0% {
+		background-position: 0% 50%
+	}
+	50% {
+		background-position: 100% 50%
+	}
+	100% {
+		background-position: 0% 50%
+	}
 }
 
 @keyframes backgroundAnimate {
-  0% {
-      background-position: 0% 50%
-  }
-
-  50% {
-      background-position: 100% 50%
-  }
-
-  100% {
-      background-position: 0% 50%
-  }
+	0% {
+		background-position: 0% 50%
+	}
+	50% {
+		background-position: 100% 50%
+	}
+	100% {
+		background-position: 0% 50%
+	}
 }
 
-.noDisplay{
-  display: none;
+.noDisplay {
+	display: none;
 }
 
-#board #player .piece{
-  z-index: 3;
-  position: absolute;
-  transform: translate(0px, 0px);
-  opacity: 0.9;
-  margin: 0;
-  padding: 0;
-  background-size: 100% 100%;
-  background-position: center;
+#board #player .piece {
+	z-index: 3;
+	position: absolute;
+	transform: translate(0px, 0px);
+	opacity: 0.9;
+	margin: 0;
+	padding: 0;
+	background-size: 100% 100%;
+	background-position: center;
 }
 
-.loadingImg{
-  display: none;
+.loadingImg {
+	display: none;
 }
 
-main{
-  position: relative;
-  width: 100vw;
+main {
+	position: relative;
+	width: 100vw;
 }
 
-#player{
-  position: relative;
+#player {
+	position: relative;
 }
 
-#game{
-  position: absolute;
-  width: 100vw;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
+#game {
+	position: absolute;
+	width: 100vw;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
 }
 
-
-#turn{
-  font-size: 20px; 
-  text-align: center;
-  margin: .1rem;
-  padding: .75rem;
+#turn {
+	font-size: 20px;
+	margin: .1rem;
+	padding: .75rem;
 }
 
-.buttons{
-  position: absolute;
-  left: 0;
-  top: 0;
-  z-index: 1;
+.dots {
+	display: flex;
+	flex-direction: row;
 }
 
-#info{
-  padding: 20px 0;
-  display: flex;
-  flex-direction: column;
+.dot-pulse, .dot-pulse-before, .dot-pulse-after {
+	width: 10px;
+	height: 10px;
+	margin: .4rem 10px;
+	border-radius: 5px;
+	background-color: #222;
+	color: #222;
+	transform: scale(1);
+	animation-delay: .25s;
+	opacity: 0.9;
 }
 
-.button{
-  box-sizing: inherit;
-  background-color: #222;
-  margin: .1rem;
-  padding: .75rem;
-  color: #fff;
-  text-align: center;
-  border-radius: .1875rem;
-  font-size: 20px;
-  outline: none;
-  border: none;
-  font-weight: 200;
+.dot-pulse {
+	transform: scale(0);
+	animation: dot-pulse 1.5s infinite linear;
 }
 
-.button:hover{
-  background-color: #eee;
-  color: #222;
+.dot-pulse-before {
+	transform: scale(0);
+	animation: dot-pulse-before 1.5s infinite linear;
 }
 
-#board{
-  display: flex;
-  flex-direction: row;
+.dot-pulse-after {
+	transform: scale(0);
+	animation: dot-pulse-after 1.5s infinite linear;
 }
 
-#board div{
-  margin: 0 20px;
+@keyframes dot-pulse-before {
+	0% {
+		transform: scale(0);
+	}
+	30%{
+		transform: scale(1.5);
+	}
+	60%, 100%{
+		transform: scale(0);
+	}
 }
 
-#patrol{
-  background: url("../../img/ships/png/patrol.png");
+@keyframes dot-pulse {
+	0%, 15% {
+		transform: scale(0);
+	}
+	45%{
+		transform: scale(1.5);
+	}
+	75%, 100%{
+		transform: scale(0);
+	}
 }
 
-#carrier{
-  background: url("../../img/ships/png/carrier.png");
+@keyframes dot-pulse-after {
+	0%,30% {
+		transform: scale(0);
+	}
+	60%{
+		transform: scale(1.5);
+	}
+	90%, 100%{
+		transform: scale(0);
+	}
 }
 
-#battleship{
-  background: url("../../img/ships/png/battleship.png");
+.buttons {
+	position: absolute;
+	left: 0;
+	top: 0;
+	z-index: 1;
 }
 
-#submarine{
-  background: url("../../img/ships/png/submarine.png");
+#info {
+	padding: 20px 0;
+	display: flex;
+	flex-direction: column;
 }
 
-#destroyer{
-  background: url("../../img/ships/png/destroyer.png");
+.button {
+	box-sizing: inherit;
+	background-color: #222;
+	margin: .1rem;
+	padding: .75rem;
+	color: #fff;
+	text-align: center;
+	border-radius: .1875rem;
+	font-size: 20px;
+	outline: none;
+	border: none;
+	font-weight: 300;
 }
 
+.button:hover {
+	background-color: #eee;
+	color: #222;
+}
+
+#board {
+	display: flex;
+	flex-direction: row;
+}
+
+#board div {
+	margin: 0 20px;
+}
+
+#patrol {
+	background: url("../../img/ships/png/patrol.png");
+}
+
+#carrier {
+	background: url("../../img/ships/png/carrier.png");
+}
+
+#battleship {
+	background: url("../../img/ships/png/battleship.png");
+}
+
+#submarine {
+	background: url("../../img/ships/png/submarine.png");
+}
+
+#destroyer {
+	background: url("../../img/ships/png/destroyer.png");
+}
 
 @media only screen and (max-width: 600px) {
-  #board{
-    flex-direction: column-reverse;
-  }
-
-  #board div{
-    margin: 1px 0;
-  }
-
-  #info{
-    padding: 0;
-  }
+	#board {
+		flex-direction: column-reverse;
+	}
+	#board div {
+		margin: 1px 0;
+	}
+	#info {
+		padding: 0;
+	}
 }
 
 @media only screen and (max-width: 450px) {
-  .button, #turn{
-    font-size: 18px;
-  }
+	.button, #turn {
+		font-size: 18px;
+	}
 }
