@@ -10,10 +10,12 @@ class Piece{
         }
         this.width = 0.4*cellSize+0.6*(length*(1/5)*cellSize);
         this.height = 0.92*length*cellSize;
+
         this.transform(0,0,this.rotation*90);
 
         this.el.style.height = this.height+'px';
         this.el.style.width = this.width+'px';
+        this.tutorialPos = this.el.children[0].getAttribute('data-balloon-pos');
 
         this.dragged = false;
         this.isDragging = false;
@@ -37,7 +39,7 @@ class Piece{
             this.startPosition = {x: e.clientX, y: e.clientY};
             this.currentPosition = this.transform();
             readyBtn.classList.add('noDisplay');
-            turn.classList.remove('noDisplay');
+            tutorialBtn.classList.remove('noDisplay');
             requestAnimationFrame(update);
         }
     }
@@ -101,5 +103,14 @@ class Piece{
             }
         }
         this.transform(null, null, this.rotation*90);
+        this.el.children[0].style.display = 'none';
+        if(this.rotation == 1){
+            this.el.children[0].setAttribute('data-balloon-pos', 'up');
+            this.transform(-this.width/2*(this.rotation), this.height/2*this.rotation, (this.rotation*-90), this.el.children[0]);
+        }else{
+            this.el.children[0].setAttribute('data-balloon-pos', this.tutorialPos);
+            this.transform(0, this.height/2, (this.rotation*-90), this.el.children[0]);
+        }
+        this.el.children[0].style.display = 'block';
     }
 } 

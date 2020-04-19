@@ -29,10 +29,10 @@ button[aria-label][data-balloon-pos] {
   content: attr(aria-label);
   padding: .5em 1em;
   position: absolute;
-  white-space: nowrap;
   z-index: 10;
   font-size: 16px;
-  text-align: left;
+  text-align: center;
+  white-space: nowrap;
 }
 
 [aria-label][data-balloon-pos]:before {
@@ -40,7 +40,7 @@ button[aria-label][data-balloon-pos] {
   border-top-color: var(--balloon-color);
   opacity: 0;
   pointer-events: none;
-  transition: all .18s ease-out .18s;
+  transition: all .15s ease-out .18s;
   transition-delay: 0.1s;
   content: "";
   position: absolute;
@@ -56,15 +56,23 @@ button[aria-label][data-balloon-pos] {
   bottom: 100%;
   left: 50%;
   margin-bottom: 10px;
-  transform: translate(-45%, var(--balloon-move));
+  transform: translate(-50%, var(--balloon-move));
   transform-origin: top;
 }
 
 [aria-label][data-balloon-pos][data-balloon-pos="up"]:before {
   bottom: 100%;
   left: 50%;
-  transform: translate(0, var(--balloon-move));
+  transform: translate(-50%, var(--balloon-move));
   transform-origin: top;
+}
+
+[aria-label][data-balloon-pos][data-balloon-pos="up"][data-balloon-visible]:after {
+  transform: translate(-50%, 0);
+}
+
+[aria-label][data-balloon-pos][data-balloon-pos="up"][data-balloon-visible]:before {
+  transform: translate(-50%, 0);
 }
 
 [aria-label][data-balloon-pos][data-balloon-pos="right"]:after {
@@ -84,6 +92,34 @@ button[aria-label][data-balloon-pos] {
 }
 
 [aria-label][data-balloon-pos][data-balloon-pos="right"][data-balloon-visible]:after {
-  transform: translate(0, -50%); }
+  transform: translate(0, -50%);
+}
+
 [aria-label][data-balloon-pos][data-balloon-pos="right"][data-balloon-visible]:before {
-  transform: translate(0, -50%); }
+  transform: translate(0, -50%);
+}
+
+[aria-label][data-balloon-pos][data-balloon-pos="left"]:after {
+  margin-right: 10px;
+  right: 100%;
+  top: 50%;
+  transform: translate(var(--balloon-move), -50%);
+}
+
+[aria-label][data-balloon-pos][data-balloon-pos="left"]:before {
+  width: 0;
+  height: 0;
+  border: 5px solid transparent;
+  border-left-color: var(--balloon-color);
+  right: 100%;
+  top: 50%;
+  transform: translate(var(--balloon-move), -50%);
+}
+
+[aria-label][data-balloon-pos][data-balloon-pos="left"][data-balloon-visible]:after {
+  transform: translate(0, -50%);
+}
+
+[aria-label][data-balloon-pos][data-balloon-pos="left"][data-balloon-visible]:before {
+  transform: translate(0, -50%);
+}

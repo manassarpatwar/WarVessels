@@ -127,6 +127,7 @@ main {
     border-radius: 3px;
     box-shadow: 0 19px 38px rgba(0, 0, 0, 0.30), 0 15px 12px rgba(0, 0, 0, 0.22);
     font-size: 25px;
+    font-weight: 200;
 }
 
 #shareBox .noDisplay {
@@ -159,7 +160,7 @@ main {
     background: #eee;
     border: none;
     outline: none;
-    font-weight: 300;
+    font-weight: 200;
 }
 
 #center .button {

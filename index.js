@@ -14,11 +14,10 @@ var gameState = require('./game.json');
 gameState['changed'] = false;
 
 var maxAge = (1000 * 1) *//s
-	(60 * 1) *
+	(60 * 1)*
 	(60 * 0.5) //h remove game from gameState after 30 mins of initialization
 
 async function write() {
-
 	var currentTime = Date.now()
 	const items = Object.keys(gameState);
 
@@ -57,10 +56,19 @@ app.post('/init', (req, res, next) => {
 	var game = uuidv4();
 	ssn = req.session;
 	let error = false;
-	if(ssn.games === undefined || ssn.games && ssn.games.length < 3){
-		if(ssn.games === undefined){
+	if(ssn.games !== undefined){
+		for(let i = 0; i < ssn.games.length; i++){
+			if(gameState[ssn.games[i]] === undefined){
+				ssn.games.splice(i,1);
+				i--;
+			}
+		}
+	}
+
+	if (ssn.games === undefined || ssn.games && ssn.games.length < 3) {
+		if (ssn.games === undefined) {
 			ssn.games = [game];
-		}else{
+		} else {
 			ssn.games.push(game);
 		}
 		gameState[game] = {};
@@ -68,7 +76,7 @@ app.post('/init', (req, res, next) => {
 		gameState[game]['players'] = {};
 		gameState[game]['lastAttack'] = null;
 		gameState['changed'] = true;
-	}else{
+	} else {
 		error = true;
 		game = ssn.games;
 	}
@@ -128,9 +136,9 @@ app.post('/requestAttack', function (req, res) {
 		if (Object.keys(gameState[game]['players']).length > 1) { //There are 2 players
 			let lastAttack = gameState[game]['lastAttack'];
 			let attack = lastAttack == null ? null : (lastAttack['player'] == player ? null : lastAttack['attack']);
-		
+
 			let started = lastAttack != null;
-			res.send({ attack: attack, ready: true, started: started});
+			res.send({ attack: attack, ready: true, started: started });
 
 		} else
 			res.send({ attack: null, ready: false, started: false });
