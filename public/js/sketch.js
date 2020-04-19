@@ -283,7 +283,7 @@ function postAttack() {
                 localStorage.setItem(battleship.id, JSON.stringify(store));
             }
 
-            if (!player.turn) {
+            if (!battleship.started || !player.turn) {
                 setTimeout(postAttack, 2000);
             }
         }
