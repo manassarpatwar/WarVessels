@@ -58,25 +58,25 @@ function setup() {
         btlshp.rotate();
         carrier.transform(boardWidth + cellSize / 4 - carrier.width / 8, boardWidth - carrier.height - cellSize / 5);
         btlshp.transform(boardWidth + cellSize / 4, boardWidth / 2 - btlshp.height - cellSize / 4);
-        carrier.transform(0, carrier.height/2, (carrier.rotation*-90), carrier.el.children[0]);
-        btlshp.transform(0, btlshp.height/2, (btlshp.rotation*-90), btlshp.el.children[0]);
+        carrier.transform(0, carrier.height / 2, (carrier.rotation * -90), carrier.el.children[0]);
+        btlshp.transform(0, btlshp.height / 2, (btlshp.rotation * -90), btlshp.el.children[0]);
     } else {
         carrier.transform(carrier.height / 2 - cellSize / 4, 3 * (boardWidth + cellSize) / 4 + carrier.width / 4);
-        carrier.transform(-carrier.width/2*(carrier.rotation), carrier.height/2*carrier.rotation, (carrier.rotation*-90), carrier.el.children[0]);
+        carrier.transform(-carrier.width / 2 * (carrier.rotation), carrier.height / 2 * carrier.rotation, (carrier.rotation * -90), carrier.el.children[0]);
         carrier.el.children[0].setAttribute('data-balloon-pos', 'up');
         btlshp.transform(boardWidth / 2 + btlshp.height / 2 - cellSize / 4, 3 * boardWidth / 4 + cellSize + btlshp.width / 2);
-        btlshp.transform(-btlshp.width/2*(btlshp.rotation), btlshp.height/2*btlshp.rotation, (btlshp.rotation*-90), btlshp.el.children[0]);
+        btlshp.transform(-btlshp.width / 2 * (btlshp.rotation), btlshp.height / 2 * btlshp.rotation, (btlshp.rotation * -90), btlshp.el.children[0]);
         btlshp.el.children[0].setAttribute('data-balloon-pos', 'up');
     }
     let destroyer = player.pieces['destroyer'];
     destroyer.transform(-cellSize, 3 * boardWidth / 4 - cellSize + destroyer.height / 4);
-    destroyer.transform(0, destroyer.height/2, (destroyer.rotation*-90), destroyer.el.children[0]);
+    destroyer.transform(0, destroyer.height / 2, (destroyer.rotation * -90), destroyer.el.children[0]);
     let submarine = player.pieces['submarine'];
     submarine.transform(-cellSize + submarine.width / 16, boardWidth / 2 - submarine.height / 4 - cellSize / 8);
-    submarine.transform(0, submarine.height/2, (submarine.rotation*-90), submarine.el.children[0]);
+    submarine.transform(0, submarine.height / 2, (submarine.rotation * -90), submarine.el.children[0]);
     let patrol = player.pieces['patrol'];
     patrol.transform(-cellSize + patrol.width / 6, boardWidth / 4 - patrol.height / 4 + cellSize / 8);
-    patrol.transform(0, patrol.height/2, (patrol.rotation*-90), patrol.el.children[0]);
+    patrol.transform(0, patrol.height / 2, (patrol.rotation * -90), patrol.el.children[0]);
 
     turn = select('#turn');
 
@@ -263,7 +263,7 @@ function postAttack() {
                     battleship.playerBoard[attack[0]][attack[1]] = -2;
                 }
                 playerSketch.touchWater(attack[1] * battleship.cellSize + battleship.cellSize / 2, attack[0] * battleship.cellSize + battleship.cellSize / 2)
-                if(!playerSketch.showing)
+                if (!playerSketch.showing)
                     playerSketch.show();
                 store['playerBoard'] = battleship.playerBoard;
                 store['turn'] = player.turn;
@@ -281,10 +281,11 @@ function postAttack() {
                     store['result'] = result;
                 }
                 localStorage.setItem(battleship.id, JSON.stringify(store));
-            } else {
-                setTimeout(postAttack, 2000);
             }
 
+            if (!player.turn) {
+                setTimeout(postAttack, 2000);
+            }
         }
     }
     xhr.open('POST', '/requestAttack', true);
@@ -311,7 +312,7 @@ function start() {
     setTimeout(postAttack, 2000);
 }
 
-function playerSketch(canvas){
+function playerSketch(canvas) {
     this.cellSize;
     this.waterWave;
     this.ctx;
@@ -326,9 +327,9 @@ function playerSketch(canvas){
         this.ctx = canvas.getContext('2d');
         this.ctx.drawImage(bg, 0, 0, bg.width, bg.height);
         this.drawBoard();
-        this.waterWave = new WaterWave(canvas.width, canvas.height,  this.ctx);
+        this.waterWave = new WaterWave(canvas.width, canvas.height, this.ctx);
 
-        select('#playerCanvasTutorial').style.transform = 'translate(0px, -'+canvas.height/2+'px)'
+        select('#playerCanvasTutorial').style.transform = 'translate(0px, -' + canvas.height / 2 + 'px)'
 
         this.show();
 
@@ -340,7 +341,7 @@ function playerSketch(canvas){
         for (let i = 0; i < battleship.playerBoard.length; i++) { //rows
             for (let j = 0; j < battleship.playerBoard[i].length; j++) { //columns
                 this.ctx.beginPath();
-                this.ctx.rect(j *  this.cellSize + 1, i *  this.cellSize + 1,  this.cellSize + 2 / battleship.size,  this.cellSize + 2 / battleship.size);
+                this.ctx.rect(j * this.cellSize + 1, i * this.cellSize + 1, this.cellSize + 2 / battleship.size, this.cellSize + 2 / battleship.size);
                 if (battleship.playerBoard[i][j] == -1) {
                     this.ctx.fillStyle = 'rgba(255, 0, 0, 0.6)';
                     this.ctx.fill();
@@ -365,10 +366,10 @@ function playerSketch(canvas){
         this.drawBoard();
         this.waterWave.render();
 
-        if(!this.waterWave.done()){
+        if (!this.waterWave.done()) {
             this.showing = true;
-            requestAnimationFrame( this.show);
-        }else{
+            requestAnimationFrame(this.show);
+        } else {
             this.showing = false;
         }
     }
@@ -400,7 +401,7 @@ function playerSketch(canvas){
                 let center = releasedPiece.getCenter();
 
                 this.waterWave.touchWater(Math.floor(center.x), Math.floor(center.y), 1000);
-                if(!this.showing)
+                if (!this.showing)
                     this.show();
 
                 let pieceCoordinates = releasedPiece.coords.map(([i, j]) => [i + place.x, j + place.y]);
@@ -427,7 +428,7 @@ function playerSketch(canvas){
     }
 }
 
-function opponentSketch(canvas){
+function opponentSketch(canvas) {
     this.cellSize;
     this.waterWave;
     this.ctx;
@@ -444,7 +445,7 @@ function opponentSketch(canvas){
 
         this.drawBoard();
         this.waterWave = new WaterWave(canvas.width, canvas.height, this.ctx);
-        select('#opponentCanvasTutorial').style.transform = 'translate(0px, -'+canvas.height/2+'px)'
+        select('#opponentCanvasTutorial').style.transform = 'translate(0px, -' + canvas.height / 2 + 'px)'
         this.show();
 
     }
@@ -476,10 +477,10 @@ function opponentSketch(canvas){
 
         this.drawBoard();
         this.waterWave.render();
-        if (!this.waterWave.done()){
+        if (!this.waterWave.done()) {
             this.showing = true;
             requestAnimationFrame(this.show);
-        }else{
+        } else {
             this.showing = false;
         }
     }
@@ -521,7 +522,6 @@ function opponentSketch(canvas){
                             let value = hit ? 1 : -1;
                             battleship.opponentBoard[attack[0]][attack[1]] = value;
                             html(turn, 'Their turn')
-                            postAttack();
                             let store = JSON.parse(localStorage.getItem(battleship.id));
                             store['opponentBoard'] = battleship.opponentBoard;
                             result = battleship.done();
@@ -538,8 +538,9 @@ function opponentSketch(canvas){
                             }
                             localStorage.setItem(battleship.id, JSON.stringify(store));
                             self.waterWave.touchWater(Math.floor(e.clientX - canvas.offsetLeft), Math.floor(e.clientY - canvas.offsetTop));
-                            if(!self.showing)
+                            if (!self.showing)
                                 self.show();
+                            postAttack();
                         } else {
                             html(turn, 'Not your turn');
                         }
