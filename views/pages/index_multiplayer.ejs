@@ -85,6 +85,14 @@
 <script>
     var gameID = "<%= game %>";
     var playerID = "<%= playerID %>";
+    var tutorialOpen = false;
+
+    if(!localStorage.getItem('tutorialDone')){
+        setTimeout(() => {
+            tutorial();
+            localStorage.setItem('tutorialDone', true);
+        }, 500);
+    }
 
     function is_touch_device() {
         return 'ontouchstart' in window;
@@ -96,6 +104,7 @@
     }
 
     function tutorial() {
+        tutorialOpen = !tutorialOpen;
         select('#help-info').classList.toggle('show');
         select('body').classList.toggle('has-overlay');
     }

@@ -33,6 +33,7 @@ class Piece{
     startDrag(e) {
         e.preventDefault();
         if(this.el.classList.contains('interactable')){
+
             if (e.touches) { e = e.touches[0]; }
             selectedPiece = this;
             this.isDragging = true;

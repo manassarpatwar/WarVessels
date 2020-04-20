@@ -10,17 +10,16 @@ html, body {
 }
 
 body.has-overlay::before {
-    content: "";
-    display: block;
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    top: 0;
+	content: "";
+	display: block;
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	top: 0;
 	left: 0;
 	z-index: 2;
-    background: rgba(0,0,0, 0.5);
+	background: rgba(0, 0, 0, 0.5);
 }
-
 
 .noDisplay {
 	display: none;
@@ -38,61 +37,62 @@ body.has-overlay::before {
 	filter: drop-shadow(0 0 1px #222);
 }
 
-#board #player .piece.piece-shadow{
+#board #player .piece.piece-shadow {
 	-webkit-filter: drop-shadow(0 0 3px #222);
 	filter: drop-shadow(0 0 3px #222);
 }
-
 
 .loadingImg {
 	display: none;
 }
 
-#help, #close{
+#help, #close {
 	position: absolute;
 	right: 0;
-	top: 0;	
-	padding: 10px;
-	width: 20px;
+	top: 0;
+	height: 40px;
+	width: 40px;
+	padding: 0;
 	text-align: center;
 }
 
-#help-info{
+#help-info {
 	position: absolute;
 	width: 380px;
 	padding: 20px;
-    background: #eee;
-    border-radius: 5px;
+	background: #eee;
+	border-radius: 5px;
 	box-shadow: 0 19px 38px rgba(0, 0, 0, 0.30), 0 15px 12px rgba(0, 0, 0, 0.22);
 	z-index: -1;
 	opacity: 0;
+	transition: opacity 0.5s ease;
 }
 
-canvas{
+canvas {
 	border-radius: 5px;
 	box-shadow: 0 0 50px 2px rgba(0, 0, 0, 0.30);
 }
 
-#help-info.show{
+#help-info.show {
 	z-index: 2;
 	opacity: 1;
 }
 
-.help-icons{
+.help-icons {
 	width: 16px;
 	height: 16px;
 	transform: translate(0, 2px);
 }
 
-#help-info ol{
+#help-info ol {
 	padding-left: 8%;
 }
 
-#help-info li{
+#help-info li {
 	padding: 5px 0;
 }
 
-#help-info p{
+#help-info p {
 	font-size: 22px;
 	text-align: center;
 	margin: 0;
@@ -118,41 +118,38 @@ main {
 
 #turn {
 	font-size: 20px;
-	margin: .5rem;
-	padding: 1rem;
+	margin: .5em;
+	padding: 0.75em;
 	text-align: center;
 	font-weight: 300;
 }
 
-.dot-pulse span{
+.dot-pulse span {
 	animation-name: pulse;
-    animation-duration: 1.4s;
-    animation-iteration-count: infinite;
+	animation-duration: 1.4s;
+	animation-iteration-count: infinite;
 	animation-fill-mode: both;
 }
 
 @keyframes pulse {
-    0% {
-      opacity: .2;
-    }
-
-    20% {
-      opacity: 1;
-    }
-
-    100% {
-      opacity: .2;
-    }
+	0% {
+		opacity: .2;
+	}
+	20% {
+		opacity: 1;
+	}
+	100% {
+		opacity: .2;
+	}
 }
 
 .dot-pulse span:nth-child(2) {
-    animation-delay: .2s;
+	animation-delay: .2s;
 }
 
 .dot-pulse span:nth-child(3) {
-    animation-delay: .4s;
+	animation-delay: .4s;
 }
-
 
 .buttons {
 	position: absolute;
@@ -161,26 +158,33 @@ main {
 }
 
 #info {
-	margin: .5rem;
-	padding: 1rem;
+	margin: .5em;
+	padding: 0.75em;
 	display: flex;
 	flex-direction: column;
 }
 
 .button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 	box-sizing: inherit;
 	font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial, sans-serif;
 	background-color: #222;
-	margin: .5rem;
-	padding: 1rem;
+	margin: .5em;
+	padding: 0.75em;
 	color: #fff;
 	text-align: center;
-	border-radius: .1875rem;
+	border-radius: .1875em;
 	font-size: 20px;
 	outline: none;
 	border: none;
 	font-weight: 300;
 	z-index: 1;
+}
+
+.button.noDisplay {
+	display: none;
 }
 
 .button:hover {
@@ -218,10 +222,9 @@ main {
 }
 
 @media only screen and (max-width: 600px) {
-	canvas{
+	canvas {
 		box-shadow: 0 0 25px 1px rgba(0, 0, 0, 0.30);
 	}
-
 	#board {
 		flex-direction: column-reverse;
 	}
@@ -234,18 +237,37 @@ main {
 }
 
 @media only screen and (max-width: 450px) {
-	#help-info{
+	#help-info {
 		font-size: 18px;
 		width: 300px;
 		padding: 10px;
-		padding-top: 20px;
 	}
-
-	#help-info p{
+	#help, #close {
+		height: 30px;
+		width: 30px;
+	}
+	#help-info p {
 		font-size: 20px;
 	}
-
-	#turn, .button{
+	#turn, .button {
 		font-size: 18px;
+	}
+}
+
+@media only screen and (max-width: 350px) {
+	#help-info {
+		font-size: 14px;
+		width: 250px;
+		padding: 10px;
+	}
+	#help, #close {
+		height: 20px;
+		width: 20px;
+	}
+	#help-info p {
+		font-size: 14px;
+	}
+	#turn, .button {
+		font-size: 12px;
 	}
 }

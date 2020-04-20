@@ -123,6 +123,8 @@ function setup() {
         opponentSketch.setup();
     })
 
+    document.addEventListener('mousedown', mouseDown);
+    document.addEventListener('touchstart', mouseDown);
     document.addEventListener('touchend', mouseUp);
     document.addEventListener('mouseup', mouseUp);
     document.addEventListener('mousemove', mouseDragged);
@@ -220,8 +222,6 @@ function mouseDragged(e) {
 }
 
 function mouseUp(e) {
-    if (e.touches) { e = e.touches[0]; }
-
     if (selectedPiece) {
 
         playerSketch.mouseReleased(e);
@@ -231,7 +231,15 @@ function mouseUp(e) {
         selectedPiece.el.classList.remove('piece-shadow');
         selectedPiece = false;
     }
-    opponentSketch.mouseReleased(e);
+}
+
+function mouseDown(e){
+    if(tutorialOpen){
+        return;
+    }
+
+    if (e.touches) { e = e.touches[0]; }
+    opponentSketch.mouseDown(e);
 }
 
 function postAttack() {
@@ -486,7 +494,7 @@ function opponentSketch(canvas) {
         }
     }
 
-    this.mouseReleased = (e) => {
+    this.mouseDown = (e) => {
         if (e === undefined)
             return;
 
