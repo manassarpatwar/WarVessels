@@ -87,6 +87,11 @@
     var playerID = "<%= playerID %>";
     var tutorialOpen = false;
 
+    var btns = document.getElementsByTagName('button');
+    for(let btn of btns){
+        btn.addEventListener('touchstart', () => {btn.click()});
+    }
+
     if(!localStorage.getItem('tutorialDone')){
         setTimeout(() => {
             tutorial();
