@@ -123,12 +123,12 @@ function setup() {
         opponentSketch.setup();
     })
 
-    document.addEventListener('mousedown', mouseDown);
-    document.addEventListener('touchstart', mouseDown);
-    document.addEventListener('touchend', mouseUp);
-    document.addEventListener('mouseup', mouseUp);
-    document.addEventListener('mousemove', mouseDragged);
-    document.addEventListener('touchmove', mouseDragged);
+    document.addEventListener('mousedown', mouseDown, { passive: false });
+    document.addEventListener('touchstart', mouseDown, { passive: false });
+    document.addEventListener('touchend', mouseUp, { passive: false });
+    document.addEventListener('mouseup', mouseUp,{ passive: false });
+    document.addEventListener('mousemove', mouseDragged, { passive: false });
+    document.addEventListener('touchmove', mouseDragged, { passive: false });
 
 
     //localStorage cleanup
@@ -210,6 +210,7 @@ function update() {
 }
 
 function mouseDragged(e) {
+    e.preventDefault();
     if (e.touches) { e = e.touches[0]; }
 
     if (selectedPiece) {
@@ -222,8 +223,8 @@ function mouseDragged(e) {
 }
 
 function mouseUp(e) {
+    e.preventDefault();
     if (selectedPiece) {
-
         playerSketch.mouseReleased(e);
         selectedPiece.delta = { x: 0, y: 0 };
         selectedPiece.isDragging = false;
@@ -233,11 +234,11 @@ function mouseUp(e) {
     }
 }
 
-function mouseDown(e){
-    if(tutorialOpen){
+function mouseDown(e) {
+    e.preventDefault();
+    if (tutorialOpen) {
         return;
     }
-
     if (e.touches) { e = e.touches[0]; }
     opponentSketch.mouseDown(e);
 }
@@ -270,7 +271,7 @@ function postAttack() {
                     battleship.playerBoard[attack[0]][attack[1]] = -2;
                 }
 
-                if(playerSketch.touchWater){
+                if (playerSketch.touchWater) {
                     playerSketch.touchWater(attack[1] * battleship.cellSize + battleship.cellSize / 2, attack[0] * battleship.cellSize + battleship.cellSize / 2)
                     if (!playerSketch.showing)
                         playerSketch.show();
@@ -384,7 +385,7 @@ function playerSketch(canvas) {
     }
 
     this.mouseReleased = (e) => {
-
+        e.preventDefault();
         if (battleship.ready)
             return;
 
@@ -495,9 +496,6 @@ function opponentSketch(canvas) {
     }
 
     this.mouseDown = (e) => {
-        if (e === undefined)
-            return;
-
         if (battleship.ready && battleship.started !== null) {
             let attack = [Math.floor((e.clientY - canvas.offsetTop) / canvas.width * battleship.size), Math.floor((e.clientX - canvas.offsetLeft) / canvas.height * battleship.size)];
 

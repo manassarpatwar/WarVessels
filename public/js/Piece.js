@@ -25,8 +25,8 @@ class Piece{
 
         this.ready = false;
 
-        this.el.addEventListener('mousedown', (e) => {this.startDrag(e)});
-        this.el.addEventListener('touchstart', (e) => {this.startDrag(e)});
+        this.el.addEventListener('mousedown', (e) => {this.startDrag(e)},  { passive: false });
+        this.el.addEventListener('touchstart', (e) => {this.startDrag(e)},  { passive: false });
 
     }
 
