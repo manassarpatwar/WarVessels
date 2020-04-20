@@ -15,7 +15,6 @@ var board;
 var bg;
 var readyBtn;
 var playAgainBtn;
-var tutorialBtn;
 
 function preload(url, callback) {
     let img = new Image();
@@ -42,8 +41,7 @@ function setup() {
     board = select('#board');
     readyBtn = select('#readyBtn');
     playAgainBtn = select('#playAgainBtn');
-    tutorialBtn = select('#help');
-    tutorialBtn.classList.remove('noDisplay');
+
     let smallSize = window.innerWidth < 600;
     boardWidth = smallSize ? 0.42 * window.innerHeight : Math.min(350, 0.4 * window.innerWidth);
 
@@ -58,15 +56,15 @@ function setup() {
         btlshp.rotate();
         carrier.transform(boardWidth + cellSize / 4 - carrier.width / 8, boardWidth - carrier.height - cellSize / 5);
         btlshp.transform(boardWidth + cellSize / 4, boardWidth / 2 - btlshp.height - cellSize / 4);
-        carrier.transform(0, carrier.height / 2, (carrier.rotation * -90), carrier.el.children[0]);
-        btlshp.transform(0, btlshp.height / 2, (btlshp.rotation * -90), btlshp.el.children[0]);
+        // carrier.transform(0, carrier.height / 2, (carrier.rotation * -90), carrier.el.children[0]);
+        // btlshp.transform(0, btlshp.height / 2, (btlshp.rotation * -90), btlshp.el.children[0]);
     } else {
         carrier.transform(carrier.height / 2 - cellSize / 4, 3 * (boardWidth + cellSize) / 4 + carrier.width / 4);
-        carrier.transform(-carrier.width / 2 * (carrier.rotation), carrier.height / 2 * carrier.rotation, (carrier.rotation * -90), carrier.el.children[0]);
-        carrier.el.children[0].setAttribute('data-balloon-pos', 'up');
+        // carrier.transform(-carrier.width / 2 * (carrier.rotation), carrier.height / 2 * carrier.rotation, (carrier.rotation * -90), carrier.el.children[0]);
+        // carrier.el.children[0].setAttribute('data-balloon-pos', 'up');
         btlshp.transform(boardWidth / 2 + btlshp.height / 2 - cellSize / 4, 3 * boardWidth / 4 + cellSize + btlshp.width / 2);
-        btlshp.transform(-btlshp.width / 2 * (btlshp.rotation), btlshp.height / 2 * btlshp.rotation, (btlshp.rotation * -90), btlshp.el.children[0]);
-        btlshp.el.children[0].setAttribute('data-balloon-pos', 'up');
+        // btlshp.transform(-btlshp.width / 2 * (btlshp.rotation), btlshp.height / 2 * btlshp.rotation, (btlshp.rotation * -90), btlshp.el.children[0]);
+        // btlshp.el.children[0].setAttribute('data-balloon-pos', 'up');
     }
     let destroyer = player.pieces['destroyer'];
     destroyer.transform(-cellSize, 3 * boardWidth / 4 - cellSize + destroyer.height / 4);
@@ -79,7 +77,7 @@ function setup() {
     patrol.transform(0, patrol.height / 2, (patrol.rotation * -90), patrol.el.children[0]);
 
     turn = select('#turn');
-
+    html(turn, 'Place ships');
     if (Object.keys(localStorage).includes(battleship.id)) {
         let json = JSON.parse(localStorage.getItem(battleship.id));
         let keys = Object.keys(json);
@@ -230,6 +228,7 @@ function mouseUp(e) {
         selectedPiece.delta = { x: 0, y: 0 };
         selectedPiece.isDragging = false;
         selectedPiece.dragged = false;
+        selectedPiece.el.classList.remove('piece-shadow');
         selectedPiece = false;
     }
     opponentSketch.mouseReleased(e);
@@ -262,9 +261,12 @@ function postAttack() {
                 } else {
                     battleship.playerBoard[attack[0]][attack[1]] = -2;
                 }
-                playerSketch.touchWater(attack[1] * battleship.cellSize + battleship.cellSize / 2, attack[0] * battleship.cellSize + battleship.cellSize / 2)
-                if (!playerSketch.showing)
-                    playerSketch.show();
+
+                if(playerSketch.touchWater){
+                    playerSketch.touchWater(attack[1] * battleship.cellSize + battleship.cellSize / 2, attack[0] * battleship.cellSize + battleship.cellSize / 2)
+                    if (!playerSketch.showing)
+                        playerSketch.show();
+                }
                 store['playerBoard'] = battleship.playerBoard;
                 store['turn'] = player.turn;
 
@@ -295,7 +297,6 @@ function postAttack() {
 }
 
 function start() {
-    tutorialBtn.classList.add('noDisplay');
     turn.classList.remove('noDisplay');
     html(turn, 'Waiting for other player to be ready');
     let data = {
@@ -419,7 +420,7 @@ function playerSketch(canvas) {
                 }
                 if (ready) {
                     readyBtn.classList.remove('noDisplay');
-                    tutorialBtn.classList.add('noDisplay');
+                    turn.classList.add('noDisplay');
                 }
 
 

@@ -9,13 +9,24 @@ html, body {
 	overflow: hidden;
 }
 
+body.has-overlay::before {
+    content: "";
+    display: block;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+	left: 0;
+	z-index: 2;
+    background: rgba(0,0,0, 0.5);
+}
+
 
 .noDisplay {
 	display: none;
 }
 
 #board #player .piece {
-	z-index: 1;
 	position: absolute;
 	transform: translate(0px, 0px);
 	opacity: 0.9;
@@ -23,15 +34,68 @@ html, body {
 	padding: 0;
 	background-size: 100% 100%;
 	background-position: center;
+	-webkit-filter: drop-shadow(0 0 1px #222);
+	filter: drop-shadow(0 0 1px #222);
 }
 
-
-#player-canvas-tutorial{
-	z-index: 5;
+#board #player .piece.piece-shadow{
+	-webkit-filter: drop-shadow(0 0 3px #222);
+	filter: drop-shadow(0 0 3px #222);
 }
+
 
 .loadingImg {
 	display: none;
+}
+
+#help, #close{
+	position: absolute;
+	right: 0;
+	top: 0;	
+	padding: 10px;
+	width: 20px;
+	text-align: center;
+}
+
+#help-info{
+	position: absolute;
+	width: 380px;
+	padding: 20px;
+    background: #eee;
+    border-radius: 5px;
+	box-shadow: 0 19px 38px rgba(0, 0, 0, 0.30), 0 15px 12px rgba(0, 0, 0, 0.22);
+	z-index: -1;
+	opacity: 0;
+}
+
+canvas{
+	border-radius: 5px;
+	box-shadow: 0 0 50px 2px rgba(0, 0, 0, 0.30);
+}
+
+#help-info.show{
+	z-index: 2;
+	opacity: 1;
+}
+
+.help-icons{
+	width: 16px;
+	height: 16px;
+	transform: translate(0, 2px);
+}
+
+#help-info ol{
+	padding-left: 8%;
+}
+
+#help-info li{
+	padding: 5px 0;
+}
+
+#help-info p{
+	font-size: 22px;
+	text-align: center;
+	margin: 0;
 }
 
 main {
@@ -54,9 +118,10 @@ main {
 
 #turn {
 	font-size: 20px;
-	margin: .1rem;
+	margin: .5rem;
 	padding: 1rem;
 	text-align: center;
+	font-weight: 300;
 }
 
 .dot-pulse span{
@@ -93,11 +158,11 @@ main {
 	position: absolute;
 	left: 0;
 	top: 0;
-	z-index: 1;
 }
 
 #info {
-	padding: 20px 0;
+	margin: .5rem;
+	padding: 1rem;
 	display: flex;
 	flex-direction: column;
 }
@@ -106,15 +171,16 @@ main {
 	box-sizing: inherit;
 	font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial, sans-serif;
 	background-color: #222;
-	margin: .1rem;
+	margin: .5rem;
 	padding: 1rem;
 	color: #fff;
 	text-align: center;
 	border-radius: .1875rem;
-	font-size: 18px;
+	font-size: 20px;
 	outline: none;
 	border: none;
 	font-weight: 300;
+	z-index: 1;
 }
 
 .button:hover {
@@ -152,11 +218,15 @@ main {
 }
 
 @media only screen and (max-width: 600px) {
+	canvas{
+		box-shadow: 0 0 25px 1px rgba(0, 0, 0, 0.30);
+	}
+
 	#board {
 		flex-direction: column-reverse;
 	}
 	#board div {
-		margin: 1px 0;
+		margin: 5px 0;
 	}
 	#info {
 		padding: 0;
@@ -164,12 +234,7 @@ main {
 }
 
 @media only screen and (max-width: 450px) {
-
-	.button{
-		font-size: 16px;
-	}
-
-	#turn {
+	#turn, .button{
 		font-size: 18px;
 	}
 }
