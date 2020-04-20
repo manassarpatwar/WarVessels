@@ -226,7 +226,7 @@ main {
 		flex-direction: column-reverse;
 	}
 	#board div {
-		margin: 5px 0;
+		margin: 1px 0;
 	}
 	#info {
 		padding: 0;
@@ -234,6 +234,12 @@ main {
 }
 
 @media only screen and (max-width: 450px) {
+	#help-info{
+		font-size: 18px;
+		width: 300px;
+		padding: 10px;
+	}
+
 	#turn, .button{
 		font-size: 18px;
 	}
