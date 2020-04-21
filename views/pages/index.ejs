@@ -64,9 +64,6 @@
         document.getElementById('max-sessions').classList.add('noDisplay');
         game = g;
         link.setAttribute('value', 'https://battleship-game-online.herokuapp.com/play/' + game);
-        Clipboard.copy(link.getAttribute('value'));
-        document.getElementById('copyBtn').click();
-        copy();
     }
 
     function init() {
