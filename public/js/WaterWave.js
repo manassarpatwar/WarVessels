@@ -29,7 +29,6 @@ class WaterWave {
 
     render() {
         this.rippleLength = 0;
-        this.texture = this.ctx.getImageData(0, 0, this.width, this.height);
         this.newFrame();
         this.ctx.putImageData(this.ripple, 0, 0);
     
@@ -92,6 +91,10 @@ class WaterWave {
                 ++i;
             }
         }
+    }
+
+    loadTexture(){
+        this.texture = this.ctx.getImageData(0, 0, this.width, this.height);
     }
 
     touchWater(dx, dy) {

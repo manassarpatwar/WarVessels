@@ -68,13 +68,13 @@ function setup() {
     }
     let destroyer = player.pieces['destroyer'];
     destroyer.transform(-cellSize, 3 * boardWidth / 4 - cellSize + destroyer.height / 4);
-    destroyer.transform(0, destroyer.height / 2, (destroyer.rotation * -90), destroyer.el.children[0]);
+    // destroyer.transform(0, destroyer.height / 2, (destroyer.rotation * -90), destroyer.el.children[0]);
     let submarine = player.pieces['submarine'];
     submarine.transform(-cellSize + submarine.width / 16, boardWidth / 2 - submarine.height / 4 - cellSize / 8);
-    submarine.transform(0, submarine.height / 2, (submarine.rotation * -90), submarine.el.children[0]);
+    // submarine.transform(0, submarine.height / 2, (submarine.rotation * -90), submarine.el.children[0]);
     let patrol = player.pieces['patrol'];
     patrol.transform(-cellSize + patrol.width / 6, boardWidth / 4 - patrol.height / 4 + cellSize / 8);
-    patrol.transform(0, patrol.height / 2, (patrol.rotation * -90), patrol.el.children[0]);
+    // patrol.transform(0, patrol.height / 2, (patrol.rotation * -90), patrol.el.children[0]);
 
     turn = select('#turn');
     html(turn, 'Place ships');
@@ -286,6 +286,7 @@ function postAttack() {
 
                 if (playerSketch.touchWater) {
                     playerSketch.touchWater(attack[1] * battleship.cellSize + battleship.cellSize / 2, attack[0] * battleship.cellSize + battleship.cellSize / 2)
+                    playerSketch.loadTexture();
                     if (!playerSketch.showing)
                         playerSketch.show();
                 }
@@ -380,13 +381,17 @@ function playerSketch(canvas) {
 
 
     this.touchWater = (x, y) => {
-        this.waterWave.touchWater(Math.floor(x), Math.floor(y), 1000);
+        this.waterWave.touchWater(Math.floor(x), Math.floor(y));
     }
 
-    this.show = () => {
+    this.loadTexture = ()=>{
         this.ctx.clearRect(0, 0, canvas.width, canvas.height);
         this.ctx.drawImage(bg, 0, 0, bg.width, bg.height);
         this.drawBoard();
+        this.waterWave.loadTexture();
+    }
+
+    this.show = () => {
         this.waterWave.render();
 
         if (!this.waterWave.done()) {
@@ -423,7 +428,8 @@ function playerSketch(canvas) {
                 releasedPiece.fit(place, battleship.cellSize);
                 let center = releasedPiece.getCenter();
 
-                this.waterWave.touchWater(Math.floor(center.x), Math.floor(center.y), 1000);
+                this.waterWave.touchWater(Math.floor(center.x), Math.floor(center.y));
+                this.loadTexture();
                 if (!this.showing)
                     this.show();
 
@@ -494,11 +500,14 @@ function opponentSketch(canvas) {
 
     }
 
-    this.show = () => {
+    this.loadTexture = ()=>{
         this.ctx.clearRect(0, 0, canvas.width, canvas.height);
         this.ctx.drawImage(bg, 0, 0, bg.width, bg.height);
-
         this.drawBoard();
+        this.waterWave.loadTexture()
+    }
+
+    this.show = () => {
         this.waterWave.render();
         if (!this.waterWave.done()) {
             this.showing = true;
@@ -558,6 +567,7 @@ function opponentSketch(canvas) {
                             }
                             localStorage.setItem(battleship.id, JSON.stringify(store));
                             self.waterWave.touchWater(Math.floor(e.clientX - canvas.offsetLeft), Math.floor(e.clientY - canvas.offsetTop));
+                            self.loadTexture();
                             if (!self.showing)
                                 self.show();
                             postAttack();
