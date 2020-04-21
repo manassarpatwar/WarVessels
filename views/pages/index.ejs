@@ -33,7 +33,7 @@
         <div id="share" class="noDisplay">
             <div id=shareBox>
                 <div id="shareContent" class="noDisplay">
-                    <label style='margin: 15px 0 5px 0'>Share game link:<button id="copyBtn" onclick="copy(this)"
+                    <label style='margin: 15px 0 5px 0'>Share game link:<button id="copyBtn" onclick="copy()"
                             aria-label="copied!" data-balloon-pos="up"><img id="copyImg" src="../img/copy.png" width="32"
                                 height="32"></button></label>
                     <input contenteditable="true" readonly='true' style='margin: 15px 0 30px 0' id="link">
@@ -64,6 +64,7 @@
         document.getElementById('max-sessions').classList.add('noDisplay');
         game = g;
         link.setAttribute('value', 'https://battleship-game-online.herokuapp.com/play/' + game);
+        Clipboard.copy(link.getAttribute('value'));
         document.getElementById('copyBtn').click();
         copy();
     }

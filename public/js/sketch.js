@@ -78,6 +78,7 @@ function setup() {
 
     turn = select('#turn');
     html(turn, 'Place ships');
+
     if (Object.keys(localStorage).includes(battleship.id)) {
         let json = JSON.parse(localStorage.getItem(battleship.id));
         let keys = Object.keys(json);
@@ -99,7 +100,7 @@ function setup() {
                 let data = json['pieces'][p];
                 player.pieces[p].el.classList.remove('interactable');
                 player.pieces[p].rotate(data.r);
-                player.pieces[p].fit(data, cellSize);
+                player.pieces[p].fit(data, battleship.cellSize);
             }
         }
         if (keys.includes('result')) {
@@ -126,7 +127,7 @@ function setup() {
     document.addEventListener('mousedown', mouseDown, { passive: false });
     document.addEventListener('touchstart', mouseDown, { passive: false });
     document.addEventListener('touchend', mouseUp, { passive: false });
-    document.addEventListener('mouseup', mouseUp,{ passive: false });
+    document.addEventListener('mouseup', mouseUp, { passive: false });
     document.addEventListener('mousemove', mouseDragged, { passive: false });
     document.addEventListener('touchmove', mouseDragged, { passive: false });
 
@@ -140,14 +141,19 @@ function setup() {
         (60 * 1) *//m
         (60 * 0.5) //h localStorage will be removed after 30 mins of initialization
 
+    let returnHome = false;
     for (let i of items) {
         let timestamp = JSON.parse(localStorage.getItem(i))['time'];
         if ((currentTime - timestamp) > maxAge) {
             localStorage.removeItem(i);
             if (i == gameID) {
-                window.location.href = '../../index';
+                returnHome = true;
             }
         }
+    }
+
+    if (returnHome) {
+        window.location.href = '../../';
     }
 }
 
@@ -164,11 +170,17 @@ function playerReady() {
     if (battleship.ready)
         return;
 
+    if (JSON.parse(localStorage.getItem(gameID))['ready']) {
+        window.location.reload();
+        return;
+    }
+
     let ready = true;
     for (let p of Object.values(player.pieces)) {
         if (!p.ready)
             ready = false;
     }
+
     if (!ready) {
         html(turn, 'Please place all pieces');
         return;
@@ -189,6 +201,7 @@ function playerReady() {
     localStorage.setItem(gameID, JSON.stringify(store));
     readyBtn.classList.add('noDisplay');
     turn.classList.remove('noDisplay');
+
     start();
 }
 
@@ -499,7 +512,7 @@ function opponentSketch(canvas) {
         if (battleship.ready && battleship.started !== null) {
             let attack = [Math.floor((e.clientY - canvas.offsetTop) / canvas.width * battleship.size), Math.floor((e.clientX - canvas.offsetLeft) / canvas.height * battleship.size)];
 
-            if (!battleship.attackOK(attack[0], attack[1], player.attack))
+            if (!battleship.attackOK(attack[0], attack[1]))
                 return
 
             if (player.turn || !battleship.started) {
@@ -549,7 +562,7 @@ function opponentSketch(canvas) {
                                 self.show();
                             postAttack();
                         } else {
-                            html(turn, 'Not your turn');
+                            window.location.reload();
                         }
                     }
                 }

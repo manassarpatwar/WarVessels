@@ -20,13 +20,13 @@ class Battleship{
     }
 
 
-    attackOK(x, y, attack){
+    attackOK(x, y){
         if(!(x >= 0 && x <= this.size &&
             y >= 0 && y <= this.size)){
                 return false;
         }
 
-        if(x == attack[0] && y == attack[1]){
+        if(this.opponentBoard[x] === undefined){
             return false;
         }
 

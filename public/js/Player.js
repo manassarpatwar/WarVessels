@@ -1,10 +1,6 @@
 class Player {
     constructor(id, cellSize) {
         this.id = id;
-        this.attack = [];
-        this.ships = [];
-        this.nextPiece = 0;
-        this.dragged = [];
 
         this.pieces = {
             'patrol': new Piece(2, 'patrol', cellSize),
@@ -14,12 +10,9 @@ class Player {
             'carrier': new Piece(5, 'carrier', cellSize, 1)
         }
         this.turn = false;
-        this.turnComplete = false;
+
     }
 
-    addAttack([x, y]) {
-        this.attack = [x, y]
-    }
 }
 
 Player.totalPieceLength = 17;
