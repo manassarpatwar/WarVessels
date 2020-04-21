@@ -1,39 +1,16 @@
-# node-js-getting-started
+# Battleship
+Battleship game recreated using Node.js and vanilla JS.  
+Game hosted on Heroku.  
+[Link to game](http://battleship-game-online.herokuapp.com/)
 
-A barebones Node.js app using [Express 4](http://expressjs.com/).
+## Ships
+Original ship art by [Lowder2](https://opengameart.org/content/sea-warfare-set-ships-and-more). Ships were slightly modified and vectorized.
 
-This application supports the [Getting Started on Heroku with Node.js](https://devcenter.heroku.com/articles/getting-started-with-nodejs) article - check it out.
+## Water animation
+Resources I found useful when animating water
+1. [Water ripple FX with Canvas and Javascript by Almeros](https://code.almeros.com/water-ripple-canvas-and-javascript/)
+2. [JavaScript implementation of the "classic" water ripple demo](https://js1k.com/2010-first/details/131)
+3. [2D water ripple by The Coding Train](https://www.youtube.com/watch?v=BZUdGqeOD0w)
 
-## Running Locally
-
-Make sure you have [Node.js](http://nodejs.org/) and the [Heroku CLI](https://cli.heroku.com/) installed.
-
-```sh
-$ git clone https://github.com/heroku/node-js-getting-started.git # or clone your own fork
-$ cd node-js-getting-started
-$ npm install
-$ npm start
-```
-
-Your app should now be running on [localhost:5000](http://localhost:5000/).
-
-## Deploying to Heroku
-
-```
-$ heroku create
-$ git push heroku master
-$ heroku open
-```
-or
-
-[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
-
-## Documentation
-
-For more information about using Node.js on Heroku, see these Dev Center articles:
-
-- [Getting Started on Heroku with Node.js](https://devcenter.heroku.com/articles/getting-started-with-nodejs)
-- [Heroku Node.js Support](https://devcenter.heroku.com/articles/nodejs-support)
-- [Node.js on Heroku](https://devcenter.heroku.com/categories/nodejs)
-- [Best Practices for Node.js Development](https://devcenter.heroku.com/articles/node-best-practices)
-- [Using WebSockets on Heroku with Node.js](https://devcenter.heroku.com/articles/node-websockets)
+## Acknowledgements
+I want to thank [Juha Lindstedt](https://github.com/pakastin) and [Mrwan Ashraf](https://github.com/mrwanashraf) for supporting me through this project.
