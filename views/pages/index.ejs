@@ -31,7 +31,7 @@
         <div id="share" class="noDisplay">
             <div id=shareBox>
                 <div id="shareContent" class="noDisplay">
-                    <label style='margin: 15px 0 5px 0'>Share game link:<button id="copyBtn" onclick="copy('link')"
+                    <label style='margin: 15px 0 5px 0'>Share game link:<button id="copyBtn" onclick="copy()"
                             aria-label="copied!" data-balloon-pos="up"><img id="copyImg" src="../img/copy.png" width="32"
                                 height="32"></button></label>
                     <input contenteditable="true" readonly='true' style='margin: 15px 0 30px 0' id="link">
@@ -54,38 +54,58 @@
     let shareDiv = document.getElementById('share');
     let link = document.getElementById('link');
     let game;
-    var isiOSDevice = navigator.userAgent.match(/ipad|iphone/i);
-    function clipboard(elementId) {
-        var input = document.getElementById(elementId);
 
-        if (isiOSDevice) {
 
-            var editable = input.contentEditable;
-            var readOnly = input.readOnly;
+    //Clipboard.js https://gist.github.com/rproenca/64781c6a1329b48a455b645d361a9aa3
+    window.Clipboard = (function (window, document, navigator) {
+        var textArea,
+            copy;
 
-            input.contentEditable = true;
-            input.readOnly = false;
-
-            var range = document.createRange();
-            range.selectNodeContents(input);
-
-            var selection = window.getSelection();
-            selection.removeAllRanges();
-            selection.addRange(range);
-
-            input.setSelectionRange(0, 999999);
-            input.contentEditable = editable;
-            input.readOnly = readOnly;
-
-        } else {
-            input.select();
+        function isOS() {
+            return navigator.userAgent.match(/ipad|iphone/i);
         }
 
-        document.execCommand('copy');
-    }
+        function createTextArea(text) {
+            textArea = document.createElement('textArea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+        }
+
+        function selectText() {
+            var range,
+                selection;
+
+            if (isOS()) {
+                range = document.createRange();
+                range.selectNodeContents(textArea);
+                selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(range);
+                textArea.setSelectionRange(0, 999999);
+            } else {
+                textArea.select();
+            }
+        }
+
+        function copyToClipboard() {
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+        }
+
+        copy = function (text) {
+            createTextArea(text);
+            selectText();
+            copyToClipboard();
+        };
+
+        return {
+            copy: copy
+        };
+    })(window, document, navigator);
+
 
     function copy() {
-        clipboard('link');
+        Clipboard.copy(link.getAttribute('value'));
         copyBtn.setAttribute('data-balloon-visible', '');
         setTimeout(() => { copyBtn.removeAttribute('data-balloon-visible') }, 2000);
     };
@@ -97,7 +117,7 @@
         document.getElementById('max-sessions').classList.add('noDisplay');
         game = g;
         link.setAttribute('value', 'https://battleship-game-online.herokuapp.com/play/' + game);
-        if(!isiOSDevice){
+        if (!Clipboard.isOS) {
             copy();
         }
     }
