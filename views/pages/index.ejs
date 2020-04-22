@@ -55,15 +55,14 @@
     let link = document.getElementById('link');
     let game;
 
+    function isOS() {
+        return navigator.userAgent.match(/ipad|iphone/i);
+    }
 
     //Clipboard.js https://gist.github.com/rproenca/64781c6a1329b48a455b645d361a9aa3
     window.Clipboard = (function (window, document, navigator) {
         var textArea,
             copy;
-
-        function isOS() {
-            return navigator.userAgent.match(/ipad|iphone/i);
-        }
 
         function createTextArea(text) {
             textArea = document.createElement('textArea');
@@ -117,9 +116,10 @@
         document.getElementById('max-sessions').classList.add('noDisplay');
         game = g;
         link.setAttribute('value', 'https://battleship-game-online.herokuapp.com/play/' + game);
-        if (!Clipboard.isOS) {
+
+        if(!isOS())
             copy();
-        }
+
     }
 
     function init() {
@@ -136,7 +136,7 @@
                     let games = json.game;
                     let btns = [];
                     let i = 1;
-                    console.log(games);
+
                     for (let g of games) {
                         btns.push("<button onclick=\"share('" + g + "')\" class='button' style = 'width: 35px; height: 35px;' >" + i + "</button>");
                         i++;
