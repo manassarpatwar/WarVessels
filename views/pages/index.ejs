@@ -57,6 +57,12 @@
     let link = document.getElementById('link');
     let game;
 
+    function copy() {
+        Clipboard.copy(link.getAttribute('value'));
+        copyBtn.setAttribute('data-balloon-visible', '');
+        setTimeout(() => {copyBtn.removeAttribute('data-balloon-visible')}, 2000);
+    };
+
     function share(g = game) {
         title.classList.add('noDisplay')
         shareDiv.classList.remove('noDisplay')
@@ -64,6 +70,7 @@
         document.getElementById('max-sessions').classList.add('noDisplay');
         game = g;
         link.setAttribute('value', 'https://battleship-game-online.herokuapp.com/play/' + game);
+        copy();
     }
 
     function init() {
@@ -98,12 +105,6 @@
     function play(g = game) {
         window.location.href = '../play/' + g;
     }
-
-    function copy() {
-        Clipboard.copy(link.getAttribute('value'));
-        copyBtn.setAttribute('data-balloon-visible', '');
-        setTimeout(() => copyBtn.removeAttribute('data-balloon-visible'), 2000);
-    };
 </script>
 
 </html>
