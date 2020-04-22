@@ -54,11 +54,9 @@
     let shareDiv = document.getElementById('share');
     let link = document.getElementById('link');
     let game;
-
+    var isiOSDevice = navigator.userAgent.match(/ipad|iphone/i);
     function clipboard(elementId) {
-
         var input = document.getElementById(elementId);
-        var isiOSDevice = navigator.userAgent.match(/ipad|iphone/i);
 
         if (isiOSDevice) {
 
@@ -99,7 +97,9 @@
         document.getElementById('max-sessions').classList.add('noDisplay');
         game = g;
         link.setAttribute('value', 'https://battleship-game-online.herokuapp.com/play/' + game);
-        document.getElementById('copyBtn').click();
+        if(!isiOSDevice){
+            copy();
+        }
     }
 
     function init() {
