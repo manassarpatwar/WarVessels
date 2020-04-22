@@ -95,7 +95,6 @@ main {
 
 #copyImg {
     transform: translate(5px, 5px);
-    cursor: pointer;
 }
 
 #copyBtn {
@@ -104,6 +103,7 @@ main {
     outline: none;
     margin: 0;
     padding: 0;
+    cursor: pointer;
 }
 
 #center {
