@@ -2,10 +2,11 @@ const express = require('express')
 const session = require('express-session');
 const path = require('path')
 const { v4: uuidv4 } = require('uuid');
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT || 5000;
+const sslRedirect = require('heroku-ssl-redirect');
 
 var app = express();
-
+app.use(sslRedirect());
 var ssn;
 
 const fs = require('fs');
