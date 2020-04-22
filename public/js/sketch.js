@@ -571,9 +571,7 @@ function opponentSketch(canvas) {
                             if (!self.showing)
                                 self.show();
                             postAttack();
-                        } else {
-                            window.location.reload();
-                        }
+                        } 
                     }
                 }
                 xhr.setRequestHeader('Content-Type', 'application/json');
