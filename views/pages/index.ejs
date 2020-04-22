@@ -10,30 +10,28 @@
     <link rel="preload" href="fonts/fhull.ttf" as="font" crossorigin="anonymous" />
     <link rel="stylesheet" type="text/css" href="css/main.css" />
     <link rel="stylesheet" type="text/css" href="css/balloon.css" />
-
-    <script language="javascript" type="text/javascript" src="js/clipboard.js"></script>
 </head>
 
 <body>
     <div id="center">
         <div id="title">
-            <div class = 'title-word'><span class = "title-letters" style = 'margin: 0 0 0 5px' >B</span>
-                <span class = "title-letters" style = 'margin: 0 -15px 0 -5px'>A</span>
-                <span class = "title-letters" style = 'margin: 0 -5px 0 5px'>T</span>
-                <span class = "title-letters" >T</span>
-                <span class = "title-letters" >L</span>
-                <span class = "title-letters">E</span>
-                <span class = "title-letters">S</span>
-                <span class = "title-letters">H</span>
-                <span class = "title-letters">I</span>
-                <span class = "title-letters">P</span>
+            <div class='title-word'><span class="title-letters" style='margin: 0 0 0 5px'>B</span>
+                <span class="title-letters" style='margin: 0 -15px 0 -5px'>A</span>
+                <span class="title-letters" style='margin: 0 -5px 0 5px'>T</span>
+                <span class="title-letters">T</span>
+                <span class="title-letters">L</span>
+                <span class="title-letters">E</span>
+                <span class="title-letters">S</span>
+                <span class="title-letters">H</span>
+                <span class="title-letters">I</span>
+                <span class="title-letters">P</span>
             </div>
             <button onclick="init()" class="button" id="multiplayer">Multiplayer</button>
         </div>
         <div id="share" class="noDisplay">
             <div id=shareBox>
                 <div id="shareContent" class="noDisplay">
-                    <label style='margin: 15px 0 5px 0'>Share game link:<button id="copyBtn" onclick="copy()"
+                    <label style='margin: 15px 0 5px 0'>Share game link:<button id="copyBtn" onclick="copy('link')"
                             aria-label="copied!" data-balloon-pos="up"><img id="copyImg" src="../img/copy.png" width="32"
                                 height="32"></button></label>
                     <input contenteditable="true" readonly='true' style='margin: 15px 0 30px 0' id="link">
@@ -57,10 +55,41 @@
     let link = document.getElementById('link');
     let game;
 
+    function clipboard(elementId) {
+
+        var input = document.getElementById(elementId);
+        var isiOSDevice = navigator.userAgent.match(/ipad|iphone/i);
+
+        if (isiOSDevice) {
+
+            var editable = input.contentEditable;
+            var readOnly = input.readOnly;
+
+            input.contentEditable = true;
+            input.readOnly = false;
+
+            var range = document.createRange();
+            range.selectNodeContents(input);
+
+            var selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+
+            input.setSelectionRange(0, 999999);
+            input.contentEditable = editable;
+            input.readOnly = readOnly;
+
+        } else {
+            input.select();
+        }
+
+        document.execCommand('copy');
+    }
+
     function copy() {
-        Clipboard.copy(link.getAttribute('value'));
+        clipboard('link');
         copyBtn.setAttribute('data-balloon-visible', '');
-        setTimeout(() => {copyBtn.removeAttribute('data-balloon-visible')}, 2000);
+        setTimeout(() => { copyBtn.removeAttribute('data-balloon-visible') }, 2000);
     };
 
     function share(g = game) {
