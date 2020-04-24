@@ -41,7 +41,6 @@ class Piece{
             this.currentPosition = this.transform();
             readyBtn.classList.add('noDisplay');
             turn.classList.remove('noDisplay');
-            this.el.classList.add('piece-shadow');
             requestAnimationFrame(update);
         }
     }

@@ -242,7 +242,6 @@ function mouseUp(e) {
         selectedPiece.delta = { x: 0, y: 0 };
         selectedPiece.isDragging = false;
         selectedPiece.dragged = false;
-        selectedPiece.el.classList.remove('piece-shadow');
         selectedPiece = false;
     }
 }
