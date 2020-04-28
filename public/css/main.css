@@ -149,6 +149,8 @@ main {
     outline: none;
     margin: 0;
     padding: 0;
+    margin-left: 20px;
+    padding-right: 5px;
     cursor: pointer;
 }
 
@@ -201,29 +203,34 @@ main {
 }
 
 #link {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: 18px;
     background: #eee;
     border: none;
     outline: none;
     font-weight: 300;
 }
-
-#center .button {
-    font-size: 30px;
-}
-
 .button {
     box-sizing: inherit;
     background-color: #222;
     margin: .1rem;
-    padding: .75rem;
+    padding: .5rem;
     color: #fff;
-    text-align: center;
     border-radius: .1875rem;
-    font-size: 18px;
     outline: none;
     border: none;
+}
+
+.text{
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-weight: 200;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 200;
+    margin: auto;
+    padding: .5rem;
+    width: 50%;
+    transform: scale(2);
 }
 
 .button:hover {
