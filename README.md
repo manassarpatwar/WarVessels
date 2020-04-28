@@ -1,5 +1,5 @@
 # Battleship
-![battleship](https://user-images.githubusercontent.com/44678221/80529474-25885900-89b5-11ea-8efc-94d79ebd1053.gif)  
+![battleship](https://user-images.githubusercontent.com/44678221/80529896-d5f65d00-89b5-11ea-8b66-5956452ed373.gif)  
 Battleship game recreated using Node.js and vanilla JS.  
 Game hosted on Heroku.  
 [Link to game](http://battleship-game-online.herokuapp.com/)
