@@ -149,8 +149,6 @@ main {
     outline: none;
     margin: 0;
     padding: 0;
-    margin-left: 20px;
-    padding-right: 5px;
     cursor: pointer;
 }
 
@@ -214,7 +212,7 @@ main {
     box-sizing: inherit;
     background-color: #222;
     margin: .1rem;
-    padding: 1rem;
+    padding: .75rem;
     color: #fff;
     border-radius: .1875rem;
     outline: none;
