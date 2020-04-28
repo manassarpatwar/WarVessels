@@ -214,7 +214,7 @@ main {
     box-sizing: inherit;
     background-color: #222;
     margin: .1rem;
-    padding: .5rem;
+    padding: 1rem;
     color: #fff;
     border-radius: .1875rem;
     outline: none;
@@ -245,7 +245,7 @@ main {
     #center {
         font-size: 27px;
     }
-    #center .button {
-        font-size: 25px;
+    .text{
+        transform: scale(1.5);
     }
 }
