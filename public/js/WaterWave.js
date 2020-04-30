@@ -1,3 +1,19 @@
+/**
+ * Water ripple effect.
+ * Original code (Java) by Neil Wallis 
+ * @link http://www.neilwallis.com/java/water.html
+ * 
+ * Original code (JavaScript) by Sergey Chikuyonok
+ * @link http://chikuyonok.ru
+ * 
+ * @author Manas Sarpatwar
+ * @link https://github.com/manassarpatwar
+ * 
+ * Modifications made to the original code:
+ * - Clamped ripples so that they don't flow over to the other side, and reflect along the boundaries
+ * - Added a rippleLength variable which helps to decide if the ripple should still animate
+ */
+
 class WaterWave {
     constructor(width, height, ctx) {
         this.current = [];
