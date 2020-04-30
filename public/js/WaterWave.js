@@ -10,7 +10,7 @@
  * @link https://github.com/manassarpatwar
  * 
  * Modifications made to the original code:
- * - Clamped ripples so that they don't flow over to the other side, and reflect along the boundaries
+ * - Clamped ripples so that they don't flow over to the other side allowing them to reflect along the boundaries
  * - Added a rippleLength variable which helps to decide if the ripple should still animate
  */
 

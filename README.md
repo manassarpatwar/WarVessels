@@ -16,3 +16,10 @@ Resources I found useful when animating water
 
 ## Acknowledgements
 I want to thank [Juha Lindstedt](https://github.com/pakastin) and [Mrwan Ashraf](https://github.com/mrwanashraf) for supporting me through this project.
+
+
+## License
+
+[MIT](http://opensource.org/licenses/MIT)
+
+Copyright (c) 2020-present [Manas Sarpatwar](https://github.com/manassarpatwar)
