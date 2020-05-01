@@ -76,6 +76,7 @@ function setup() {
         battleship.opponentBoard = keys.includes('opponentBoard') ? json.opponentBoard : battleship.opponentBoard;
         battleship.ready = json.ready;
         battleship.started = keys.includes('started') ? json.started : battleship.started;
+        battleship.opponentReady = keys.includes('opponentReady') ? json.opponentReady : battleship.opponentReady;
         player.turn = keys.includes('turn') ? json.turn : player.turn;
         if (battleship.ready) {
             start();
@@ -103,23 +104,9 @@ function setup() {
         localStorage.setItem(battleship.id, JSON.stringify({ 'ready': false, 'time': Date.now() }));
     }
 
-    socket.on('connect', function (data) {
-        socket.emit('join', battleship.id);
 
-        socket.on('opponentReady', function () {
-            battleship.opponentReady = true;
-            if (battleship.ready && !battleship.started) {
-                player.turn = true;
-                battleship.started = false;
-                html(turn, 'Attack to start playing');
-            }
-        });
+    socket.emit('join', battleship.id);
 
-        // socket.on('playAgain', function(){
-        //     localStorage.removeItem(battleship.id);
-        //     window.location.reload();
-        // })
-    });
 
     bg = preload('../public/img/bg2.png', () => {
         playerCanvas = createCanvas('playerCanvas');
@@ -131,6 +118,20 @@ function setup() {
         playerSketch.setup();
         opponentSketch.setup();
     })
+
+    socket.on('opponentReady', function () {
+        let store = JSON.parse(localStorage.getItem(battleship.id));
+        battleship.opponentReady = true;
+        if (battleship.ready && !battleship.started) {
+            player.turn = true;
+            store['turn'] = player.turn;
+            battleship.started = false;
+            store['started'] = battleship.started;
+            html(turn, 'Attack to start playing');
+        }
+        store['opponentReady'] = battleship.opponentReady;
+        localStorage.setItem(battleship.id, JSON.stringify(store));
+    });
 
 
     document.addEventListener('mousedown', mouseDown, { passive: false });
@@ -271,10 +272,14 @@ function start() {
     }
 
     socket.emit('ready', data);
-    console.log(battleship.opponentReady);
-    if (battleship.opponentReady) {
+
+    if (battleship.opponentReady && !battleship.started) {
+        let store = JSON.parse(localStorage.getItem(battleship.id));
         player.turn = true;
         battleship.started = false;
+        store['turn'] = player.turn;
+        store['started'] = battleship.started;
+        localStorage.setItem(battleship.id, JSON.stringify(store));
         html(turn, 'Attack to start playing');
     }
 
@@ -297,6 +302,7 @@ function start() {
         }
         store['playerBoard'] = battleship.playerBoard;
         store['turn'] = player.turn;
+        store['started'] = player.turn;
 
         result = battleship.done();
         if (battleship.finished) {
@@ -522,30 +528,28 @@ function initOpponentSketch(canvas) {
 
                 var self = this;
                 socket.emit('attack', data, function (hit) {
-                    if(hit !== null){
-                        let value = hit ? 1 : -1;
-                        battleship.opponentBoard[attack[0]][attack[1]] = value;
-                        html(turn, 'Their turn')
-                        let store = JSON.parse(localStorage.getItem(battleship.id));
-                        store['opponentBoard'] = battleship.opponentBoard;
-                        result = battleship.done();
-                        if (battleship.finished) {
-                            battleship.ready = false;
-                            store['ready'] = false;
-                            store['result'] = result;
-                            setTimeout(() => {
-                                turn.style.fontSize = '30px';
-                                html(turn, 'You ' + (result == 1 ? 'won!' : 'lost!'));
-                                result == 1 ? select('#player').classList.add('noDisplay') : select('#opponent').classList.add('noDisplay');
-                                playAgainBtn.classList.remove('noDisplay');
-                            }, 1000);
-                        }
-                        localStorage.setItem(battleship.id, JSON.stringify(store));
-                        self.waterWave.touchWater(Math.floor(e.clientX - canvas.offsetLeft), Math.floor(e.clientY - canvas.offsetTop));
-                        self.loadTexture();
-                        if (!self.showing)
-                            self.show();
+                    let value = hit ? 1 : -1;
+                    battleship.opponentBoard[attack[0]][attack[1]] = value;
+                    html(turn, 'Their turn')
+                    let store = JSON.parse(localStorage.getItem(battleship.id));
+                    store['opponentBoard'] = battleship.opponentBoard;
+                    result = battleship.done();
+                    if (battleship.finished) {
+                        battleship.ready = false;
+                        store['ready'] = false;
+                        store['result'] = result;
+                        setTimeout(() => {
+                            turn.style.fontSize = '30px';
+                            html(turn, 'You ' + (result == 1 ? 'won!' : 'lost!'));
+                            result == 1 ? select('#player').classList.add('noDisplay') : select('#opponent').classList.add('noDisplay');
+                            playAgainBtn.classList.remove('noDisplay');
+                        }, 1000);
                     }
+                    localStorage.setItem(battleship.id, JSON.stringify(store));
+                    self.waterWave.touchWater(Math.floor(e.clientX - canvas.offsetLeft), Math.floor(e.clientY - canvas.offsetTop));
+                    self.loadTexture();
+                    if (!self.showing)
+                        self.show();
                 });
             } else {
                 html(turn, 'Not your turn');

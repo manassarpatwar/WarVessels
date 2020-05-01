@@ -10,8 +10,6 @@ const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 
 io.on('connection', (client) => {
-	console.log('Client connected...');
-
 	client.on('join', function (game) {
 		client.join(game);
 	});
@@ -24,7 +22,7 @@ io.on('connection', (client) => {
 		gameState[game]['players'][player]['attacks'] = [];
 		gameState[game]['players'][player]['playerBoard'] = playerBoard;
 		gameState['changed'] = true;
-		client.broadcast.emit('opponentReady', true);
+		client.to(game).emit('opponentReady', true);
 	});
 
 	client.on('attack', function (data, callback) {
@@ -41,13 +39,12 @@ io.on('connection', (client) => {
 			gameState[game]['lastAttack'] = { player: player, attack: attack };
 			gameState[game]['players'][player]['attacks'].push(attack);
 			gameState['changed'] = true;
+			client.to(game).emit('incomingAttack', attack);
+			callback(hit);
 		}
-		client.broadcast.emit('incomingAttack', attack);
-		callback(false, hit);
 	});
 
-	client.on('playAgain', function(data){
-		let game = data.game;
+	client.on('playAgain', function(game){
 		if (gameState[game]['lastAttack'] !== null) {
 			gameState[game] = {};
 			gameState[game]['time'] = Date.now();
@@ -55,7 +52,6 @@ io.on('connection', (client) => {
 			gameState[game]['lastAttack'] = null;
 			gameState['changed'] = true;
 		}
-		client.broadcast.emit('playAgain', true);
 	});
 });
 
@@ -152,11 +148,6 @@ app.get('/play/:game', (req, res, next) => {
 			res.render('pages/index_multiplayer', {
 				game: game,
 				playerID: ssn.player
-				// playerBoard: player['playerBoard'],
-				// attacks: player['attacks'],
-				// ready: player['ready'],
-				// started: gameState[game]['started'],
-				// result: player['result']
 			});
 		} else if (gameState[game]['players'] === undefined || Object.keys(gameState[game]['players']).length < 2) {
 			//Another player joins the game, and has not been given a unique id
@@ -169,16 +160,5 @@ app.get('/play/:game', (req, res, next) => {
 	} else {
 		//Link to game does not exist
 		res.redirect('/')
-	}
-});
-
-app.post('/playAgain', function (req, res) {
-	let game = req.body['game'];
-	if (gameState[game]['lastAttack'] !== null) {
-		gameState[game] = {};
-		gameState[game]['time'] = Date.now();
-		gameState[game]['players'] = {};
-		gameState[game]['lastAttack'] = null;
-		gameState['changed'] = true;
 	}
 });
