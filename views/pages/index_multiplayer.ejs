@@ -7,14 +7,14 @@
     <meta name='author' content="Manas Sarpatwar">
     <meta name="description" content="Battleship in browser">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="../../css/main_multiplayer.css" />
-    <link rel="stylesheet" type="text/css" href="../../css/balloon.css" />
-    <script language="javascript" type="text/javascript" src="../../js/sketch.js"></script>
-    <script language="javascript" type="text/javascript" src="../../js/Battleship.js"></script>
-    <script language="javascript" type="text/javascript" src="../../js/Piece.js"></script>
-    <script language="javascript" type="text/javascript" src="../../js/Player.js"></script>
-    <script language="javascript" type="text/javascript" src="../../js/helpers.js"></script>
-    <script language="javascript" type="text/javascript" src="../../js/WaterWave.js"></script>
+    <link rel="stylesheet" type="text/css" href="../public/css/main_multiplayer.css" />
+    <link rel="stylesheet" type="text/css" href="../public/css/balloon.css" />
+    <script language="javascript" type="text/javascript" src="../public/js/sketch.js"></script>
+    <script language="javascript" type="text/javascript" src="../public/js/Battleship.js"></script>
+    <script language="javascript" type="text/javascript" src="../public/js/Piece.js"></script>
+    <script language="javascript" type="text/javascript" src="../public/js/Player.js"></script>
+    <script language="javascript" type="text/javascript" src="../public/js/helpers.js"></script>
+    <script language="javascript" type="text/javascript" src="../public/js/WaterWave.js"></script>
 
 </head>
 
@@ -28,8 +28,8 @@
                     <ol>
                         <li>Battleship is played by 2 players</li>
                         <li>It is a game of guessing where the opponent has placed their ships</li>
-                        <li><img alt='hit' src='../../img/hit.png' class='help-icons'> is a hit and <img alt='miss' src='../../img/miss.png'
-                                class='help-icons'> is a miss</li>
+                        <li><img alt='hit' src='../public/img/hit.png' class='help-icons'> is a hit and <img alt='miss'
+                                src='../public/img/miss.png' class='help-icons'> is a miss</li>
                         <li>Ships sink when they cannot survive another attack</li>
                         <li>Game is over when either all your ships or your opponent's ships have sunk</li>
                     </ol>
@@ -82,17 +82,20 @@
         </div>
     </main>
 </body>
+<script src="/socket.io/socket.io.js"></script>
 <script>
     var gameID = "<%= game %>";
     var playerID = "<%= playerID %>";
     var tutorialOpen = false;
 
+    var socket = io();
+
     var btns = document.getElementsByTagName('button');
-    for(let btn of btns){
-        btn.addEventListener('touchstart', () => {btn.click()});
+    for (let btn of btns) {
+        btn.addEventListener('touchstart', () => { btn.click() });
     }
 
-    if(!localStorage.getItem('tutorialDone')){
+    if (!localStorage.getItem('tutorialDone')) {
         setTimeout(() => {
             tutorial();
             localStorage.setItem('tutorialDone', true);
@@ -104,7 +107,7 @@
     }
 
     let touchElements = document.getElementsByClassName('touch');
-    for(let t of touchElements){
+    for (let t of touchElements) {
         html(t, (is_touch_device() ? 'Tap' : 'Click'));
     }
 

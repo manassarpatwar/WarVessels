@@ -195,23 +195,23 @@ main {
 }
 
 #patrol {
-	background: url("../../img/ships/png/patrol.png");
+	background: url("../img/ships/png/patrol.png");
 }
 
 #carrier {
-	background: url("../../img/ships/png/carrier.png");
+	background: url("../img/ships/png/carrier.png");
 }
 
 #battleship {
-	background: url("../../img/ships/png/battleship.png");
+	background: url("../img/ships/png/battleship.png");
 }
 
 #submarine {
-	background: url("../../img/ships/png/submarine.png");
+	background: url("../img/ships/png/submarine.png");
 }
 
 #destroyer {
-	background: url("../../img/ships/png/destroyer.png");
+	background: url("../img/ships/png/destroyer.png");
 }
 
 @media only screen and (max-width: 600px) {
