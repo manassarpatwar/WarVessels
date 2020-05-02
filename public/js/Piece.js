@@ -1,5 +1,6 @@
 class Piece{
-    constructor(length, el, cellSize, rot=0){
+    constructor(id, length, el, cellSize, rot=0){
+        this.id = id;
         this.coords = [];
         this.boardCoords = [];
         this.name = el;

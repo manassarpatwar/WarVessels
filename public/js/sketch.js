@@ -16,6 +16,10 @@ var bg;
 var readyBtn;
 var playAgainBtn;
 
+var audioCurrentlyPlaying = [];
+var soundImg;
+var SOUNDON;
+
 window.onload = setup;
 
 function preload(url, callback) {
@@ -40,6 +44,14 @@ function setup() {
     board = select('#board');
     readyBtn = select('#readyBtn');
     playAgainBtn = select('#playAgainBtn');
+    soundImg = select('#soundImg');
+
+    let storedSound = localStorage.getItem('sound');
+    SOUNDON = storedSound ? JSON.parse(storedSound) : true;
+  
+    if(!SOUNDON){
+        soundImg.classList.remove('on');
+    }
 
     let smallSize = window.innerWidth < 600;
     boardWidth = smallSize ? 0.42 * window.innerHeight : Math.min(350, 0.4 * window.innerWidth);
@@ -69,15 +81,19 @@ function setup() {
     turn = select('#turn');
     html(turn, 'Place ships');
 
-    if (Object.keys(localStorage).includes(battleship.id)) {
-        let json = JSON.parse(localStorage.getItem(battleship.id));
-        let keys = Object.keys(json);
-        battleship.playerBoard = keys.includes('playerBoard') ? json.playerBoard : battleship.playerBoard;
-        battleship.opponentBoard = keys.includes('opponentBoard') ? json.opponentBoard : battleship.opponentBoard;
+    if (data !== null) {
+        let json = data;
+
+        battleship.playerBoard = json.playerBoard;
+        let attacks = json.attacks;
+
+        for (let a of attacks) {
+            battleship.opponentBoard[a[0]][a[1]] = a[2] ? 1 : -1;
+        }
         battleship.ready = json.ready;
-        battleship.started = keys.includes('started') ? json.started : battleship.started;
-        battleship.opponentReady = keys.includes('opponentReady') ? json.opponentReady : battleship.opponentReady;
-        player.turn = keys.includes('turn') ? json.turn : player.turn;
+        battleship.started = json.started;
+        player.turn = json.turn;
+
         if (battleship.ready) {
             start();
         }
@@ -86,26 +102,43 @@ function setup() {
         } else if (!player.turn && battleship.started) {
             html(turn, 'Their turn');
         }
-        if (keys.includes('pieces')) {
-            for (let p of Object.keys(player.pieces)) {
-                let data = json['pieces'][p];
-                player.pieces[p].el.classList.remove('interactable');
-                player.pieces[p].rotate(data.r);
-                player.pieces[p].fit(data, battleship.cellSize);
+
+        //Fixing pieces to the board
+        let pieceData = {};
+        for (let i = 0; i < battleship.playerBoard.length; i++) { //rows
+            for (let j = 0; j < battleship.playerBoard[i].length; j++) { //columns
+                let key = battleship.playerBoard[j][i];
+                if (key !== 0) {
+                    if (pieceData[key] == undefined) {
+                        pieceData[key] = { x: i, y: j }
+                    } else if (pieceData[key].x == i) {
+                        pieceData[key].r = 0
+                    } else if (pieceData[key].y == j) {
+                        pieceData[key].r = 1;
+                    }
+                }
             }
         }
-        if (keys.includes('result')) {
-            turn.style.fontSize = '30px';
+
+        for (let p of Object.keys(player.pieces)) {
+            let data = pieceData[player.pieces[p].id]
+            player.pieces[p].el.classList.remove('interactable');
+            player.pieces[p].rotate(data.r);
+            player.pieces[p].fit(data, battleship.cellSize);
+        }
+
+
+
+        if (json.result !== -1) {
+            turn.classList.add('end');
             html(turn, 'You ' + (json.result == 1 ? 'won!' : 'lost!'));
             json.result == 1 ? select('#player').classList.add('noDisplay') : select('#opponent').classList.add('noDisplay');
             playAgainBtn.classList.remove('noDisplay');
         }
-    } else {
-        localStorage.setItem(battleship.id, JSON.stringify({ 'ready': false, 'time': Date.now() }));
-    }
+    } 
 
 
-    socket.emit('join', battleship.id);
+    socket.emit('join', battleship.id, player.id);
 
 
     bg = preload('../public/img/bg2.png', () => {
@@ -120,17 +153,12 @@ function setup() {
     })
 
     socket.on('opponentReady', function () {
-        let store = JSON.parse(localStorage.getItem(battleship.id));
         battleship.opponentReady = true;
         if (battleship.ready && !battleship.started) {
             player.turn = true;
-            store['turn'] = player.turn;
             battleship.started = false;
-            store['started'] = battleship.started;
             html(turn, 'Attack to start playing');
         }
-        store['opponentReady'] = battleship.opponentReady;
-        localStorage.setItem(battleship.id, JSON.stringify(store));
     });
 
 
@@ -140,47 +168,37 @@ function setup() {
     document.addEventListener('mouseup', mouseUp, { passive: false });
     document.addEventListener('mousemove', mouseDragged, { passive: false });
     document.addEventListener('touchmove', mouseDragged, { passive: false });
+}
 
+function toggleSound(){
+    SOUNDON = !SOUNDON;
+    localStorage.setItem('sound', SOUNDON);
+    soundImg.classList.toggle('on');
+}
 
-    //localStorage cleanup
+function playHitAudio(){
+    var hitAudio = new Audio('../public/audio/hit.mp3');
+    hitAudio.play();
+}
 
-    var currentTime = Date.now()
-    const items = Object.keys(localStorage);
+function playMissAudio(){
+    var missAudio = new Audio('../public/audio/miss.mp3');    
+    missAudio.play();
+}
 
-    var maxAge = (1000 * 1) *//s
-        (60 * 1) *//m
-        (60 * 0.5) //h localStorage will be removed after 30 mins of initialization
-
-    let returnHome = false;
-    for (let i of items) {
-        let timestamp = JSON.parse(localStorage.getItem(i))['time'];
-        if ((currentTime - timestamp) > maxAge) {
-            localStorage.removeItem(i);
-            if (i == gameID) {
-                returnHome = true;
-            }
-        }
-    }
-
-    if (returnHome) {
-        window.location.href = '../../';
-    }
+function playShipAudio(){
+    var shipPlaceAudio = new Audio('../public/audio/ship_place.mp3');
+    shipPlaceAudio.play();
 }
 
 function playAgain() {
     socket.emit('playAgain', battleship.id);
-    localStorage.removeItem(battleship.id);
     window.location.reload();
 }
 
 function playerReady() {
     if (battleship.ready)
         return;
-
-    if (JSON.parse(localStorage.getItem(gameID))['ready']) {
-        window.location.reload();
-        return;
-    }
 
     let ready = true;
     for (let p of Object.values(player.pieces)) {
@@ -193,32 +211,72 @@ function playerReady() {
         return;
     }
 
-    let store = JSON.parse(localStorage.getItem(gameID));
-    store['playerBoard'] = battleship.playerBoard;
-    store['pieces'] = {};
     let pieces = Object.values(player.pieces);
     for (let p of pieces) {
         p.el.classList.remove('interactable');
-        store['pieces'][p.name] = { x: p.boardCoords[0][0], y: p.boardCoords[0][1], r: p.rotation };
     }
 
-    Array.from(document.getElementsByClassName('tutorial')).map(x => x.removeAttribute('data-balloon-visible'))
     battleship.ready = true;
-    store['ready'] = true;
-    localStorage.setItem(gameID, JSON.stringify(store));
     readyBtn.classList.add('noDisplay');
     turn.classList.remove('noDisplay');
 
     start();
 }
 
-function windowResized() {
-    for (let p of Object.keys(player.pieces)) {
-        if (Object.keys(localStorage).includes(p)) {
-            localStorage.removeItem(p);
-        }
+function start() {
+    turn.classList.remove('noDisplay');
+    html(turn, 'Waiting for other player to be ready');
+    let data = {
+        playerBoard: battleship.playerBoard,
+        game: battleship.id,
+        totalHits: Player.totalPieceLength,
+        player: player.id
     }
+
+    socket.emit('ready', data);
+
+    if (battleship.opponentReady && !battleship.started) {
+        player.turn = true;
+        battleship.started = false;
+        html(turn, 'Attack to start playing');
+    }
+
+    socket.on('incomingAttack', function (attack) {
+        battleship.started = true;
+        player.turn = true;
+        html(turn, 'Your turn');
+        if (attack[2] == 1) {
+            if(SOUNDON)
+                playHitAudio();
+            battleship.playerBoard[attack[0]][attack[1]] = -1;
+        } else {
+            if(SOUNDON) 
+                playMissAudio();
+            battleship.playerBoard[attack[0]][attack[1]] = -2;
+        }
+
+        if (playerSketch.touchWater) {
+            playerSketch.touchWater(attack[1] * battleship.cellSize + battleship.cellSize / 2, attack[0] * battleship.cellSize + battleship.cellSize / 2)
+            playerSketch.loadTexture();
+            if (!playerSketch.showing)
+                playerSketch.show();
+        }
+
+        result = battleship.done();
+        if (battleship.finished) {
+            setTimeout(() => {
+                turn.classList.add('end');
+                html(turn, 'You ' + (result == 1 ? 'won!' : 'lost!'));
+                result == 1 ? select('#player').classList.add('noDisplay') : select('#opponent').classList.add('noDisplay');
+                playAgainBtn.classList.remove('noDisplay');
+            }, 1000);
+            battleship.ready = false;
+
+        }
+
+    })
 }
+
 
 function update() {
     if (selectedPiece) {
@@ -260,66 +318,6 @@ function mouseDown(e) {
     }
     if (e.touches) { e = e.touches[0]; }
     opponentSketch.mouseDown(e);
-}
-
-function start() {
-    turn.classList.remove('noDisplay');
-    html(turn, 'Waiting for other player to be ready');
-    let data = {
-        playerBoard: battleship.playerBoard,
-        game: battleship.id,
-        player: player.id
-    }
-
-    socket.emit('ready', data);
-
-    if (battleship.opponentReady && !battleship.started) {
-        let store = JSON.parse(localStorage.getItem(battleship.id));
-        player.turn = true;
-        battleship.started = false;
-        store['turn'] = player.turn;
-        store['started'] = battleship.started;
-        localStorage.setItem(battleship.id, JSON.stringify(store));
-        html(turn, 'Attack to start playing');
-    }
-
-    socket.on('incomingAttack', function (attack) {
-        battleship.started = true;
-        player.turn = true;
-        html(turn, 'Your turn');
-        let store = JSON.parse(localStorage.getItem(battleship.id));
-        if (attack[2] == 1) {
-            battleship.playerBoard[attack[0]][attack[1]] = -1;
-        } else {
-            battleship.playerBoard[attack[0]][attack[1]] = -2;
-        }
-
-        if (playerSketch.touchWater) {
-            playerSketch.touchWater(attack[1] * battleship.cellSize + battleship.cellSize / 2, attack[0] * battleship.cellSize + battleship.cellSize / 2)
-            playerSketch.loadTexture();
-            if (!playerSketch.showing)
-                playerSketch.show();
-        }
-        store['playerBoard'] = battleship.playerBoard;
-        store['turn'] = player.turn;
-        store['started'] = player.turn;
-
-        result = battleship.done();
-        if (battleship.finished) {
-            setTimeout(() => {
-                turn.style.fontSize = '30px';
-                html(turn, 'You ' + (result == 1 ? 'won!' : 'lost!'));
-                result == 1 ? select('#player').classList.add('noDisplay') : select('#opponent').classList.add('noDisplay');
-                playAgainBtn.classList.remove('noDisplay');
-            }, 1000);
-            battleship.ready = false;
-            store['ready'] = false;
-            store['result'] = result;
-        }
-        localStorage.setItem(battleship.id, JSON.stringify(store));
-
-
-    })
 }
 
 function initPlayerSketch(canvas) {
@@ -419,10 +417,14 @@ function initPlayerSketch(canvas) {
                 if (!this.showing)
                     this.show();
 
+                if(SOUNDON){
+                    playShipAudio();
+                }
+
                 let pieceCoordinates = releasedPiece.coords.map(([i, j]) => [i + place.x, j + place.y]);
 
                 for (let p of pieceCoordinates) {
-                    battleship.playerBoard[p[1]][p[0]] = releasedPiece.getLength();
+                    battleship.playerBoard[p[1]][p[0]] = releasedPiece.id;
                 }
                 releasedPiece.boardCoords = pieceCoordinates;
                 releasedPiece.ready = true;
@@ -513,10 +515,7 @@ function initOpponentSketch(canvas) {
             if (player.turn || !battleship.started) {
                 battleship.started = true;
                 player.turn = false;
-                let store = JSON.parse(localStorage.getItem(battleship.id));
-                store['turn'] = player.turn;
-                store['started'] = battleship.started;
-                localStorage.setItem(battleship.id, JSON.stringify(store));
+
 
                 html(turn, "<div class='dot-pulse'><span>.</span><span>.</span><span>.</span></div>")
 
@@ -528,24 +527,29 @@ function initOpponentSketch(canvas) {
 
                 var self = this;
                 socket.emit('attack', data, function (hit) {
+                    if(SOUNDON){
+                        if (hit) {
+                            playHitAudio();
+                        } else {
+                            playMissAudio();
+                        }
+                    }
                     let value = hit ? 1 : -1;
                     battleship.opponentBoard[attack[0]][attack[1]] = value;
                     html(turn, 'Their turn')
-                    let store = JSON.parse(localStorage.getItem(battleship.id));
-                    store['opponentBoard'] = battleship.opponentBoard;
+
                     result = battleship.done();
                     if (battleship.finished) {
                         battleship.ready = false;
-                        store['ready'] = false;
-                        store['result'] = result;
+
                         setTimeout(() => {
-                            turn.style.fontSize = '30px';
+                            turn.classList.add('end');
                             html(turn, 'You ' + (result == 1 ? 'won!' : 'lost!'));
                             result == 1 ? select('#player').classList.add('noDisplay') : select('#opponent').classList.add('noDisplay');
                             playAgainBtn.classList.remove('noDisplay');
                         }, 1000);
                     }
-                    localStorage.setItem(battleship.id, JSON.stringify(store));
+
                     self.waterWave.touchWater(Math.floor(e.clientX - canvas.offsetLeft), Math.floor(e.clientY - canvas.offsetTop));
                     self.loadTexture();
                     if (!self.showing)

@@ -10,19 +10,29 @@ const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 
 io.on('connection', (client) => {
-	client.on('join', function (game) {
+	client.on('join', function (game, player) {
 		client.join(game);
+		let opponentID = Object.keys(gameState[game]['players']).filter(k => k !== player)[0];
+		let opponent = gameState[game]['players'][opponentID];
+		if(opponent && opponent['ready'])
+			client.emit('opponentReady', true);
 	});
 
 	client.on('ready', function (data) {
 		let game = data.game;
 		let player = data.player;
-		let playerBoard = data.playerBoard;
-		gameState[game]['players'][player] = {};
-		gameState[game]['players'][player]['attacks'] = [];
-		gameState[game]['players'][player]['playerBoard'] = playerBoard;
-		gameState['changed'] = true;
-		client.to(game).emit('opponentReady', true);
+		if(gameState[game]['players'][player] === undefined){
+			let totalHits = data.totalHits;
+			let playerBoard = data.playerBoard;
+			gameState[game]['players'][player] = {};
+			gameState[game]['players'][player]['hits'] = totalHits;
+			gameState[game]['players'][player]['result'] = -1;
+			gameState[game]['players'][player]['ready'] = true;
+			gameState[game]['players'][player]['attacks'] = [];
+			gameState[game]['players'][player]['playerBoard'] = playerBoard;
+			gameState['changed'] = true;
+			client.to(game).emit('opponentReady', true);
+		}
 	});
 
 	client.on('attack', function (data, callback) {
@@ -35,10 +45,17 @@ io.on('connection', (client) => {
 		let opponent = gameState[game]['players'][opponentID];
 		if (gameState[game]['lastAttack'] === null || gameState[game]['lastAttack']['player'] !== player) {
 			hit = opponent['playerBoard'][attack[0]][attack[1]] > 0;
+			opponent['playerBoard'][attack[0]][attack[1]] = hit ? -1 : -2;
+			opponent['hits'] -= hit;
+			if(opponent['hits'] === 0){
+				gameState[game]['players'][player]['result'] = 1;
+				opponent['result'] = 0;
+			}
 			attack[2] = hit;
 			gameState[game]['lastAttack'] = { player: player, attack: attack };
-			gameState[game]['players'][player]['attacks'].push(attack);
 			gameState['changed'] = true;
+			gameState[game]['players'][player]['attacks'].push(attack);
+
 			client.to(game).emit('incomingAttack', attack);
 			callback(hit);
 		}
@@ -147,13 +164,21 @@ app.get('/play/:game', (req, res, next) => {
 			let player = gameState[game]['players'][ssn.player];
 			res.render('pages/index_multiplayer', {
 				game: game,
-				playerID: ssn.player
+				playerID: ssn.player,
+				data: player ? {
+					playerBoard: player.playerBoard,
+					ready: player.ready,
+					started: gameState[game]['lastAttack'] !== null,
+					turn: gameState[game]['lastAttack'] ? gameState[game]['lastAttack']['player'] !== ssn.player : true,
+					result: player.result,
+					attacks: player.attacks
+				} : null
 			});
 		} else if (gameState[game]['players'] === undefined || Object.keys(gameState[game]['players']).length < 2) {
 			//Another player joins the game, and has not been given a unique id
 			const player = uuidv4();
 			ssn.player = player;
-			res.render('pages/index_multiplayer', { game: game, playerID: ssn.player });
+			res.render('pages/index_multiplayer', { game: game, playerID: ssn.player, data: null });
 		} else {
 			res.redirect('/')
 		}

@@ -21,6 +21,7 @@
 <body>
     <main>
         <button id="help" onclick="tutorial()" class="button">?</button>
+        <button id="sound" onclick = 'toggleSound()' class="button"><div class = 'on' id = 'soundImg'></div></button>
         <div id="game">
             <div id="help-info">
                 <section>
@@ -86,6 +87,7 @@
 <script>
     var gameID = "<%= game %>";
     var playerID = "<%= playerID %>";
+    var data = <%- JSON.stringify(data) %>;
     var tutorialOpen = false;
 
     var socket = io();

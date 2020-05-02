@@ -39,7 +39,7 @@ body.has-overlay::before {
 	display: none;
 }
 
-#help, #close {
+#help, #close{
 	position: absolute;
 	right: 0;
 	top: 0;
@@ -47,6 +47,32 @@ body.has-overlay::before {
 	width: 40px;
 	padding: 0;
 	text-align: center;
+}
+
+#sound{
+	position: absolute;
+	left: 0;
+	top: 0;
+	height: 40px;
+	width: 40px;
+	padding: 0;
+	text-align: center;
+} 
+
+#soundImg{
+	height: 32px;
+	width: 32px;
+	background: url('../img/soundOff.png');
+	background-size: 100% 100%;
+}
+
+#sound #soundImg.on{
+	background: url('../img/soundOn.png');
+	background-size: 100% 100%;
+}
+
+#soundImg:hover{
+	filter: invert(100%);
 }
 
 #help-info {
@@ -115,6 +141,11 @@ main {
 	padding: 0.75em;
 	text-align: center;
 	font-weight: 300;
+}
+
+#turn.end{
+	font-size: 30px;
+	padding: 0 0.75em;
 }
 
 .dot-pulse span {
