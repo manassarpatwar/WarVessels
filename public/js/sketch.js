@@ -176,17 +176,23 @@ function toggleSound(){
 }
 
 function playHitAudio(){
-    var hitAudio = new Audio('../public/audio/hit.mp3');
+    var hitAudio = new Audio();
+    hitAudio.play();
+    hitAudio.src = '../public/audio/hit.mp3';
     hitAudio.play();
 }
 
 function playMissAudio(){
-    var missAudio = new Audio('../public/audio/miss.mp3');    
+    var missAudio = new Audio();    
+    missAudio.play();
+    missAudio.src = '../public/audio/miss.mp3';
     missAudio.play();
 }
 
 function playShipAudio(){
-    var shipPlaceAudio = new Audio('../public/audio/ship_place.mp3');
+    var shipPlaceAudio = new Audio();
+    shipPlaceAudio.play();
+    shipPlaceAudio.src = '../public/audio/ship_place.mp3';
     shipPlaceAudio.play();
 }
 
