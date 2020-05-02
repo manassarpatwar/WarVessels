@@ -4,6 +4,8 @@ Battleship™ clone recreated using Node.js Socket.io and vanilla JS.
 Game hosted on Heroku.  
 [Link to game](https://war-vessels.herokuapp.com/)
 
+*Game renamed due to Battleship being trademarked.
+
 ## Ships
 Original ship art by [Lowder2](https://opengameart.org/content/sea-warfare-set-ships-and-more). Ships were slightly modified and vectorized.
 
