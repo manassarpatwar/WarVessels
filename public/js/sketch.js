@@ -16,7 +16,6 @@ var bg;
 var readyBtn;
 var playAgainBtn;
 
-var audioCurrentlyPlaying = [];
 var soundImg;
 var SOUNDON;
 
@@ -88,7 +87,7 @@ function setup() {
         let attacks = json.attacks;
 
         for (let a of attacks) {
-            battleship.opponentBoard[a[0]][a[1]] = a[2] ? 1 : -1;
+            battleship.opponentBoard[a[0]][a[1]] = a[2] ? 'hit' : 'miss';
         }
         battleship.ready = json.ready;
         battleship.started = json.started;
@@ -108,7 +107,8 @@ function setup() {
         for (let i = 0; i < battleship.playerBoard.length; i++) { //rows
             for (let j = 0; j < battleship.playerBoard[i].length; j++) { //columns
                 let key = battleship.playerBoard[j][i];
-                if (key !== 0) {
+                if (Number.isInteger(key) && key !== 0) {
+                    key = Math.abs(key);
                     if (pieceData[key] == undefined) {
                         pieceData[key] = { x: i, y: j }
                     } else if (pieceData[key].x == i) {
@@ -160,7 +160,6 @@ function setup() {
             html(turn, 'Attack to start playing');
         }
     });
-
 
     document.addEventListener('mousedown', mouseDown, { passive: false });
     document.addEventListener('touchstart', mouseDown, { passive: false });
@@ -248,11 +247,11 @@ function start() {
         if (attack[2] == 1) {
             if(SOUNDON)
                 playHitAudio();
-            battleship.playerBoard[attack[0]][attack[1]] = -1;
+            battleship.playerBoard[attack[0]][attack[1]] *= -1;
         } else {
             if(SOUNDON) 
                 playMissAudio();
-            battleship.playerBoard[attack[0]][attack[1]] = -2;
+            battleship.playerBoard[attack[0]][attack[1]] = 'miss';
         }
 
         if (playerSketch.touchWater) {
@@ -350,10 +349,10 @@ function initPlayerSketch(canvas) {
             for (let j = 0; j < battleship.playerBoard[i].length; j++) { //columns
                 this.ctx.beginPath();
                 this.ctx.rect(j * this.cellSize + 1, i * this.cellSize + 1, this.cellSize + 2 / battleship.size, this.cellSize + 2 / battleship.size);
-                if (battleship.playerBoard[i][j] == -1) {
+                if (battleship.playerBoard[i][j] < 0) {
                     this.ctx.fillStyle = 'rgba(255, 0, 0, 0.6)';
                     this.ctx.fill();
-                } else if (battleship.playerBoard[i][j] == -2) {
+                } else if (battleship.playerBoard[i][j] == 'miss') {
                     this.ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
                     this.ctx.fill();
                 } else {
@@ -474,10 +473,10 @@ function initOpponentSketch(canvas) {
             for (let j = 0; j < battleship.opponentBoard[i].length; j++) { //columns
                 this.ctx.beginPath();
                 this.ctx.rect(j * this.cellSize + 1, i * this.cellSize + 1, this.cellSize + 2 / battleship.size, this.cellSize + 2 / battleship.size);
-                if (battleship.opponentBoard[i][j] > 0) {
+                if (battleship.opponentBoard[i][j] == 'hit') {
                     this.ctx.fillStyle = 'rgba(255, 0, 0, 0.6)';
                     this.ctx.fill();
-                } else if (battleship.opponentBoard[i][j] < 0) {
+                } else if (battleship.opponentBoard[i][j] == 'miss') {
                     this.ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
                     this.ctx.fill();
                 } else {
@@ -534,7 +533,7 @@ function initOpponentSketch(canvas) {
                             playMissAudio();
                         }
                     }
-                    let value = hit ? 1 : -1;
+                    let value = hit ? 'hit' : 'miss';
                     battleship.opponentBoard[attack[0]][attack[1]] = value;
                     html(turn, 'Their turn')
 
@@ -555,9 +554,7 @@ function initOpponentSketch(canvas) {
                     if (!self.showing)
                         self.show();
                 });
-            } else {
-                html(turn, 'Not your turn');
-            }
+            } 
         }
     }
 }

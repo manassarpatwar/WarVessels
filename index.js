@@ -45,7 +45,7 @@ io.on('connection', (client) => {
 		let opponent = gameState[game]['players'][opponentID];
 		if (gameState[game]['lastAttack'] === null || gameState[game]['lastAttack']['player'] !== player) {
 			hit = opponent['playerBoard'][attack[0]][attack[1]] > 0;
-			opponent['playerBoard'][attack[0]][attack[1]] = hit ? -1 : -2;
+			opponent['playerBoard'][attack[0]][attack[1]] = hit ? -opponent['playerBoard'][attack[0]][attack[1]] : 'miss';
 			opponent['hits'] -= hit;
 			if(opponent['hits'] === 0){
 				gameState[game]['players'][player]['result'] = 1;

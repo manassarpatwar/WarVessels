@@ -71,7 +71,7 @@ body.has-overlay::before {
 	background-size: 100% 100%;
 }
 
-#soundImg:hover{
+#sound:hover #soundImg{
 	filter: invert(100%);
 }
 
