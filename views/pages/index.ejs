@@ -24,10 +24,10 @@
         </svg>
     </a>
     <div id="center">
-        <div id="title">
+        <div id="title" class = 'noDisplay'>
             <div class='title-word'>
-                <div style = 'animation: right_to_left 3s ease;'>WAR</div>
-                <div style = 'animation: left_to_right 3s ease;'>&nbsp;&nbsp;&nbsp;&nbsp;VESSELS</div>
+                <div id = 'war'>WAR</div>
+                <div id = 'vessels'>&nbsp;&nbsp;&nbsp;&nbsp;VESSELS</div>
             </div>
             <button onclick="init()" class="button" id="multiplayer">
                 <p class='text'>Multiplayer</p>
@@ -68,6 +68,12 @@
     let shareDiv = document.getElementById('share');
     let link = document.getElementById('link');
     let game;
+
+    window.addEventListener('load',  () => {
+        document.getElementById('title').classList.remove('noDisplay');
+        document.getElementById('war').style = 'animation: right_to_left 3s ease;';
+        document.getElementById('vessels').style = 'animation: left_to_right 3s ease;';
+    }, false);
 
     function isOS() {
         return navigator.userAgent.match(/ipad|iphone/i);

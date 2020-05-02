@@ -166,6 +166,10 @@ main {
     flex-direction: column;
 }
 
+title.noDisplay {
+	display: none;
+}
+
 #title .title-word {
     display: flex;
     flex-direction: column;
