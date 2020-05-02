@@ -11,11 +11,14 @@ const io = require('socket.io')(http);
 
 io.on('connection', (client) => {
 	client.on('join', function (game, player) {
-		client.join(game);
-		let opponentID = Object.keys(gameState[game]['players']).filter(k => k !== player)[0];
-		let opponent = gameState[game]['players'][opponentID];
-		if(opponent && opponent['ready'])
-			client.emit('opponentReady', true);
+		let gameExists = Object.keys(gameState).includes(game);
+		if(gameExists){
+			client.join(game);
+			let opponentID = Object.keys(gameState[game]['players']).filter(k => k !== player)[0];
+			let opponent = gameState[game]['players'][opponentID];
+			if(opponent && opponent['ready'])
+				client.emit('opponentReady', true);
+		}
 	});
 
 	client.on('ready', function (data) {
