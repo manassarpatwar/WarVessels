@@ -3,11 +3,11 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Battleship</title>
+    <title>War Vessels</title>
     <meta name='author' content="Manas Sarpatwar">
-    <meta name="description" content="Battleship in browser">
+    <meta name="description" content="War vessels in browser">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="preload" href="public/fonts/fhull.ttf" as="font" crossorigin="anonymous" />
+    <link rel="preload" href="public/fonts/octin\ stencil\ rg.ttf" as="font" crossorigin="anonymous" />
     <link rel="stylesheet" type="text/css" href="public/css/main.css" />
     <link rel="stylesheet" type="text/css" href="public/css/balloon.css" />
 </head>
@@ -25,16 +25,9 @@
     </a>
     <div id="center">
         <div id="title">
-            <div class='title-word'><span class="title-letters" style='margin: 0 0 0 5px'>B</span>
-                <span class="title-letters" style='margin: 0 -15px 0 -5px'>A</span>
-                <span class="title-letters" style='margin: 0 -5px 0 5px'>T</span>
-                <span class="title-letters">T</span>
-                <span class="title-letters">L</span>
-                <span class="title-letters">E</span>
-                <span class="title-letters">S</span>
-                <span class="title-letters">H</span>
-                <span class="title-letters">I</span>
-                <span class="title-letters">P</span>
+            <div class='title-word'>
+                <div style = 'animation: right_to_left 3s ease;'>WAR</div>
+                <div style = 'animation: left_to_right 3s ease;'>&nbsp;&nbsp;&nbsp;&nbsp;VESSELS</div>
             </div>
             <button onclick="init()" class="button" id="multiplayer">
                 <p class='text'>Multiplayer</p>
@@ -136,7 +129,7 @@
         document.getElementById('shareContent').classList.remove('noDisplay');
         document.getElementById('max-sessions').classList.add('noDisplay');
         game = g;
-        link.setAttribute('value', 'https://battleship-game-online.herokuapp.com/play/' + game);
+        link.setAttribute('value', 'https://war-vessels.herokuapp.com/play/' + game);
 
         if (!isOS())
             copy();

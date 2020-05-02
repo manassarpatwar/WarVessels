@@ -3,14 +3,14 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Battleship</title>
+    <title>War Vessels</title>
     <meta name='author' content="Manas Sarpatwar">
-    <meta name="description" content="Battleship in browser">
+    <meta name="description" content="War vessels game in browser">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="../public/css/main_multiplayer.css" />
     <link rel="stylesheet" type="text/css" href="../public/css/balloon.css" />
     <script language="javascript" type="text/javascript" src="../public/js/sketch.js"></script>
-    <script language="javascript" type="text/javascript" src="../public/js/Battleship.js"></script>
+    <script language="javascript" type="text/javascript" src="../public/js/WarVessels.js"></script>
     <script language="javascript" type="text/javascript" src="../public/js/Piece.js"></script>
     <script language="javascript" type="text/javascript" src="../public/js/Player.js"></script>
     <script language="javascript" type="text/javascript" src="../public/js/helpers.js"></script>
@@ -27,7 +27,7 @@
                 <section>
                     <p>Rules <button id="close" onclick="tutorial()" class="button">&times;</button></p>
                     <ol>
-                        <li>Battleship is played by 2 players</li>
+                        <li>War Vessels is played by 2 players</li>
                         <li>It is a game of guessing where the opponent has placed their ships</li>
                         <li><img alt='hit' src='../public/img/hit.png' class='help-icons'> is a hit and <img alt='miss'
                                 src='../public/img/miss.png' class='help-icons'> is a miss</li>
@@ -50,33 +50,19 @@
             <div id="board">
                 <div id="player">
                     <div id="patrol" draggable="false" class="interactable piece loadingImg">
-                        <!-- <div id='patrol-tutorial' style='transition: none !important' class='tutorial' aria-label=''
-                            data-balloon-pos='right'></div> -->
                     </div>
                     <div id="submarine" draggable="false" class="interactable piece loadingImg">
-                        <!-- <div id='submarine-tutorial' class='tutorial' aria-label='3 attacks will sink submarine'
-                            data-balloon-pos='right'></div> -->
                     </div>
                     <div id="destroyer" draggable="false" class="interactable piece loadingImg">
-                        <!-- <div id='destroyer-tutorial' class='tutorial' aria-label='3 attacks will sink destroyer'
-                            data-balloon-pos='right'></div> -->
                     </div>
                     <div id="battleship" draggable="false" class="interactable piece loadingImg">
-                        <!-- <div id='battleship-tutorial' class='tutorial' aria-label='4 attacks will sink battleship'
-                            data-balloon-pos='left'></div> -->
                     </div>
                     <div id="carrier" draggable="false" class="interactable piece loadingImg">
-                        <!-- <div id='carrier-tutorial' class='tutorial' aria-label='5 attacks will sink carrier'
-                            data-balloon-pos='left'></div> -->
                     </div>
                     <canvas id="playerCanvas"></canvas>
-                    <div id='playerCanvasTutorial' class='tutorial' aria-label='This is your territory'
-                        data-balloon-pos="up"></div>
                 </div>
                 <div id="opponent">
                     <canvas id="opponentCanvas"></canvas>
-                    <div id='opponentCanvasTutorial' class='tutorial' aria-label="This is your enemy's territory"
-                        data-balloon-pos="up"></div>
                 </div>
             </div>
 

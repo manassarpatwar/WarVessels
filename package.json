@@ -1,7 +1,7 @@
 {
-  "name": "Battleship",
+  "name": "War Vessels",
   "version": "0.3.0",
-  "description": "Battleship in browser",
+  "description": "War Vessels in browser",
   "engines": {
     "node": "12.x"
   },

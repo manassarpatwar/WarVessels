@@ -1,4 +1,4 @@
-class Battleship{
+class WarVessels{
     constructor(gameID, size, boardWidth){
         this.id = gameID;
         this.size = size;
