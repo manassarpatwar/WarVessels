@@ -17,7 +17,8 @@ var readyBtn;
 var playAgainBtn;
 
 var soundImg;
-var SOUNDON;
+var SOUNDON; 
+var unlockedSound = false;
 
 window.onload = setup;
 
@@ -50,7 +51,10 @@ function setup() {
   
     if(!SOUNDON){
         soundImg.classList.remove('on');
+    }else{
+        soundImg.classList.add('on');
     }
+    unlock();
 
     let smallSize = window.innerWidth < 600;
     boardWidth = smallSize ? 0.42 * window.innerHeight : Math.min(350, 0.4 * window.innerWidth);
@@ -171,29 +175,24 @@ function setup() {
 
 function toggleSound(){
     SOUNDON = !SOUNDON;
+    if(!unlockedSound){
+        unlock();
+        unlockedSound = true;
+    }
     localStorage.setItem('sound', SOUNDON);
     soundImg.classList.toggle('on');
 }
 
 function playHitAudio(){
-    var hitAudio = new Audio();
-    hitAudio.play();
-    hitAudio.src = '../public/audio/hit.mp3';
-    hitAudio.play();
+    playUrl('../public/audio/hit.mp3');
 }
 
 function playMissAudio(){
-    var missAudio = new Audio();    
-    missAudio.play();
-    missAudio.src = '../public/audio/miss.mp3';
-    missAudio.play();
+    playUrl('../public/audio/miss.mp3');
 }
 
 function playShipAudio(){
-    var shipPlaceAudio = new Audio();
-    shipPlaceAudio.play();
-    shipPlaceAudio.src = '../public/audio/ship_place.mp3';
-    shipPlaceAudio.play();
+    playUrl('../public/audio/ship_place.mp3');
 }
 
 function playAgain() {
@@ -317,6 +316,10 @@ function mouseUp(e) {
 }
 
 function mouseDown(e) {
+    if(!unlockedSound){
+        unlock();
+        unlockedSound = true;
+    }
     e.preventDefault();
     if (tutorialOpen) {
         return;

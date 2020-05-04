@@ -23,11 +23,11 @@
                 fill="currentColor" class="octo-body"></path>
         </svg>
     </a>
-    <div id="center">
-        <div id="title" class = 'noDisplay'>
+    <div id="center" class='noDisplay'>
+        <div id="title">
             <div class='title-word'>
-                <div id = 'war'>WAR</div>
-                <div id = 'vessels'>&nbsp;&nbsp;&nbsp;&nbsp;VESSELS</div>
+                <div id='war'>WAR</div>
+                <div id='vessels'>&nbsp;&nbsp;&nbsp;&nbsp;VESSELS</div>
             </div>
             <button onclick="init()" class="button" id="multiplayer">
                 <p class='text'>Multiplayer</p>
@@ -69,8 +69,8 @@
     let link = document.getElementById('link');
     let game;
 
-    window.addEventListener('load',  () => {
-        document.getElementById('title').classList.remove('noDisplay');
+    window.addEventListener('load', () => {
+        document.getElementById('center').classList.remove('noDisplay');
         document.getElementById('war').style = 'animation: right_to_left 3s ease;';
         document.getElementById('vessels').style = 'animation: left_to_right 3s ease;';
     }, false);
