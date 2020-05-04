@@ -56,7 +56,11 @@ function playUrl(url) {
 // From https://paulbakaus.com/tutorials/html5/web-audio-on-ios/
 // "The only way to unmute the Web Audio context is to call noteOn() right after a user interaction. This can be a click or any of the touch events (AFAIK – I only tested click and touchstart)."
 
-function unlock(context = new AudioContext()) {
+function unlock(context) {
+    if(context === null){
+        var AudioContext = window.AudioContext || window.webkitAudioContext;
+        context = new AudioContext();
+    }
     console.log("unlocking")
     try{
         // create empty buffer and play it
