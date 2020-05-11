@@ -16,9 +16,6 @@ var bg;
 var readyBtn;
 var playAgainBtn;
 
-var soundImg;
-var SOUNDON;
-
 window.onload = setup;
 
 function preload(url, callback) {
@@ -43,14 +40,6 @@ function setup() {
     board = select('#board');
     readyBtn = select('#readyBtn');
     playAgainBtn = select('#playAgainBtn');
-    soundImg = select('#soundImg');
-
-    let storedSound = localStorage.getItem('sound');
-    SOUNDON = storedSound ? JSON.parse(storedSound) : true;
-  
-    if(!SOUNDON){
-        soundImg.classList.remove('on');
-    }
 
     let smallSize = window.innerWidth < 600;
     boardWidth = smallSize ? 0.42 * window.innerHeight : Math.min(350, 0.4 * window.innerWidth);
@@ -169,33 +158,6 @@ function setup() {
     document.addEventListener('touchmove', mouseDragged, { passive: false });
 }
 
-function toggleSound(){
-    SOUNDON = !SOUNDON;
-    localStorage.setItem('sound', SOUNDON);
-    soundImg.classList.toggle('on');
-}
-
-function playHitAudio(){
-    var hitAudio = new Audio();
-    hitAudio.play();
-    hitAudio.src = '../public/audio/hit.mp3';
-    hitAudio.play();
-}
-
-function playMissAudio(){
-    var missAudio = new Audio();    
-    missAudio.play();
-    missAudio.src = '../public/audio/miss.mp3';
-    missAudio.play();
-}
-
-function playShipAudio(){
-    var shipPlaceAudio = new Audio();
-    shipPlaceAudio.play();
-    shipPlaceAudio.src = '../public/audio/ship_place.mp3';
-    shipPlaceAudio.play();
-}
-
 function playAgain() {
     socket.emit('playAgain', warvessels.id);
     window.location.reload();
@@ -251,12 +213,8 @@ function start() {
         player.turn = true;
         html(turn, 'Your turn');
         if (attack[2] == 1) {
-            if(SOUNDON)
-                playHitAudio();
             warvessels.playerBoard[attack[0]][attack[1]] *= -1;
         } else {
-            if(SOUNDON) 
-                playMissAudio();
             warvessels.playerBoard[attack[0]][attack[1]] = 'miss';
         }
 
@@ -420,10 +378,6 @@ function initPlayerSketch(canvas) {
                 if (!this.showing)
                     this.show();
 
-                if(SOUNDON){
-                    playShipAudio();
-                }
-
                 let pieceCoordinates = releasedPiece.coords.map(([i, j]) => [i + place.x, j + place.y]);
 
                 for (let p of pieceCoordinates) {
@@ -529,13 +483,6 @@ function initOpponentSketch(canvas) {
 
                 var self = this;
                 socket.emit('attack', data, function (hit) {
-                    if(SOUNDON){
-                        if (hit) {
-                            playHitAudio();
-                        } else {
-                            playMissAudio();
-                        }
-                    }
                     let value = hit ? 'hit' : 'miss';
                     warvessels.opponentBoard[attack[0]][attack[1]] = value;
                     html(turn, 'Their turn')
