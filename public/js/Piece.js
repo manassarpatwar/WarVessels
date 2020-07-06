@@ -1,86 +1,89 @@
 class Piece{
-    constructor(id, length, el, cellSize, rot=0){
-        this.id = id;
+
+    static increaseCount(){
+        this.count++;
+    }
+
+    constructor(length, name, rot=false){
+        this.id = Piece.count;
         this.coords = [];
         this.boardCoords = [];
-        this.name = el;
-        this.el = select('#'+el)
+        this.name = name;
+        this.el = select('#'+this.name)
         this.rotation = rot;
+        this.length = length;
         for(let i = 0; i < length; i++){
             this.coords[i] = [i*this.rotation, i*(1-this.rotation)];
         }
-        this.width = 0.4*cellSize+0.6*(length*(1/5)*cellSize);
-        this.height = 0.92*length*cellSize;
 
-        this.transform(0,0,this.rotation*90);
-
-        this.el.style.height = this.height+'px';
-        this.el.style.width = this.width+'px';
 
         this.dragged = false;
         this.isDragging = false;
         this.startPosition = {x: 0, y: 0};
         this.delta = {x: 0, y: 0};
         this.currentPosition;
+        this.selected = false;
 
         this.ready = false;
 
-        this.el.addEventListener('mousedown', (e) => {this.startDrag(e)},  { passive: false });
-        this.el.addEventListener('touchstart', (e) => {this.startDrag(e)},  { passive: false });
+        const el_img = select('#'+this.name+"-img");
+        el_img.addEventListener('mousedown', (e) => {this.startDrag(e)},  { passive: false });
+        el_img.addEventListener('touchstart', (e) => {this.startDrag(e)},  { passive: false });
 
+        Piece.increaseCount();
     }
 
     startDrag(e) {
         e.preventDefault();
         if(this.el.classList.contains('interactable')){
-
             if (e.touches) { e = e.touches[0]; }
-            selectedPiece = this;
+            this.selected = true;
             this.isDragging = true;
             this.startPosition = {x: e.clientX, y: e.clientY};
             this.currentPosition = this.transform();
+            this.el.classList.add('pickedup');
             readyBtn.classList.add('noDisplay');
             turn.classList.remove('noDisplay');
             requestAnimationFrame(update);
         }
     }
 
-    getPiecePlace(){
-        let data = this.transform();
-        data.x -= (this.height/2-this.width/2)*this.rotation;
-        data.y += (this.height/2-this.width/2)*this.rotation;
+    getPiecePlace(cellSize){
+        const data = this.transform();
+        const height = this.length*cellSize;
+        const width = cellSize;
+    
+        data.x -= (height/2-width/2)*this.rotation;
+        data.y += (height/2-width/2)*this.rotation;
         return {x: data.x, y: data.y};
     }
 
-    getFitBuffer(){
-        let data = {x: 0, y :0};
-        data.x = (this.height/2-this.width/2)*this.rotation;
-        data.y = -(this.height/2-this.width/2)*this.rotation;
+    getFitBuffer(cellSize){
+        const data = {x: 0, y :0};
+        const height = this.length*cellSize;
+        const width = cellSize;
+        data.x = (height/2-width/2)*this.rotation;
+        data.y = -(height/2-width/2)*this.rotation;
         return data;
     }
 
-    getCenter(){
-        let data = this.getPiecePlace();
-        data.x += this.height/2*this.rotation+this.width/2*(1-this.rotation);
-        data.y += this.width/2*this.rotation+this.height/2*(1-this.rotation);
+    getCenter(cellSize){
+        const data = this.getPiecePlace(cellSize);
+        const height = this.length*cellSize;
+        const width = cellSize;
+        data.x += height/2*this.rotation+width/2*(1-this.rotation);
+        data.y += width/2*this.rotation+height/2*(1-this.rotation);
 
         return data;
     }
 
     fit(place, cellSize){
-        let fitBuffer = this.getFitBuffer();
-        let center = {x : (cellSize-this.width)/2, y: (cellSize*this.getLength()-this.height)/2}
-        if(this.rotation == 1){
-            let tmp = center.x;
-            center.x = center.y;
-            center.y = tmp;
-        }
-
-        this.transform(place.x*cellSize+fitBuffer.x+center.x, place.y*cellSize+fitBuffer.y+center.y);
+        const buffer = this.getFitBuffer(cellSize);
+        this.transform(place.x*cellSize+buffer.x, place.y*cellSize+buffer.y);
     }
 
     transform(x, y, r, el = this.el){
-        let d = getComputedStyle(el).transform.split(',').map(d => parseInt(d));
+        const d = getComputedStyle(el).transform.split(',').map(d => parseInt(d));
 
         x = x == null ? d[4] : x;
         y = y == null ? d[5] : y;
@@ -89,13 +92,9 @@ class Piece{
         return {x: x, y: y, r: r};
     };
 
-    getLength(){
-        return this.coords.length;
-    }
-
     rotate(r){
         if(r == null){
-            this.rotation = (this.rotation+1)%2;
+            this.rotation = !this.rotation;
             this.coords = this.coords.map(([i, j]) => ([j, i]));
         }else{
             this.rotation = r;
@@ -106,3 +105,5 @@ class Piece{
         this.transform(null, null, this.rotation*90);
     }
 } 
+
+Piece.count = 1;

@@ -1,82 +1,102 @@
 const express = require('express')
 const session = require('express-session');
-const path = require('path')
 const { v4: uuidv4 } = require('uuid');
 const PORT = process.env.PORT || 5000;
 const sslRedirect = require('heroku-ssl-redirect');
 
-var app = express();
+const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 
 io.on('connection', (client) => {
-	client.on('join', function (game, player) {
-		let gameExists = Object.keys(gameState).includes(game);
+	client.on('join', function (gameID, playerID, callback) {
+		const gameExists = Object.keys(gameState).includes(gameID);
 		if(gameExists){
-			client.join(game);
-			let opponentID = Object.keys(gameState[game]['players']).filter(k => k !== player)[0];
-			let opponent = gameState[game]['players'][opponentID];
+			client.playerID = playerID;
+			client.join(gameID);
+			const opponentID = Object.keys(gameState[gameID]['players']).filter(k => k !== playerID)[0];
+			const opponent = gameState[gameID]['players'][opponentID];
 			if(opponent && opponent['ready'])
-				client.emit('opponentReady', true);
+				client.emit('opponentReady', playerID);
+			
+			const active = gameState[gameID]['active'][playerID];
+			if(active === undefined || !active){
+				gameState[gameID]['active'][playerID] = client.id;
+			}else{
+				callback(active);
+			}
 		}
 	});
 
+	client.on('disconnecting', function(){
+		const rooms = Object.keys(client.rooms);
+		const game =  gameState[rooms[1]];
+		if(game){
+			const player = game['active'][client.playerID];
+			if(player && player == client.id){
+				gameState[rooms[1]]['active'][client.playerID] = false;
+			}
+		}
+	})
+
 	client.on('ready', function (data) {
-		let game = data.game;
-		let player = data.player;
-		if(gameState[game]['players'][player] === undefined){
-			let totalHits = data.totalHits;
-			let playerBoard = data.playerBoard;
-			gameState[game]['players'][player] = {};
-			gameState[game]['players'][player]['hits'] = totalHits;
-			gameState[game]['players'][player]['result'] = -1;
-			gameState[game]['players'][player]['ready'] = true;
-			gameState[game]['players'][player]['attacks'] = [];
-			gameState[game]['players'][player]['playerBoard'] = playerBoard;
+		const gameID = data.gameID;
+		const playerID = data.playerID;
+		const opponentID = Object.keys(gameState[gameID]['active']).filter(k => k !== playerID)[0];
+		if(gameState[gameID]['players'][playerID] === undefined){
+			const totalHits = data.totalHits;
+			const playerBoard = data.playerBoard;
+			gameState[gameID]['players'][playerID] = {};
+			gameState[gameID]['players'][playerID]['hits'] = totalHits;
+			gameState[gameID]['players'][playerID]['result'] = -1;
+			gameState[gameID]['players'][playerID]['ready'] = true;
+			gameState[gameID]['players'][playerID]['attacks'] = [];
+			gameState[gameID]['players'][playerID]['playerBoard'] = playerBoard;
 			gameState['changed'] = true;
-			client.to(game).emit('opponentReady', true);
+			client.to(gameID).emit('opponentReady');
+		
 		}
 	});
 
 	client.on('attack', function (data, callback) {
-		let game = data.game;
-		let player = data.player;
-		let attack = data.attack;
+		const gameID = data.gameID;
+		const playerID = data.playerID;
+		const attack = data.attack;
 
-		let hit = null;
-		let opponentID = Object.keys(gameState[game]['players']).filter(k => k !== player)[0];
-		let opponent = gameState[game]['players'][opponentID];
-		if (gameState[game]['lastAttack'] === null || gameState[game]['lastAttack']['player'] !== player) {
-			hit = opponent['playerBoard'][attack[0]][attack[1]] > 0;
+		const opponentID = Object.keys(gameState[gameID]['players']).filter(k => k !== playerID)[0];
+		const opponent = gameState[gameID]['players'][opponentID];
+		const player = gameState[gameID]['players'][playerID];
+		if (opponent && (gameState[gameID]['lastAttack'] === null || gameState[gameID]['lastAttack']['playerID'] !== playerID)) {
+			const hit = opponent['playerBoard'][attack[0]][attack[1]] > 0;
 			opponent['playerBoard'][attack[0]][attack[1]] = hit ? -opponent['playerBoard'][attack[0]][attack[1]] : 'miss';
 			opponent['hits'] -= hit;
 			if(opponent['hits'] === 0){
-				gameState[game]['players'][player]['result'] = 1;
+				player['result'] = 1;
 				opponent['result'] = 0;
 			}
 			attack[2] = hit;
-			gameState[game]['lastAttack'] = { player: player, attack: attack };
+			attack[3] = opponentID;
+			gameState[gameID]['lastAttack'] = { playerID: playerID, attack: attack };
 			gameState['changed'] = true;
-			gameState[game]['players'][player]['attacks'].push(attack);
+			player['attacks'].push(attack);
 
-			client.to(game).emit('incomingAttack', attack);
+			client.to(gameID).emit('incomingAttack', attack);
 			callback(hit);
 		}
 	});
 
-	client.on('playAgain', function(game){
-		if (gameState[game]['lastAttack'] !== null) {
-			gameState[game] = {};
-			gameState[game]['time'] = Date.now();
-			gameState[game]['players'] = {};
-			gameState[game]['lastAttack'] = null;
+	client.on('playAgain', function(gameID){
+		if (gameState[gameID]['lastAttack'] !== null) {
+			gameState[gameID] = {};
+			gameState[gameID]['time'] = Date.now();
+			gameState[gameID]['players'] = {};
+			gameState[gameID]['lastAttack'] = null;
 			gameState['changed'] = true;
 		}
 	});
 });
 
 app.use(sslRedirect());
-var ssn;
 
 const fs = require('fs');
 
@@ -117,7 +137,10 @@ app.use(express.json());
 app.use(session({ secret: 'XASDASDA' }));
 app.use(express.static(__dirname))
 	.set('view engine', 'ejs')
-	.get('/', (req, res) => res.render('pages/index'))
+	.get('/', (req, res) => {
+		const ssn = req.session;
+		res.render('pages/index', {gamesID: ssn.gamesID ? ssn.gamesID : []});
+	})
 	.get('/index', (req, res) => res.redirect('/'))
 
 http.listen(PORT, () => {
@@ -125,63 +148,60 @@ http.listen(PORT, () => {
 });
 
 app.post('/init', (req, res, next) => {
-	var game = uuidv4();
-	ssn = req.session;
-	let error = false;
-	if (ssn.games !== undefined) {
-		for (let i = 0; i < ssn.games.length; i++) {
-			if (gameState[ssn.games[i]] === undefined) {
-				ssn.games.splice(i, 1);
+	const ssn = req.session;
+	
+	if (ssn.gamesID !== undefined) {
+		for (let i = 0; i < ssn.gamesID.length; i++) {
+			if (gameState[ssn.gamesID[i]] === undefined) {
+				ssn.gamesID.splice(i, 1);
 				i--;
 			}
 		}
 	}
 
-	if (ssn.games === undefined || ssn.games && ssn.games.length < 3) {
-		if (ssn.games === undefined) {
-			ssn.games = [game];
+	if (ssn.gamesID === undefined || ssn.gamesID && ssn.gamesID.length < 3) {
+		const gameID = uuidv4();
+		if (ssn.gamesID === undefined) {
+			ssn.gamesID = [gameID];
 		} else {
-			ssn.games.push(game);
+			ssn.gamesID.push(gameID);
 		}
-		gameState[game] = {};
-		gameState[game]['time'] = Date.now();
-		gameState[game]['players'] = {};
-		gameState[game]['lastAttack'] = null;
+		gameState[gameID] = {};
+		gameState[gameID]['time'] = Date.now();
+		gameState[gameID]['players'] = {};
+		gameState[gameID]['active'] = {};
+		gameState[gameID]['lastAttack'] = null;
 		gameState['changed'] = true;
-	} else {
-		error = true;
-		game = ssn.games;
 	}
 
-
-	res.send({ game: game, error: error });
+	res.send({gamesID: ssn.gamesID });
 })
 
-app.get('/play/:game', (req, res, next) => {
-	const { game } = req.params;
-	let gameExists = Object.keys(gameState).includes(game);
-	ssn = req.session;
+app.get('/play/:gameID', (req, res, next) => {
+	const { gameID } = req.params;
+	const gameExists = Object.keys(gameState).includes(gameID);
+	const ssn = req.session;
 	if (gameExists) {
-		if (ssn.player) {
+		if (ssn.playerID) {
 			//Game exists and player has been given a unique id
-			let player = gameState[game]['players'][ssn.player];
+			const player = gameState[gameID]['players'][ssn.playerID];
 			res.render('pages/index_multiplayer', {
-				game: game,
-				playerID: ssn.player,
+				gameID: gameID,
+				playerID: ssn.playerID,
 				data: player ? {
 					playerBoard: player.playerBoard,
 					ready: player.ready,
-					started: gameState[game]['lastAttack'] !== null,
-					turn: gameState[game]['lastAttack'] ? gameState[game]['lastAttack']['player'] !== ssn.player : true,
+					started: gameState[gameID]['lastAttack'] !== null,
+					turn: gameState[gameID]['lastAttack'] ? gameState[gameID]['lastAttack']['playerID'] !== ssn.playerID : true,
 					result: player.result,
 					attacks: player.attacks
 				} : null
 			});
-		} else if (gameState[game]['players'] === undefined || Object.keys(gameState[game]['players']).length < 2) {
+		} else if (gameState[gameID]['players'] === undefined || Object.keys(gameState[gameID]['players']).length < 2) {
 			//Another player joins the game, and has not been given a unique id
-			const player = uuidv4();
-			ssn.player = player;
-			res.render('pages/index_multiplayer', { game: game, playerID: ssn.player, data: null });
+			const playerID = uuidv4();
+			ssn.playerID = playerID;
+			res.render('pages/index_multiplayer', { gameID: gameID, playerID: ssn.playerID, data: null });
 		} else {
 			res.redirect('/')
 		}

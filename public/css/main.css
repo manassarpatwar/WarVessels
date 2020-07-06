@@ -91,36 +91,23 @@ body {
     }
 }
 
-@keyframes right_to_left {
-    from {
-      margin-left: 50%;
-      opacity: 0;
-    }
-    to {
-      margin-left: 0;
-      opacity: 1;
-    }
-  }
-  
-  @keyframes left_to_right {
-    from {
-      margin-left: -50%;
-      opacity: 0;
-    }
-    to {
-      margin-left: 0;
-      opacity: 1;
-    }
-  }
-
 main {
     position: relative;
     width: 100vw;
 }
 
-#copyImg {
-    transform: translate(5px, 5px);
+.text {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 200;
+    margin: auto;
+    padding: .5rem;
+    width: 50%;
+    height: 50%;
+    transform: scale(2);
 }
+
 
 #copyBtn {
     background: none;
@@ -128,6 +115,27 @@ main {
     outline: none;
     margin: 0;
     padding: 0;
+    cursor: pointer;
+}
+
+#backBtn{
+    position: absolute;
+    background-color: #eee; 
+    left: 0;
+    color: #222;
+    z-index: 1;
+    width: 30px;
+    height: 30px;
+    margin: 2px;
+}
+
+#backBtn img{
+    width: 30px;
+    height: 30px;
+}
+
+
+#backBtn:hover{
     cursor: pointer;
 }
 
@@ -139,11 +147,12 @@ main {
     font-size: 34px;
 }
 
-.noDisplay {
+#center .noDisplay {
     display: none;
 }
 
-#shareBox, #shareContent {
+.card {
+    position: relative;
     display: flex;
     flex-direction: column;
     text-align: center;
@@ -153,10 +162,6 @@ main {
     box-shadow: 0 19px 38px rgba(0, 0, 0, 0.30), 0 15px 12px rgba(0, 0, 0, 0.22);
     font-size: 22px;
     font-weight: 300;
-}
-
-#shareBox .noDisplay {
-    display: none;
 }
 
 #title {
@@ -215,21 +220,45 @@ title.noDisplay {
     border: none;
 }
 
-.text {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-weight: 200;
-    text-align: center;
-    font-size: 16px;
-    font-weight: 200;
-    margin: auto;
-    padding: .5rem;
-    width: 50%;
-    transform: scale(2);
-}
+
 
 .button:hover {
     background-color: #eee;
     color: #222;
+}
+
+.square{
+    padding: 0;
+    width: 45px;
+    height: 45px;
+}
+
+.square .text{
+    width: 50%;
+    height: 50%;
+    padding: 0;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translate(0, -10%) scale(2);
+}
+
+.create{
+    box-sizing: border-box;
+    background-color: #eee;
+    color: #222;
+    border-radius: .1875rem;
+    border: 2px dashed #222;
+}
+
+.create .text{
+    transform: translate(0, -20%) scale(2);
+}
+
+.create:hover{
+    background-color: #222;
+    color: #eee;
 }
 
 @media only screen and (max-width: 600px) {

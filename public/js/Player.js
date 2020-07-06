@@ -1,18 +1,25 @@
 class Player {
-    constructor(id, cellSize) {
+    constructor(id, smallSize) {
         this.id = id;
 
-        this.pieces = {
-            'patrol': new Piece(1, 2, 'patrol', cellSize),
-            'submarine': new Piece(2, 3, 'submarine', cellSize),
-            'destroyer': new Piece(3, 3, 'destroyer', cellSize),
-            'battleship': new Piece(4, 4, 'battleship', cellSize, 1),
-            'carrier': new Piece(5, 5, 'carrier', cellSize, 1)
-        }
+        this.pieces = [
+            new Piece(2, 'patrol'),
+            new Piece(3, 'submarine'),
+            new Piece(3, 'destroyer'),
+            new Piece(4, 'battleship', !smallSize),
+            new Piece(5, 'carrier', !smallSize)
+        ]
         this.turn = false;
-
     }
 
+    getSelectedPiece(){
+        for(const piece of this.pieces){
+            if(piece.selected){
+                return piece;
+            }
+        }
+        return null;
+    }
 }
 
 Player.totalPieceLength = 17;

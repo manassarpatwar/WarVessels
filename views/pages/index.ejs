@@ -7,9 +7,9 @@
     <meta name='author' content="Manas Sarpatwar">
     <meta name="description" content="War vessels in browser">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="preload" href="public/fonts/octin\ stencil\ rg.ttf" as="font" crossorigin="anonymous" />
     <link rel="stylesheet" type="text/css" href="public/css/main.css" />
     <link rel="stylesheet" type="text/css" href="public/css/balloon.css" />
+    <script language="javascript" type="text/javascript" src="../public/js/helpers.js"></script>
 </head>
 
 <body>
@@ -23,8 +23,8 @@
                 fill="currentColor" class="octo-body"></path>
         </svg>
     </a>
-    <div id="center" class='noDisplay'>
-        <div id="title">
+    <div id="center">
+        <div id="title" class = "">
             <div class='title-word'>
                 <div id='war'>WAR</div>
                 <div id='vessels'>&nbsp;&nbsp;&nbsp;&nbsp;VESSELS</div>
@@ -33,47 +33,65 @@
                 <p class='text'>Multiplayer</p>
             </button>
         </div>
-        <div id="share" class="noDisplay">
-            <div id=shareBox>
-                <div id="shareContent" class="noDisplay">
-                    <div style='display: flex; flex-direction: row; justify-content: center;'>
-                        <p class='text' style='transform: scale(1.3); font-weight: 300; margin-right: 0; margin-left: 0'>Share
-                            game
-                            link:</p>
-                        <label style='margin: 15px 0 5px 0;'>
-                            <button id="copyBtn" onclick="copy()" aria-label="copied!" data-balloon-pos="up"><img id="copyImg"
-                                    src="public/img/copy.png" width="32" height="32" style='transform: translate(-4px, -4px)'></button>
-                        </label>
-                    </div>
-                    <input contenteditable="true" readonly='true' style='margin: 15px 0 30px 0' id="link">
-                    <button onclick="play()" class="button" id="play">
-                        <p class='text'>Play</p>
-                    </button>
-                </div>
-                <div id="max-sessions" class="noDisplay">
-                    <p class='text' style='transform: scale(1.2); margin: 1em auto; font-weight: 300'>Select from
-                        created game sessions</p>
-                    <div id='max-sessions-btns' style='margin: 0 0 40px 0'>
+        <div id="share" class="card noDisplay">
+            <button id = "backBtn" onclick = "switchState('sessions')" class = "button square"><img src="public/img/back.png"></button>
+            <div style='display: flex; flex-direction: row; justify-content: center;'>
+                <p class='text' style='transform: scale(1.3); font-weight: 300; margin-right: 0; margin-left: 0'>Share
+                    game
+                    link:</p>
+                <label style='margin: 15px 0 5px 0;'>
+                    <button id="copyBtn" onclick="copy()" aria-label="copied!" data-balloon-pos="up"><img id="copyImg"
+                            src="public/img/copy.png" width="28" height="28" style='transform: translate(5%, 2.5%)'></button>
+                </label>
+            </div>
+            <input contenteditable="true" readonly='true' style='margin: 15px 0 30px 0' id="link">
+            <button class="button" id="play">
+                <p class='text'>Play</p>
+            </button>
+        </div>
+        <div id="sessions" class="card noDisplay">
+            <button id = "backBtn" onclick = "switchState('title')" class = "button square"><img src="public/img/back.png"></button>
+            <p class='text' style='transform: scale(1.2); margin: 1em auto; font-weight: 300'>Select from
+                created game sessions</p>
+            <div id='sessions-buttons' style='margin: 0 0 40px 0'>
 
-                    </div>
-                </div>
             </div>
         </div>
     </div>
 
 </body>
 <script>
-    document.getElementById('center').style.height = window.innerHeight + 'px';
-    let title = document.getElementById('title');
-    let shareDiv = document.getElementById('share');
-    let link = document.getElementById('link');
+    select('#center').style.height = window.innerHeight + 'px';
+    const title = select('#title');
+    const share = select('#share');
+    const sessions = select('#sessions');
+    const link = select('#link');
+    const playButton = select('#play');
+
+    const states = [title, share, sessions]
     let game;
 
-    window.addEventListener('load', () => {
-        document.getElementById('center').classList.remove('noDisplay');
-        document.getElementById('war').style = 'animation: right_to_left 3s ease;';
-        document.getElementById('vessels').style = 'animation: left_to_right 3s ease;';
-    }, false);
+    function switchState(state){
+        switch(state){
+            case 'title':
+                states.map(x => x.classList.add('noDisplay'));
+                title.classList.remove('noDisplay');
+                break;
+            case 'share':
+                states.map(x => x.classList.add('noDisplay'));
+                share.classList.remove('noDisplay');
+                break;
+            case 'sessions':
+                states.map(x => x.classList.add('noDisplay'));
+                appendSessionButtons(sessionGamesID);
+                sessions.classList.remove('noDisplay');
+                break;
+            default:
+                break;
+        }
+    }
+
+    let sessionGamesID = <%- JSON.stringify(gamesID) %>
 
     function isOS() {
         return navigator.userAgent.match(/ipad|iphone/i);
@@ -129,49 +147,55 @@
         setTimeout(() => { copyBtn.removeAttribute('data-balloon-visible') }, 2000);
     };
 
-    function share(g = game) {
-        title.classList.add('noDisplay')
-        shareDiv.classList.remove('noDisplay')
-        document.getElementById('shareContent').classList.remove('noDisplay');
-        document.getElementById('max-sessions').classList.add('noDisplay');
-        game = g;
-        link.setAttribute('value', 'https://war-vessels.herokuapp.com/play/' + game);
-
+    function shareGame(g) {
+        switchState('share');
+        link.setAttribute('value', 'https://war-vessels.herokuapp.com/play/' + g);
+        playButton.onclick = function(){play(g)};
         if (!isOS())
             copy();
 
     }
 
+    function appendSessionButtons(gamesID){
+        const buttons = [];
+        let i = 1;
+        for (const g of gamesID) {
+            buttons.push("<button onclick=\"shareGame('" + g + "')\" class='square button'><p class = 'text'>" + i + "</p></button>");
+            i++;
+        }
+        for(let j = i-1; j < 3; j++){
+            buttons.push("<button onclick=\"createNewGame()\" class='square button create'><p class = 'text'>+</p></button>");
+        }
+        select('#sessions').classList.remove('noDisplay');
+        select('#sessions-buttons').innerHTML = buttons.join('');
+    }
+
     function init() {
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', '/init', true);
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState == XMLHttpRequest.DONE) {
-                var json = JSON.parse(xhr.responseText);
-                if (!json.error) {
-                    share(json.game);
-                } else {
-                    title.classList.add('noDisplay')
-                    shareDiv.classList.remove('noDisplay');
-                    let games = json.game;
-                    let btns = [];
-                    let i = 1;
+        if(sessionGamesID.length == 0){
+            createNewGame();
+        }else{
+            switchState('sessions');
+            appendSessionButtons(sessionGamesID);
+        }
+    }   
 
-                    for (let g of games) {
-                        btns.push("<button onclick=\"share('" + g + "')\" class='button' style = 'width: 35px; height: 35px;' ><p class = 'text'>" + i + "</p></button>");
-                        i++;
-                    }
-                    document.getElementById('max-sessions').classList.remove('noDisplay');
-                    document.getElementById('max-sessions-btns').innerHTML = btns.join('');
-
+    function createNewGame(){
+        if(sessionGamesID.length < 4){
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/init', true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    const json = JSON.parse(xhr.responseText);
+                    sessionGamesID = json.gamesID;
+                    shareGame(sessionGamesID[sessionGamesID.length-1]);
                 }
             }
+            xhr.send();
         }
-        xhr.send();
     }
 
 
-    function play(g = game) {
+    function play(g) {
         window.location.href = '../play/' + g;
     }
 </script>

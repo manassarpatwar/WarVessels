@@ -5,10 +5,10 @@ class WarVessels{
         this.playerBoard = this.initBoard(size);
         this.opponentBoard = this.initBoard(size);
         this.cellSize = boardWidth/size;
-        this.boardWidth = boardWidth
+        this.boardWidth = boardWidth;
         this.ready = false;
         this.opponentReady = false;
-        this.started = null;
+        this.started = false;
         this.finished = false;
 
     }
@@ -38,14 +38,16 @@ class WarVessels{
         return true;
     }
 
-    piecePlaceOK(x, y, piece){
+    piecePlaceOK(data, piece){
+        const x = data.x;
+        const y = data.y;
         if(!(x >= 0 && x <= this.size &&
             y >= 0 && y <= this.size)){
                 return false;
         }
 
-        if(x+piece.getLength()*piece.rotation > this.size ||
-        y+piece.getLength()*(1-piece.rotation) > this.size){
+        if(x+piece.length*piece.rotation > this.size ||
+        y+piece.length*(1-piece.rotation) > this.size){
             return false;
         }
 
@@ -68,6 +70,18 @@ class WarVessels{
         }
 
         return true;
+    }
+
+    getPiecePlace(piece){
+        return piece.getPiecePlace(this.cellSize);
+    }
+
+    placePiece(piece, data){
+        piece.fit(data, this.cellSize);
+    }
+
+    getCenter(piece){
+        return piece.getCenter(this.cellSize);
     }
 
     initBoard(size){

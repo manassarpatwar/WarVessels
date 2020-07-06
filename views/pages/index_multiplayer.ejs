@@ -7,8 +7,7 @@
     <meta name='author' content="Manas Sarpatwar">
     <meta name="description" content="War vessels game in browser">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="../public/css/main_multiplayer.css" />
-    <link rel="stylesheet" type="text/css" href="../public/css/balloon.css" />
+    <link rel="stylesheet" type="text/css" href="../public/css/multiplayer.css" />
     <script language="javascript" type="text/javascript" src="../public/js/sketch.js"></script>
     <script language="javascript" type="text/javascript" src="../public/js/WarVessels.js"></script>
     <script language="javascript" type="text/javascript" src="../public/js/Piece.js"></script>
@@ -20,12 +19,15 @@
 
 <body>
     <main>
-        <button id="help" onclick="tutorial()" class="button">?</button>
-        <!-- <button id="sound" onclick = 'toggleSound()' class="button"><div class = 'on' id = 'soundImg'></div></button> -->
-        <div id="game">
+        <button id="help" onclick="tutorial()" class="button-square">?</button>
+        <div id="game" class = "noDisplay">
+            <div id = "multiple-sessions" class = "noDisplay">
+                <p>Another session of the same game is running on your browser.</p>
+                <p>Please return to that session to continue playing.</p>
+            </div>
             <div id="help-info">
                 <section>
-                    <p>Rules <button id="close" onclick="tutorial()" class="button">&times;</button></p>
+                    <p>Rules <button id="close" onclick="tutorial()" class="button-square" style="padding-top: 0.5%;">&times;</button></p>
                     <ol>
                         <li>War Vessels is played by 2 players</li>
                         <li>It is a game of guessing where the opponent has placed their ships</li>
@@ -48,20 +50,25 @@
                 <button id="playAgainBtn" onclick="playAgain()" class="button noDisplay">Play again?</button>
             </div>
             <div id="board">
-                <div id="player">
+                <div id="player" class = "boards">
                     <div id="patrol" draggable="false" class="interactable piece loadingImg">
+                        <div id = "patrol-img" class = "piece-img"></div>
                     </div>
                     <div id="submarine" draggable="false" class="interactable piece loadingImg">
+                        <div id = "submarine-img" class = "piece-img"></div>
                     </div>
                     <div id="destroyer" draggable="false" class="interactable piece loadingImg">
+                        <div id = "destroyer-img" class = "piece-img"></div>
                     </div>
                     <div id="battleship" draggable="false" class="interactable piece loadingImg">
+                        <div id = "battleship-img" class = "piece-img"></div>
                     </div>
                     <div id="carrier" draggable="false" class="interactable piece loadingImg">
+                        <div id = "carrier-img" class = "piece-img"></div>
                     </div>
                     <canvas id="playerCanvas"></canvas>
                 </div>
-                <div id="opponent">
+                <div id="opponent" class = "boards">
                     <canvas id="opponentCanvas"></canvas>
                 </div>
             </div>
@@ -71,17 +78,17 @@
 </body>
 <script src="/socket.io/socket.io.js"></script>
 <script>
-    var gameID = "<%= game %>";
-    var playerID = "<%= playerID %>";
-    var data = <%- JSON.stringify(data) %>;
-    var tutorialOpen = false;
+    const gameID = "<%= gameID %>";
+    const playerID = "<%= playerID %>";
+    const json = <%- JSON.stringify(data) %>;
+    let tutorialOpen = false;
 
-    var socket = io();
+    const socket = io();
     socket.on('disconnect', () => {window.location.reload()});
     socket.on('reconnect', () => {window.location.reload()});
-    var btns = document.getElementsByTagName('button');
-    for (let btn of btns) {
-        btn.addEventListener('touchstart', () => { btn.click() });
+    const buttons = document.getElementsByTagName('button');
+    for (const button of buttons) {
+        button.addEventListener('touchstart', () => { button.click() });
     }
 
     if (!localStorage.getItem('tutorialDone')) {
@@ -95,8 +102,8 @@
         return 'ontouchstart' in window;
     }
 
-    let touchElements = document.getElementsByClassName('touch');
-    for (let t of touchElements) {
+    const touchElements = document.getElementsByClassName('touch');
+    for (const t of touchElements) {
         html(t, (is_touch_device() ? 'Tap' : 'Click'));
     }
 

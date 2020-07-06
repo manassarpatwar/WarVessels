@@ -1,0 +1,401 @@
+:root{
+	--cellsize: 0px;
+	--cellsizepx: 0px;
+	--canvas-size: 0px;
+}
+
+html, body {
+	margin: 0;
+	padding: 0;
+	font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	font-weight: 300;
+	background: #eee;
+	width: 100vw;
+	height: 100%;
+	overflow: hidden;
+}
+
+body.has-overlay::before {
+	content: "";
+	display: block;
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	z-index: 2;
+	background: rgba(0, 0, 0, 0.5);
+}
+
+.noDisplay {
+	display: none;
+}
+
+/*======================Help info========================*/
+.button-square{
+	position: absolute;
+	right: 0;
+	top: 0;
+	height: 40px;
+	width: 40px;
+	padding: 0;
+	text-align: center;
+	background-color: #222;
+	color: #eee;
+	border-radius: .1875em;
+	margin: .5em;
+	outline: none;
+	border: none;
+	font-weight: 300;
+	z-index: 1;
+}
+
+.button-square:hover{
+	background-color: #eee;
+	color: #222;
+}
+
+#help-info {
+	position: absolute;
+	width: 380px;
+	padding: 20px;
+	background: #eee;
+	border-radius: 5px;
+	box-shadow: 0 19px 38px rgba(0, 0, 0, 0.30), 0 15px 12px rgba(0, 0, 0, 0.22);
+	z-index: -1;
+	opacity: 0;
+	transition: opacity 0.5s ease;
+}
+
+#help-info.show {
+	z-index: 2;
+	opacity: 1;
+}
+
+.help-icons {
+	width: 16px;
+	height: 16px;
+	transform: translate(0, 2px);
+}
+
+#help-info ol {
+	padding-left: 8%;
+}
+
+#help-info li {
+	padding: 5px 0;
+}
+
+#help-info p {
+	font-size: 22px;
+	text-align: center;
+	margin: 0;
+}
+
+#info {
+	margin: .5em;
+	padding: 0.75em;
+	display: flex;
+	flex-direction: column;
+}
+/*=====================================================*/
+
+
+
+canvas {
+	border-radius: 5px;
+	box-shadow: 0 0 50px 2px rgba(0, 0, 0, 0.30);
+	width: var(--canvas-size);
+	height: var(--canvas-size);
+}
+
+
+
+main {
+	position: relative;
+	width: 100vw;
+}
+
+#multiple-sessions{
+	position: absolute;
+	top: 0;
+	left: 50%;
+	transform: translate(-50%, -100%);
+	border-bottom-left-radius: 10px;
+	border-bottom-right-radius: 10px;
+	padding: 0 2%;
+	box-shadow: 0 0 50px 2px rgba(0, 0, 0, 0.30);
+	z-index: 3;
+	background: #eee;
+	transition: transform 1s ease;
+}
+
+#multiple-sessions.active{
+	transform: translate(-50%, 0%);
+	transition: transform 1s ease;
+}
+
+#player {
+	position: relative;
+}
+
+#game {
+	position: absolute;
+	width: 100vw;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+}
+
+#game.noDisplay{
+	opacity: 0;
+}
+
+#turn {
+	font-size: 20px;
+	margin: .5em;
+	padding: 0.75em;
+	text-align: center;
+	font-weight: 300;
+}
+
+#turn.end{
+	font-size: 30px;
+	padding: 0 0.75em;
+}
+
+.dot-pulse span {
+	animation-name: pulse;
+	animation-duration: 1.4s;
+	animation-iteration-count: infinite;
+	animation-fill-mode: both;
+}
+
+@keyframes pulse {
+	0% {
+		opacity: .2;
+	}
+	20% {
+		opacity: 1;
+	}
+	100% {
+		opacity: .2;
+	}
+}
+
+.dot-pulse span:nth-child(2) {
+	animation-delay: .2s;
+}
+
+.dot-pulse span:nth-child(3) {
+	animation-delay: .4s;
+}
+
+.buttons {
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+
+
+.button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	box-sizing: inherit;
+	font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	background-color: #222;
+	margin: .5em;
+	padding: 0.75em;
+	color: #fff;
+	text-align: center;
+	border-radius: .1875em;
+	font-size: 20px;
+	outline: none;
+	border: none;
+	font-weight: 300;
+	z-index: 1;
+}
+
+.button.noDisplay {
+	display: none;
+}
+
+.button:hover {
+	background-color: #eee;
+	color: #222;
+}
+
+#board {
+	display: flex;
+	flex-direction: row;
+}
+
+.boards {
+	margin: 0 20px;
+}
+
+#player .piece {
+	position: absolute;
+	opacity: 0.9;
+	margin: 0px;
+	padding: 0px;
+	background-repeat: no-repeat;
+}
+
+#player .piece .piece-img{
+	position: relative;
+	top: 50%;
+	left: 50%;
+	margin: 0;
+	padding: 0;
+	background-size: 100% 100%;
+	background-position: center;
+	transform: translate(-50%, -50%);
+	-webkit-filter: drop-shadow(0px 0px 15px rgba(0,0,0, 0.5));
+    filter: drop-shadow(0px 0px 15px rgba(0,0,0, 0.5));
+}
+
+#player .pickedup .piece-img{
+	-webkit-filter: drop-shadow(0px 0px 15px rgba(0,0,0, 1));
+    filter: drop-shadow(0px 0px 15px rgba(0,0,0, 1));
+}
+
+#player .loadingImg {
+	display: none;
+}
+
+#patrol {
+	width: var(--cellsize);
+	height: calc(var(--cellsize)*2);
+	transform: translate(-100%, calc(var(--canvas-size) - calc(50%*8)));
+}
+
+
+#patrol .piece-img{
+	width: 50%;
+	height: 60%;
+	background: url("../img/ships/png/patrol.png");
+	transform: translate(-50%, -50%);
+}
+
+#submarine {
+	width: var(--cellsize);
+	height: calc(var(--cellsize)*3);
+	transform: translate(-100%, calc(var(--canvas-size) - 200%));
+}
+
+#submarine .piece-img{
+	width: 70%;
+	height: 70%;
+	background: url("../img/ships/png/submarine.png");
+	transform: translate(-50%, -50%);
+}
+
+#destroyer {
+	width: var(--cellsize);
+	height: calc(var(--cellsize)*3);
+	transform: translate(-100%, calc(var(--canvas-size) - 100%));
+}
+
+#destroyer .piece-img{
+	width: 70%;
+	height: 70%;
+	background: url("../img/ships/png/destroyer.png");
+	transform: translate(-50%, -50%);
+}
+
+#battleship {
+	width: var(--cellsize);
+	height: calc(var(--cellsize)*4);
+	transform: translate(calc(var(--cellsizepx)*6.5),calc(calc(var(--canvas-size) - 50%) + var(--cellsize)*1.5));
+}
+
+#battleship .piece-img{
+	width: 75%;
+	height: 80%;
+	background: url("../img/ships/png/battleship.png");
+	transform: translate(-50%, -50%);
+}
+
+#carrier {
+	width: var(--cellsize);
+	height: calc(var(--cellsize)*5);
+	transform: translate(calc(var(--cellsizepx)*2),calc(calc(var(--canvas-size) - 50%) + var(--cellsize)*1.25));
+}
+
+#carrier .piece-img{
+	width: 100%;
+	height: 85%;
+	background: url("../img/ships/png/carrier.png");
+	transform: translate(-50%, -50%);
+}
+
+@media only screen and (max-width: 600px) {
+	:root{
+		--canvas-size:  42vh;
+	}
+
+	canvas {
+		box-shadow: 0 0 25px 1px rgba(0, 0, 0, 0.30);
+	}
+	#board {
+		flex-direction: column-reverse;
+	}
+	#board div {
+		margin: 1px 0;
+	}
+	#info {
+		padding: 0;
+	}
+	#turn, .button {
+		font-size: 16px;
+		margin: 0;
+	}
+
+	#battleship{
+		transform: translate(calc(12.5% + var(--canvas-size)),calc(var(--canvas-size) - var(--cellsizepx)*9));
+	}
+
+	#carrier{
+		transform: translate(calc(12.5% + var(--canvas-size)),calc(var(--canvas-size) - var(--cellsizepx)*5));
+	}
+}
+
+@media only screen and (max-width: 450px) {
+	#help-info {
+		font-size: 18px;
+		width: 300px;
+		padding: 10px;
+	}
+	.button-square {
+		height: 30px;
+		width: 30px;
+	}
+	#help-info p {
+		font-size: 20px;
+	}
+	#turn, .button {
+		font-size: 16px;
+		padding: 0.55em;
+	}
+}
+
+@media only screen and (max-width: 350px) {
+	#help-info {
+		font-size: 14px;
+		width: 250px;
+		padding: 10px;
+	}
+	.button-square {
+		height: 20px;
+		width: 20px;
+	}
+	#help-info p {
+		font-size: 14px;
+	}
+	#turn, .button {
+		font-size: 12px;
+	}
+}

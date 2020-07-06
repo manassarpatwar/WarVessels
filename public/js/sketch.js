@@ -1,119 +1,100 @@
-var playerCanvas;
-var opponentCanvas;
-var playerSketch;
-var opponentSketch;
+let PLAYERSKETCH
+let OPPONENTSKETCH;
 
-var warvessels;
-var player;
+let WARVESSELS;
+let PLAYER;
 var turn;
 
-var boardWidth;
-var selectedPiece;
-var board;
-
-
-var bg;
 var readyBtn;
 var playAgainBtn;
 
 window.onload = setup;
 
 function preload(url, callback) {
-    let img = new Image();
+    const img = new Image();
     img.src = url;
-    img.onload = callback;
+    img.addEventListener('load', () => {callback(img)});
     return img;
 }
 
-
-function createCanvas(canvasId) {
+function createCanvas(canvasId, size) {
     var canvas = document.getElementById(canvasId);
-    canvas.width = boardWidth;
-    canvas.height = boardWidth;
-    canvas.style.width = canvas.width + 'px';
-    canvas.style.height = canvas.height + 'px';
+    canvas.width = size;
+    canvas.height = size;
     return canvas;
 }
 
 function setup() {
-    select('#game').style.height = window.innerHeight + 'px';
-    board = select('#board');
+    
+    const game = select('#game');
+    game.style.height = window.innerHeight + 'px';
     readyBtn = select('#readyBtn');
     playAgainBtn = select('#playAgainBtn');
 
-    let smallSize = window.innerWidth < 600;
-    boardWidth = smallSize ? 0.42 * window.innerHeight : Math.min(350, 0.4 * window.innerWidth);
+    const smallSize = window.innerWidth < 600;
+    const boardWidth = smallSize ? 0.42 * window.innerHeight : Math.min(350, 0.4 * window.innerWidth);
 
-    warvessels = new WarVessels(gameID, 10, boardWidth);
-    player = new Player(playerID, warvessels.cellSize);
-    Object.values(player.pieces).map(x => x.el.classList.remove('loadingImg'));
-    let cellSize = warvessels.cellSize;
-    let carrier = player.pieces['carrier']
-    let btlshp = player.pieces['battleship']
-    if (smallSize) {
-        carrier.rotate();
-        btlshp.rotate();
-        carrier.transform(boardWidth + cellSize / 4 - carrier.width / 8, boardWidth - carrier.height - cellSize / 5);
-        btlshp.transform(boardWidth + cellSize / 4, boardWidth / 2 - btlshp.height - cellSize / 4);
-    } else {
-        carrier.transform(carrier.height / 2 - cellSize / 4, 3 * (boardWidth + cellSize) / 4 + carrier.width / 4);
-        btlshp.transform(boardWidth / 2 + btlshp.height / 2 - cellSize / 4, 3 * boardWidth / 4 + cellSize + btlshp.width / 2);
-    }
-    let destroyer = player.pieces['destroyer'];
-    destroyer.transform(-cellSize, 3 * boardWidth / 4 - cellSize + destroyer.height / 4);
-    let submarine = player.pieces['submarine'];
-    submarine.transform(-cellSize + submarine.width / 16, boardWidth / 2 - submarine.height / 4 - cellSize / 8);
-    let patrol = player.pieces['patrol'];
-    patrol.transform(-cellSize + patrol.width / 6, boardWidth / 4 - patrol.height / 4 + cellSize / 8);
+    WARVESSELS = new WarVessels(gameID, 10, boardWidth);
+    const root = document.documentElement;
+    const percentage = ((WARVESSELS.cellSize/boardWidth)*100).toFixed(2);
+    root.style.setProperty("--cellsize", percentage+"%");
+    root.style.setProperty("--cellsizepx", WARVESSELS.cellSize+"px");
+    root.style.setProperty("--canvas-size", boardWidth+"px");
+    
+    PLAYER = new Player(playerID, smallSize);
+
+    Object.values(PLAYER.pieces).map(x => {
+        x.el.classList.remove('loadingImg');
+        x.transform(null,null,x.rotation*90);
+    });
 
     turn = select('#turn');
     html(turn, 'Place ships');
 
-    if (data !== null) {
-        let json = data;
+    if (json !== null) {
 
-        warvessels.playerBoard = json.playerBoard;
-        let attacks = json.attacks;
+        WARVESSELS.playerBoard = json.playerBoard;
+        const attacks = json.attacks;
 
-        for (let a of attacks) {
-            warvessels.opponentBoard[a[0]][a[1]] = a[2] ? 'hit' : 'miss';
+        for (const a of attacks) {
+            WARVESSELS.opponentBoard[a[0]][a[1]] = a[2] ? 'hit' : 'miss';
         }
-        warvessels.ready = json.ready;
-        warvessels.started = json.started;
-        player.turn = json.turn;
+        WARVESSELS.ready = json.ready;
+        WARVESSELS.started = json.started;
+        PLAYER.turn = json.turn;
 
-        if (warvessels.ready) {
+        if (WARVESSELS.ready) {
             start();
         }
-        if (player.turn && warvessels.started) {
+        if (PLAYER.turn && WARVESSELS.started) {
             html(turn, 'Your turn');
-        } else if (!player.turn && warvessels.started) {
+        } else if (!PLAYER.turn && WARVESSELS.started) {
             html(turn, 'Their turn');
         }
 
         //Fixing pieces to the board
-        let pieceData = {};
-        for (let i = 0; i < warvessels.playerBoard.length; i++) { //rows
-            for (let j = 0; j < warvessels.playerBoard[i].length; j++) { //columns
-                let key = warvessels.playerBoard[j][i];
+        const pieceData = {};
+        for (let i = 0; i < WARVESSELS.playerBoard.length; i++) { //rows
+            for (let j = 0; j < WARVESSELS.playerBoard[i].length; j++) { //columns
+                let key = WARVESSELS.playerBoard[j][i];
                 if (Number.isInteger(key) && key !== 0) {
                     key = Math.abs(key);
                     if (pieceData[key] == undefined) {
                         pieceData[key] = { x: i, y: j }
                     } else if (pieceData[key].x == i) {
-                        pieceData[key].r = 0
+                        pieceData[key].r = false;
                     } else if (pieceData[key].y == j) {
-                        pieceData[key].r = 1;
+                        pieceData[key].r = true;
                     }
                 }
             }
         }
 
-        for (let p of Object.keys(player.pieces)) {
-            let data = pieceData[player.pieces[p].id]
-            player.pieces[p].el.classList.remove('interactable');
-            player.pieces[p].rotate(data.r);
-            player.pieces[p].fit(data, warvessels.cellSize);
+        for (const p of Object.keys(PLAYER.pieces)) {
+            const data = pieceData[PLAYER.pieces[p].id]
+            PLAYER.pieces[p].el.classList.remove('interactable');
+            PLAYER.pieces[p].rotate(data.r);
+            PLAYER.pieces[p].fit(data, WARVESSELS.cellSize);
         }
 
 
@@ -121,31 +102,38 @@ function setup() {
         if (json.result !== -1) {
             turn.classList.add('end');
             html(turn, 'You ' + (json.result == 1 ? 'won!' : 'lost!'));
-            json.result == 1 ? select('#player').classList.add('noDisplay') : select('#opponent').classList.add('noDisplay');
+            json.result == 1 ? select('#PLAYER').classList.add('noDisplay') : select('#opponent').classList.add('noDisplay');
             playAgainBtn.classList.remove('noDisplay');
         }
     } 
 
 
-    socket.emit('join', warvessels.id, player.id);
+    socket.emit('join', WARVESSELS.id, PLAYER.id, function(id){
+        if(id != socket.id){
+            select("#multiple-sessions").classList.remove('noDisplay');
+            setTimeout(()=>{select("#multiple-sessions").classList.add('active')}, 500);
+            select('body').classList.add('has-overlay');
+        }
+    });
 
 
-    bg = preload('../public/img/bg2.png', () => {
-        playerCanvas = createCanvas('playerCanvas');
-        opponentCanvas = createCanvas('opponentCanvas');
+    preload('../public/img/bg2.png', (bg) => {
+        const playerCanvas = createCanvas('playerCanvas', boardWidth);
+        const opponentCanvas = createCanvas('opponentCanvas', boardWidth);
 
-        playerSketch = new initPlayerSketch(playerCanvas);
-        opponentSketch = new initOpponentSketch(opponentCanvas);
+        PLAYERSKETCH = new initPlayerSketch(playerCanvas);
+        OPPONENTSKETCH = new initOpponentSketch(opponentCanvas);
 
-        playerSketch.setup();
-        opponentSketch.setup();
+        PLAYERSKETCH.setup(bg);
+        OPPONENTSKETCH.setup(bg);
+        game.classList.remove('noDisplay');
     })
 
     socket.on('opponentReady', function () {
-        warvessels.opponentReady = true;
-        if (warvessels.ready && !warvessels.started) {
-            player.turn = true;
-            warvessels.started = false;
+        WARVESSELS.opponentReady = true;
+        if (WARVESSELS.ready && !WARVESSELS.started) {
+            PLAYER.turn = true;
+            WARVESSELS.started = false;
             html(turn, 'Attack to start playing');
         }
     });
@@ -159,16 +147,16 @@ function setup() {
 }
 
 function playAgain() {
-    socket.emit('playAgain', warvessels.id);
+    socket.emit('playAgain', WARVESSELS.id);
     window.location.reload();
 }
 
 function playerReady() {
-    if (warvessels.ready)
+    if (WARVESSELS.ready)
         return;
 
     let ready = true;
-    for (let p of Object.values(player.pieces)) {
+    for (let p of Object.values(PLAYER.pieces)) {
         if (!p.ready)
             ready = false;
     }
@@ -178,70 +166,72 @@ function playerReady() {
         return;
     }
 
-    let pieces = Object.values(player.pieces);
+    let pieces = Object.values(PLAYER.pieces);
     for (let p of pieces) {
         p.el.classList.remove('interactable');
     }
 
-    warvessels.ready = true;
     readyBtn.classList.add('noDisplay');
     turn.classList.remove('noDisplay');
-
     start();
 }
 
 function start() {
     turn.classList.remove('noDisplay');
     html(turn, 'Waiting for other player to be ready');
-    let data = {
-        playerBoard: warvessels.playerBoard,
-        game: warvessels.id,
+    const data = {
+        playerBoard: WARVESSELS.playerBoard,
+        gameID: WARVESSELS.id,
         totalHits: Player.totalPieceLength,
-        player: player.id
+        playerID: PLAYER.id
     }
 
-    socket.emit('ready', data);
-
-    if (warvessels.opponentReady && !warvessels.started) {
-        player.turn = true;
-        warvessels.started = false;
+    if(!WARVESSELS.ready){
+        socket.emit('ready', data);
+    }
+    WARVESSELS.ready = true;
+    if (WARVESSELS.opponentReady && !WARVESSELS.started) {
+        PLAYER.turn = true;
+        WARVESSELS.started = false;
         html(turn, 'Attack to start playing');
     }
 
     socket.on('incomingAttack', function (attack) {
-        warvessels.started = true;
-        player.turn = true;
-        html(turn, 'Your turn');
-        if (attack[2] == 1) {
-            warvessels.playerBoard[attack[0]][attack[1]] *= -1;
-        } else {
-            warvessels.playerBoard[attack[0]][attack[1]] = 'miss';
+        if(attack[3] == PLAYER.id){
+            WARVESSELS.started = true;
+            PLAYER.turn = true;
+            html(turn, 'Your turn');
+            if (attack[2] == 1) {
+                WARVESSELS.playerBoard[attack[0]][attack[1]] *= -1;
+            } else {
+                WARVESSELS.playerBoard[attack[0]][attack[1]] = 'miss';
+            }
+
+            if (PLAYERSKETCH.touchWater) {
+                PLAYERSKETCH.touchWater(attack[1] * WARVESSELS.cellSize + WARVESSELS.cellSize / 2, attack[0] * WARVESSELS.cellSize + WARVESSELS.cellSize / 2)
+                PLAYERSKETCH.loadTexture();
+                if (!PLAYERSKETCH.showing)
+                    PLAYERSKETCH.show();
+            }
+
+            result = WARVESSELS.done();
+            if (WARVESSELS.finished) {
+                setTimeout(() => {
+                    turn.classList.add('end');
+                    html(turn, 'You ' + (result == 1 ? 'won!' : 'lost!'));
+                    result == 1 ? select('#PLAYER').classList.add('noDisplay') : select('#opponent').classList.add('noDisplay');
+                    playAgainBtn.classList.remove('noDisplay');
+                }, 1000);
+                WARVESSELS.ready = false;
+
+            }
         }
-
-        if (playerSketch.touchWater) {
-            playerSketch.touchWater(attack[1] * warvessels.cellSize + warvessels.cellSize / 2, attack[0] * warvessels.cellSize + warvessels.cellSize / 2)
-            playerSketch.loadTexture();
-            if (!playerSketch.showing)
-                playerSketch.show();
-        }
-
-        result = warvessels.done();
-        if (warvessels.finished) {
-            setTimeout(() => {
-                turn.classList.add('end');
-                html(turn, 'You ' + (result == 1 ? 'won!' : 'lost!'));
-                result == 1 ? select('#player').classList.add('noDisplay') : select('#opponent').classList.add('noDisplay');
-                playAgainBtn.classList.remove('noDisplay');
-            }, 1000);
-            warvessels.ready = false;
-
-        }
-
     })
 }
 
 
 function update() {
+    const selectedPiece = PLAYER.getSelectedPiece();
     if (selectedPiece) {
         if (selectedPiece.isDragging) {
             requestAnimationFrame(update);
@@ -253,7 +243,7 @@ function update() {
 function mouseDragged(e) {
     e.preventDefault();
     if (e.touches) { e = e.touches[0]; }
-
+    const selectedPiece = PLAYER.getSelectedPiece();
     if (selectedPiece) {
         selectedPiece.dragged = true;
 
@@ -265,12 +255,14 @@ function mouseDragged(e) {
 
 function mouseUp(e) {
     e.preventDefault();
+    const selectedPiece = PLAYER.getSelectedPiece();
     if (selectedPiece) {
-        playerSketch.mouseReleased(e);
+        PLAYERSKETCH.mouseReleased(selectedPiece);
         selectedPiece.delta = { x: 0, y: 0 };
         selectedPiece.isDragging = false;
         selectedPiece.dragged = false;
-        selectedPiece = false;
+        selectedPiece.selected = false;
+        selectedPiece.el.classList.remove('pickedup');
     }
 }
 
@@ -280,7 +272,7 @@ function mouseDown(e) {
         return;
     }
     if (e.touches) { e = e.touches[0]; }
-    opponentSketch.mouseDown(e);
+    OPPONENTSKETCH.mouseDown(e);
 }
 
 function initPlayerSketch(canvas) {
@@ -288,15 +280,16 @@ function initPlayerSketch(canvas) {
     this.waterWave;
     this.ctx;
     this.showing;
+    this.bg;
 
-    this.setup = () => {
-        this.cellSize = (canvas.width - 2) / warvessels.size;
-
-        bg.width = canvas.width;
-        bg.height = canvas.height;
+    this.setup = (bg) => {
+        this.cellSize = (canvas.width - 2) / WARVESSELS.size;
+        this.bg = bg;
+        this.bg.width = canvas.width;
+        this.bg.height = canvas.height;
 
         this.ctx = canvas.getContext('2d');
-        this.ctx.drawImage(bg, 0, 0, bg.width, bg.height);
+        this.ctx.drawImage(this.bg, 0, 0, this.bg.width, this.bg.height);
         this.drawBoard();
         this.waterWave = new WaterWave(canvas.width, canvas.height, this.ctx);
 
@@ -307,14 +300,14 @@ function initPlayerSketch(canvas) {
     this.drawBoard = () => {
         this.ctx.strokeStyle = 'rgba(255,255,255,0.15)'
 
-        for (let i = 0; i < warvessels.playerBoard.length; i++) { //rows
-            for (let j = 0; j < warvessels.playerBoard[i].length; j++) { //columns
+        for (let i = 0; i < WARVESSELS.playerBoard.length; i++) { //rows
+            for (let j = 0; j < WARVESSELS.playerBoard[i].length; j++) { //columns
                 this.ctx.beginPath();
-                this.ctx.rect(j * this.cellSize + 1, i * this.cellSize + 1, this.cellSize + 2 / warvessels.size, this.cellSize + 2 / warvessels.size);
-                if (warvessels.playerBoard[i][j] < 0) {
+                this.ctx.rect(j * this.cellSize + 1, i * this.cellSize + 1, this.cellSize + 2 / WARVESSELS.size, this.cellSize + 2 / WARVESSELS.size);
+                if (WARVESSELS.playerBoard[i][j] < 0) {
                     this.ctx.fillStyle = 'rgba(255, 0, 0, 0.6)';
                     this.ctx.fill();
-                } else if (warvessels.playerBoard[i][j] == 'miss') {
+                } else if (WARVESSELS.playerBoard[i][j] == 'miss') {
                     this.ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
                     this.ctx.fill();
                 } else {
@@ -331,7 +324,7 @@ function initPlayerSketch(canvas) {
 
     this.loadTexture = () => {
         this.ctx.clearRect(0, 0, canvas.width, canvas.height);
-        this.ctx.drawImage(bg, 0, 0, bg.width, bg.height);
+        this.ctx.drawImage(this.bg, 0, 0, this.bg.width, this.bg.height);
         this.drawBoard();
         this.waterWave.loadTexture();
     }
@@ -347,57 +340,54 @@ function initPlayerSketch(canvas) {
         }
     }
 
-    this.mouseReleased = (e) => {
-        e.preventDefault();
-        if (warvessels.ready)
+    this.mouseReleased = (piece) => {
+
+        if (WARVESSELS.ready)
             return;
 
-        if (selectedPiece) {
-            releasedPiece = selectedPiece; //really bad as selectedPiece is set to false by global mouseReleased
+        if (Math.abs(piece.delta.x) < 0.5 && Math.abs(piece.delta.y) < 0.5) {
+            piece.rotate();
+        }
 
-            if (Math.abs(releasedPiece.delta.x) < 0.5 && Math.abs(releasedPiece.delta.y) < 0.5) {
-                releasedPiece.rotate();
+
+        const place = WARVESSELS.getPiecePlace(piece);
+        place.x = Math.round(place.x / canvas.width * WARVESSELS.size);
+        place.y = Math.round(place.y / canvas.width * WARVESSELS.size);
+        
+        if (piece.ready) {
+            piece.boardCoords.map(c => WARVESSELS.playerBoard[c[1]][c[0]] = 0);
+            piece.ready = false;
+        }
+
+        if (WARVESSELS.piecePlaceOK(place, piece)) {
+            
+            WARVESSELS.placePiece(piece, place);
+            const center = WARVESSELS.getCenter(piece);
+
+            this.waterWave.touchWater(Math.floor(center.x), Math.floor(center.y));
+            this.loadTexture();
+            if (!this.showing)
+                this.show();
+
+            const pieceCoordinates = piece.coords.map(([i, j]) => [i + place.x, j + place.y]);
+
+            for (const p of pieceCoordinates) {
+                WARVESSELS.playerBoard[p[1]][p[0]] = piece.id;
+            }
+            piece.boardCoords = pieceCoordinates;
+            piece.ready = true;
+
+            let ready = true;
+            for (const p of Object.values(PLAYER.pieces)) {
+                if (!p.ready)
+                    ready = false;
+            }
+            if (ready) {
+                readyBtn.classList.remove('noDisplay');
+                turn.classList.add('noDisplay');
             }
 
 
-            let place = releasedPiece.getPiecePlace();
-            place.x = Math.round(place.x / canvas.width * warvessels.size);
-            place.y = Math.round(place.y / canvas.width * warvessels.size);
-
-            if (releasedPiece.ready) {
-                releasedPiece.boardCoords.map(c => warvessels.playerBoard[c[1]][c[0]] = 0);
-                releasedPiece.ready = false;
-            }
-
-            if (warvessels.piecePlaceOK(place.x, place.y, releasedPiece)) {
-                releasedPiece.fit(place, warvessels.cellSize);
-                let center = releasedPiece.getCenter();
-
-                this.waterWave.touchWater(Math.floor(center.x), Math.floor(center.y));
-                this.loadTexture();
-                if (!this.showing)
-                    this.show();
-
-                let pieceCoordinates = releasedPiece.coords.map(([i, j]) => [i + place.x, j + place.y]);
-
-                for (let p of pieceCoordinates) {
-                    warvessels.playerBoard[p[1]][p[0]] = releasedPiece.id;
-                }
-                releasedPiece.boardCoords = pieceCoordinates;
-                releasedPiece.ready = true;
-
-                let ready = true;
-                for (let p of Object.values(player.pieces)) {
-                    if (!p.ready)
-                        ready = false;
-                }
-                if (ready) {
-                    readyBtn.classList.remove('noDisplay');
-                    turn.classList.add('noDisplay');
-                }
-
-
-            }
         }
     }
 }
@@ -407,15 +397,17 @@ function initOpponentSketch(canvas) {
     this.waterWave;
     this.ctx;
     this.showing;
+    this.bg;
 
-    this.setup = () => {
-        this.cellSize = (canvas.width - 2) / warvessels.size;
+    this.setup = (bg) => {
+        this.cellSize = (canvas.width - 2) / WARVESSELS.size;
 
-        bg.width = canvas.width;
-        bg.height = canvas.height;
+        this.bg = bg;
+        this.bg.width = canvas.width;
+        this.bg.height = canvas.height;
 
         this.ctx = canvas.getContext('2d');
-        this.ctx.drawImage(bg, 0, 0, bg.width, bg.height);
+        this.ctx.drawImage(this.bg, 0, 0, this.bg.width, this.bg.height);
 
         this.drawBoard();
         this.waterWave = new WaterWave(canvas.width, canvas.height, this.ctx);
@@ -426,14 +418,14 @@ function initOpponentSketch(canvas) {
 
     this.drawBoard = () => {
         this.ctx.strokeStyle = 'rgba(255,255,255,0.15)'
-        for (let i = 0; i < warvessels.opponentBoard.length; i++) { //rows
-            for (let j = 0; j < warvessels.opponentBoard[i].length; j++) { //columns
+        for (let i = 0; i < WARVESSELS.opponentBoard.length; i++) { //rows
+            for (let j = 0; j < WARVESSELS.opponentBoard[i].length; j++) { //columns
                 this.ctx.beginPath();
-                this.ctx.rect(j * this.cellSize + 1, i * this.cellSize + 1, this.cellSize + 2 / warvessels.size, this.cellSize + 2 / warvessels.size);
-                if (warvessels.opponentBoard[i][j] == 'hit') {
+                this.ctx.rect(j * this.cellSize + 1, i * this.cellSize + 1, this.cellSize + 2 / WARVESSELS.size, this.cellSize + 2 / WARVESSELS.size);
+                if (WARVESSELS.opponentBoard[i][j] == 'hit') {
                     this.ctx.fillStyle = 'rgba(255, 0, 0, 0.6)';
                     this.ctx.fill();
-                } else if (warvessels.opponentBoard[i][j] == 'miss') {
+                } else if (WARVESSELS.opponentBoard[i][j] == 'miss') {
                     this.ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
                     this.ctx.fill();
                 } else {
@@ -446,7 +438,7 @@ function initOpponentSketch(canvas) {
 
     this.loadTexture = () => {
         this.ctx.clearRect(0, 0, canvas.width, canvas.height);
-        this.ctx.drawImage(bg, 0, 0, bg.width, bg.height);
+        this.ctx.drawImage(this.bg, 0, 0, this.bg.width, this.bg.height);
         this.drawBoard();
         this.waterWave.loadTexture()
     }
@@ -462,39 +454,39 @@ function initOpponentSketch(canvas) {
     }
 
     this.mouseDown = (e) => {
-        if (warvessels.ready && warvessels.started !== null) {
-            let attack = [Math.floor((e.clientY - canvas.offsetTop) / canvas.width * warvessels.size), Math.floor((e.clientX - canvas.offsetLeft) / canvas.height * warvessels.size)];
+        if (WARVESSELS.ready && WARVESSELS.opponentReady) {
+            const attack = [Math.floor((e.clientY - canvas.offsetTop) / canvas.width * WARVESSELS.size), Math.floor((e.clientX - canvas.offsetLeft) / canvas.height * WARVESSELS.size)];
 
-            if (!warvessels.attackOK(attack[0], attack[1]))
+            if (!WARVESSELS.attackOK(attack[0], attack[1]))
                 return
 
-            if (player.turn || !warvessels.started) {
-                warvessels.started = true;
-                player.turn = false;
+            if (PLAYER.turn) {
+                WARVESSELS.started = true
+                PLAYER.turn = false;
 
 
                 html(turn, "<div class='dot-pulse'><span>.</span><span>.</span><span>.</span></div>")
 
-                let data = {
-                    player: player.id,
+                const data = {
+                    playerID: PLAYER.id,
                     attack: attack,
-                    game: warvessels.id
+                    gameID: WARVESSELS.id
                 }
 
                 var self = this;
                 socket.emit('attack', data, function (hit) {
-                    let value = hit ? 'hit' : 'miss';
-                    warvessels.opponentBoard[attack[0]][attack[1]] = value;
+                    const value = hit ? 'hit' : 'miss';
+                    WARVESSELS.opponentBoard[attack[0]][attack[1]] = value;
                     html(turn, 'Their turn')
 
-                    result = warvessels.done();
-                    if (warvessels.finished) {
-                        warvessels.ready = false;
+                    result = WARVESSELS.done();
+                    if (WARVESSELS.finished) {
+                        WARVESSELS.ready = false;
 
                         setTimeout(() => {
                             turn.classList.add('end');
                             html(turn, 'You ' + (result == 1 ? 'won!' : 'lost!'));
-                            result == 1 ? select('#player').classList.add('noDisplay') : select('#opponent').classList.add('noDisplay');
+                            result == 1 ? select('#PLAYER').classList.add('noDisplay') : select('#opponent').classList.add('noDisplay');
                             playAgainBtn.classList.remove('noDisplay');
                         }, 1000);
                     }
