@@ -42,8 +42,8 @@ class Piece{
             this.startPosition = {x: e.clientX, y: e.clientY};
             this.currentPosition = this.transform();
             this.el.classList.add('pickedup');
-            readyBtn.classList.add('noDisplay');
-            turn.classList.remove('noDisplay');
+            playButton.classList.add('noDisplay');
+            infoPara.classList.remove('noDisplay');
             requestAnimationFrame(update);
         }
     }

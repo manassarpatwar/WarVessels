@@ -3,10 +3,14 @@ let OPPONENTSKETCH;
 
 let WARVESSELS;
 let PLAYER;
-var turn;
 
-var readyBtn;
-var playAgainBtn;
+let infoPara;
+let playButton;
+let dropdownInfoDiv;
+let body;
+
+const session_error = "<p>Another session of the same game is running on your browser.<br>Please return to that session to continue playing.</p>"
+const max_players_error = "<p>Game session already underway with 2 players</p>"
 
 window.onload = setup;
 
@@ -26,10 +30,8 @@ function createCanvas(canvasId, size) {
 
 function setup() {
     
-    const game = select('#game');
-    game.style.height = window.innerHeight + 'px';
-    readyBtn = select('#readyBtn');
-    playAgainBtn = select('#playAgainBtn');
+    const main = select('main');
+    main.style.height = window.innerHeight + 'px';
 
     const smallSize = window.innerWidth < 600;
     const boardWidth = smallSize ? 0.42 * window.innerHeight : Math.min(350, 0.4 * window.innerWidth);
@@ -48,8 +50,12 @@ function setup() {
         x.transform(null,null,x.rotation*90);
     });
 
-    turn = select('#turn');
-    html(turn, 'Place ships');
+    infoPara = select('#infoPara');
+    dropdownInfoDiv = select('#dropdown-info');
+    body = select('body');
+    playButton = select('#playButton');
+    playButton.onclick = playerReady;
+    html(infoPara, 'Place ships');
 
     if (json !== null) {
 
@@ -67,9 +73,9 @@ function setup() {
             start();
         }
         if (PLAYER.turn && WARVESSELS.started) {
-            html(turn, 'Your turn');
+            html(infoPara, 'Your turn');
         } else if (!PLAYER.turn && WARVESSELS.started) {
-            html(turn, 'Their turn');
+            html(infoPara, 'Their turn');
         }
 
         //Fixing pieces to the board
@@ -100,19 +106,19 @@ function setup() {
 
 
         if (json.result !== -1) {
-            turn.classList.add('end');
-            html(turn, 'You ' + (json.result == 1 ? 'won!' : 'lost!'));
-            json.result == 1 ? select('#PLAYER').classList.add('noDisplay') : select('#opponent').classList.add('noDisplay');
-            playAgainBtn.classList.remove('noDisplay');
+            infoPara.classList.add('end');
+            html(infoPara, 'You ' + (json.result == 1 ? 'won!' : 'lost!'));
+            json.result == 1 ? select('#player').classList.add('noDisplay') : select('#opponent').classList.add('noDisplay');
+            playButton.onclick = playAgain;
+            html(playAgain, '<p>Play again?</p>');
+            playButton.classList.remove('noDisplay');
         }
     } 
 
 
     socket.emit('join', WARVESSELS.id, PLAYER.id, function(id){
         if(id != socket.id){
-            select("#multiple-sessions").classList.remove('noDisplay');
-            setTimeout(()=>{select("#multiple-sessions").classList.add('active')}, 500);
-            select('body').classList.add('has-overlay');
+            dropdownInfo(session_error);
         }
     });
 
@@ -126,7 +132,6 @@ function setup() {
 
         PLAYERSKETCH.setup(bg);
         OPPONENTSKETCH.setup(bg);
-        game.classList.remove('noDisplay');
     })
 
     socket.on('opponentReady', function () {
@@ -134,7 +139,7 @@ function setup() {
         if (WARVESSELS.ready && !WARVESSELS.started) {
             PLAYER.turn = true;
             WARVESSELS.started = false;
-            html(turn, 'Attack to start playing');
+            html(infoPara, 'Attack to start playing');
         }
     });
 
@@ -144,6 +149,13 @@ function setup() {
     document.addEventListener('mouseup', mouseUp, { passive: false });
     document.addEventListener('mousemove', mouseDragged, { passive: false });
     document.addEventListener('touchmove', mouseDragged, { passive: false });
+}
+
+function dropdownInfo(e){  
+    html(dropdownInfoDiv, e);
+    dropdownInfoDiv.classList.remove('noDisplay');
+    setTimeout(()=>{dropdownInfoDiv.classList.add('active')}, 500);
+    body.classList.add('overlay');
 }
 
 function playAgain() {
@@ -162,7 +174,7 @@ function playerReady() {
     }
 
     if (!ready) {
-        html(turn, 'Please place all pieces');
+        html(infoPara, 'Please place all pieces');
         return;
     }
 
@@ -171,14 +183,14 @@ function playerReady() {
         p.el.classList.remove('interactable');
     }
 
-    readyBtn.classList.add('noDisplay');
-    turn.classList.remove('noDisplay');
+    playButton.classList.add('noDisplay');
+    infoPara.classList.remove('noDisplay');
     start();
 }
 
 function start() {
-    turn.classList.remove('noDisplay');
-    html(turn, 'Waiting for other player to be ready');
+    infoPara.classList.remove('noDisplay');
+    html(infoPara, 'Waiting for other player to be ready');
     const data = {
         playerBoard: WARVESSELS.playerBoard,
         gameID: WARVESSELS.id,
@@ -187,20 +199,22 @@ function start() {
     }
 
     if(!WARVESSELS.ready){
-        socket.emit('ready', data);
+        socket.emit('ready', data, ()=>{
+            dropdownInfo(max_players_error);
+        });
     }
     WARVESSELS.ready = true;
     if (WARVESSELS.opponentReady && !WARVESSELS.started) {
         PLAYER.turn = true;
         WARVESSELS.started = false;
-        html(turn, 'Attack to start playing');
+        html(infoPara, 'Attack to start playing');
     }
 
     socket.on('incomingAttack', function (attack) {
         if(attack[3] == PLAYER.id){
             WARVESSELS.started = true;
             PLAYER.turn = true;
-            html(turn, 'Your turn');
+            html(infoPara, 'Your turn');
             if (attack[2] == 1) {
                 WARVESSELS.playerBoard[attack[0]][attack[1]] *= -1;
             } else {
@@ -217,10 +231,12 @@ function start() {
             result = WARVESSELS.done();
             if (WARVESSELS.finished) {
                 setTimeout(() => {
-                    turn.classList.add('end');
-                    html(turn, 'You ' + (result == 1 ? 'won!' : 'lost!'));
-                    result == 1 ? select('#PLAYER').classList.add('noDisplay') : select('#opponent').classList.add('noDisplay');
-                    playAgainBtn.classList.remove('noDisplay');
+                    infoPara.classList.add('end');
+                    html(infoPara, 'You ' + (result == 1 ? 'won!' : 'lost!'));
+                    result == 1 ? select('#player').classList.add('noDisplay') : select('#opponent').classList.add('noDisplay');
+                    playButton.onclick = playAgain;
+                    html(playAgain, '<p>Play again?</p>');
+                    playButton.classList.remove('noDisplay');
                 }, 1000);
                 WARVESSELS.ready = false;
 
@@ -383,11 +399,9 @@ function initPlayerSketch(canvas) {
                     ready = false;
             }
             if (ready) {
-                readyBtn.classList.remove('noDisplay');
-                turn.classList.add('noDisplay');
+                playButton.classList.remove('noDisplay');
+                infoPara.classList.add('noDisplay');
             }
-
-
         }
     }
 }
@@ -455,8 +469,9 @@ function initOpponentSketch(canvas) {
 
     this.mouseDown = (e) => {
         if (WARVESSELS.ready && WARVESSELS.opponentReady) {
-            const attack = [Math.floor((e.clientY - canvas.offsetTop) / canvas.width * WARVESSELS.size), Math.floor((e.clientX - canvas.offsetLeft) / canvas.height * WARVESSELS.size)];
-
+            const rect = canvas.getBoundingClientRect()
+            const attack = [Math.floor((e.clientY - rect.top) / canvas.width * WARVESSELS.size), Math.floor((e.clientX - rect.left) / canvas.height * WARVESSELS.size)];
+            
             if (!WARVESSELS.attackOK(attack[0], attack[1]))
                 return
 
@@ -465,7 +480,7 @@ function initOpponentSketch(canvas) {
                 PLAYER.turn = false;
 
 
-                html(turn, "<div class='dot-pulse'><span>.</span><span>.</span><span>.</span></div>")
+                html(infoPara, "<div class='dot-pulse'><span>.</span><span>.</span><span>.</span></div>")
 
                 const data = {
                     playerID: PLAYER.id,
@@ -477,21 +492,23 @@ function initOpponentSketch(canvas) {
                 socket.emit('attack', data, function (hit) {
                     const value = hit ? 'hit' : 'miss';
                     WARVESSELS.opponentBoard[attack[0]][attack[1]] = value;
-                    html(turn, 'Their turn')
+                    html(infoPara, 'Their turn')
 
                     result = WARVESSELS.done();
                     if (WARVESSELS.finished) {
                         WARVESSELS.ready = false;
 
                         setTimeout(() => {
-                            turn.classList.add('end');
-                            html(turn, 'You ' + (result == 1 ? 'won!' : 'lost!'));
-                            result == 1 ? select('#PLAYER').classList.add('noDisplay') : select('#opponent').classList.add('noDisplay');
-                            playAgainBtn.classList.remove('noDisplay');
+                            infoPara.classList.add('end');
+                            html(infoPara, 'You ' + (result == 1 ? 'won!' : 'lost!'));
+                            result == 1 ? select('#player').classList.add('noDisplay') : select('#opponent').classList.add('noDisplay');
+                            playButton.onclick = playAgain;
+                            html(playAgain, '<p>Play again?</p>');
+                            playButton.classList.remove('noDisplay');
                         }, 1000);
                     }
 
-                    self.waterWave.touchWater(Math.floor(e.clientX - canvas.offsetLeft), Math.floor(e.clientY - canvas.offsetTop));
+                    self.waterWave.touchWater(Math.floor(e.clientX - rect.left), Math.floor(e.clientY - rect.top));
                     self.loadTexture();
                     if (!self.showing)
                         self.show();

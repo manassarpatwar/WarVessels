@@ -1,274 +1,316 @@
+:root {
+    --font-size: 24px;
+    --button-background: #222;
+    --button-color: #eee;
+    --border-radius: 3px;
+}
+
 @font-face {
     font-family: Logo;
     src: url(../fonts/octin\ stencil\ rg.ttf);
 }
 
-html, body {
+html,
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial, sans-serif;
     margin: 0;
     padding: 0;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background: #eee;
     width: 100vw;
-    font-weight: 300;
-}
-
-body {
-    background: linear-gradient(-45deg, #adcbf5, #a793f7);
-    background-size: 400% 400%;
-    -webkit-animation: AnimationName 30s ease infinite;
-    -moz-animation: AnimationName 30s ease infinite;
-    animation: AnimationName 30s ease infinite;
-}
-
-@-webkit-keyframes gradient {
-    0% {
-        background-position: 0% 50%
-    }
-    50% {
-        background-position: 100% 50%
-    }
-    100% {
-        background-position: 0% 50%
-    }
-}
-
-@-moz-keyframes gradient {
-    0% {
-        background-position: 0% 50%
-    }
-    50% {
-        background-position: 100% 50%
-    }
-    100% {
-        background-position: 0% 50%
-    }
-}
-
-@keyframes gradient {
-    0% {
-        background-position: 0% 50%
-    }
-    50% {
-        background-position: 100% 50%
-    }
-    100% {
-        background-position: 0% 50%
-    }
-}
-
-@-webkit-keyframes gradient {
-    0% {
-        background-position: 0% 50%
-    }
-    50% {
-        background-position: 100% 50%
-    }
-    100% {
-        background-position: 0% 50%
-    }
-}
-
-@-moz-keyframes gradient {
-    0% {
-        background-position: 0% 50%
-    }
-    50% {
-        background-position: 100% 50%
-    }
-    100% {
-        background-position: 0% 50%
-    }
-}
-
-@keyframes gradient {
-    0% {
-        background-position: 0% 50%
-    }
-    50% {
-        background-position: 100% 50%
-    }
-    100% {
-        background-position: 0% 50%
-    }
+    height: 100%;
+    overflow: hidden;
 }
 
 main {
     position: relative;
-    width: 100vw;
-}
-
-.text {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    text-align: center;
-    font-size: 16px;
-    font-weight: 200;
-    margin: auto;
-    padding: .5rem;
-    width: 50%;
-    height: 50%;
-    transform: scale(2);
-}
-
-
-#copyBtn {
-    background: none;
-    border: none;
-    outline: none;
-    margin: 0;
-    padding: 0;
-    cursor: pointer;
-}
-
-#backBtn{
-    position: absolute;
-    background-color: #eee; 
-    left: 0;
-    color: #222;
-    z-index: 1;
-    width: 30px;
-    height: 30px;
-    margin: 2px;
-}
-
-#backBtn img{
-    width: 30px;
-    height: 30px;
-}
-
-
-#backBtn:hover{
-    cursor: pointer;
+    width: 100%;
+    height: 100%;
 }
 
 #center {
-    width: 100vw;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 34px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
 }
 
-#center .noDisplay {
+p {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    display: inline-block;
+    font-size: var(--font-size);
+    font-weight: 200;
+    margin: 0;
+    padding: calc(var(--font-size)/2);
+    border: none;
+    outline: none;
+}
+
+.small{
+    font-size: calc(var(--font-size)*0.75);
+}
+
+.noDisplay {
     display: none;
 }
 
-.card {
-    position: relative;
-    display: flex;
-    flex-direction: column;
+/*===============================================*/
+
+/*==============Buttons===========================*/
+button {
+    background: var(--button-background);
+    color: var(--button-color);
+    border: none;
+    outline: none;
+    margin: 0;
+    border-radius: .1875em;
+    transition: background-color 0.2s ease;
+}
+
+button p{
+    font-size: calc(var(--font-size)*1.25);
+}
+
+button:hover {
+    background: var(--button-color);
+    color: var(--button-background);
+}
+
+.button-top-left {
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform: translate(25%, 25%);
+}
+
+.square-button {
+    padding: 0;
+    margin: 0;
+    width: calc(var(--font-size)*2);
+    height: calc(var(--font-size)*2);
     text-align: center;
-    width: 300px;
-    background: #eee;
-    border-radius: 3px;
-    box-shadow: 0 19px 38px rgba(0, 0, 0, 0.30), 0 15px 12px rgba(0, 0, 0, 0.22);
-    font-size: 22px;
-    font-weight: 300;
+    line-height: 100%;
+}
+
+.triangle {
+    width: 0;
+    height: 0;
+    background: none;
+    border-top: var(--font-size) solid #222;
+    border-left: var(--font-size) solid #222;
+    border-bottom: var(--font-size) solid transparent;
+    border-right: var(--font-size) solid transparent;
+    transform: scale(0.5);
+    transition: transform 0.1s ease;
+}
+
+.triangle:hover {
+    background: none;
+    transform: translate(-5%, -5%) scale(0.5);
+}
+
+button.fill {
+    width: 100%;
+}
+
+button.point{
+    cursor: pointer;
+}
+
+.create{
+    transform: rotate(90deg) scale(0.6);
+}
+
+.create::after,
+.create::before {
+    content: " ";
+    position: absolute;
+    background: var(--button-background);
+    display: block;
+    border-radius: .1875em;
+}
+
+button:hover .create::after,
+button:hover .create::before {
+    background: var(--button-color);
+}
+
+
+.create::after {
+    height: 5%;
+    margin-top: -2.5%;
+    top: 50%;
+    left: 20%;
+    right: 20%;
+}
+
+.create::before {
+    width: 5%;
+    margin-left: -2.5%;
+    left: 50%;
+    top: 20%;
+    bottom: 20%;
+}
+
+.plus{
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    background: var(--button-color);
+    border: 2px dashed var(--button-background);
+    transition: border ease 0.1s, background-color ease 0.2s;
+}
+
+.plus:hover{
+    background: var(--button-background);
+    border: 2px dashed transparent;
+    transition: border ease 0.1s, background-color ease 0.2s;
+}
+
+#mode-button-wrapper{
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-bottom: 10%;
+}
+
+.mode-button{
+    text-align: center;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+.mode-button:nth-child(even){
+    margin: 0 0 2% 0;
+}
+
+.mode-button:nth-child(odd){
+    margin: 2% 0 0 0;
+}
+
+#sessions-buttons{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    padding-bottom: 10%;
+}
+
+.sessions-button{
+    transform: scale(1.25);
+    margin: 2% 3% 0 3%;
+}
+
+.sessions-button .create{
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+/*=======================================================*/
+
+/*===================Logo===============================*/
+#splash {
+    font-family: Logo;
+    font-size: calc(var(--font-size)*3);
 }
 
 #title {
     display: flex;
-    font-family: Logo;
-    font-size: 60px;
     flex-direction: column;
-}
-
-title.noDisplay {
-	display: none;
 }
 
 #title .title-word {
-    display: flex;
-    flex-direction: column;
-    margin: 10px 0;
-}
-
-#title .title-word div{
     padding: 0;
-    margin: -10px 0;
-    background: #000428;  /* fallback for old browsers */
-    background: -webkit-linear-gradient(to right, #000428, #004e92);  /* Chrome 10-25, Safari 5.1-6 */
-    background: linear-gradient(to right,  #000428, #004e92); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    margin: -5% 0;
+    background: #000428;
+    /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #000428, #004e92);
+    /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, #000428, #004e92);
+    /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
-#title .title-letters {
-    margin: 0 -1px 0 -1px
-}
+/*========================================================*/
 
-#title.noDisplay {
-    display: none;
-}
-
-#link {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: 18px;
+/*=================== card ======================================*/
+.card {
+    position: relative;
+    text-align: center;
+    width: 360px;
     background: #eee;
-    border: none;
-    outline: none;
+    border-radius: var(--border-radius);
+    box-shadow: 0 19px 38px rgba(0, 0, 0, 0.30), 0 15px 12px rgba(0, 0, 0, 0.22);
     font-weight: 300;
 }
 
-.button {
-    box-sizing: inherit;
-    background-color: #222;
-    margin: .1rem;
-    padding: .75rem;
-    color: #fff;
-    border-radius: .1875rem;
-    outline: none;
-    border: none;
-}
-
-
-
-.button:hover {
-    background-color: #eee;
-    color: #222;
-}
-
-.square{
-    padding: 0;
-    width: 45px;
-    height: 45px;
-}
-
-.square .text{
-    width: 50%;
-    height: 50%;
-    padding: 0;
-    margin: auto;
+#link-wrapper{
     display: flex;
+    width: 100%;
+    flex-direction: row;
+    justify-content: flex-start;
     align-items: center;
-    justify-content: center;
-    transform: translate(0, -10%) scale(2);
 }
 
-.create{
-    box-sizing: border-box;
-    background-color: #eee;
-    color: #222;
-    border-radius: .1875rem;
-    border: 2px dashed #222;
+#link{
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: calc(var(--font-size)*0.9);
+    background: transparent;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    padding: 2% 0;
+    margin: 2.5%;
+    margin-left: 0;
+    border: 1px solid var(--button-background);
+    outline: none;
+    font-weight: 300;
+    border-radius: var(--border-radius);
 }
 
-.create .text{
-    transform: translate(0, -20%) scale(2);
+#copy{
+    background: none;
 }
 
-.create:hover{
-    background-color: #222;
-    color: #eee;
+#copy img{
+    width: calc(var(--font-size)*1.5);
+    height: calc(var(--font-size)*1.5);
+    transform: scale(1);
+    transition: transform 0.1s ease;
 }
+
+#copy:hover img{
+    transform: scale(1.1);
+}
+
+/*========================================================*/
+
+/*=============== Loading ==============================*/
+
+/*======================================================*/
 
 @media only screen and (max-width: 600px) {
-    #title {
-        font-size: 50px;
+    :root{
+        --font-size: 18px;
     }
-    #center {
-        font-size: 27px;
-    }
-    .text {
-        transform: scale(1.5);
+
+    .card{
+        width: 280px;
     }
 }
+
+@media only screen and (max-width: 350px) {
+    :root{
+        --font-size: 14px;
+    }
+
+    .card{
+        width: 200px;
+    }
+}
+
+

@@ -20,7 +20,7 @@ io.on('connection', (client) => {
 				client.emit('opponentReady', playerID);
 			
 			const active = gameState[gameID]['active'][playerID];
-			if(active === undefined || !active){
+			if(active === undefined){
 				gameState[gameID]['active'][playerID] = client.id;
 			}else{
 				callback(active);
@@ -34,15 +34,15 @@ io.on('connection', (client) => {
 		if(game){
 			const player = game['active'][client.playerID];
 			if(player && player == client.id){
-				gameState[rooms[1]]['active'][client.playerID] = false;
+				delete gameState[rooms[1]]['active'][client.playerID];
 			}
 		}
 	})
 
-	client.on('ready', function (data) {
+	client.on('ready', function (data, callback) {
 		const gameID = data.gameID;
 		const playerID = data.playerID;
-		const opponentID = Object.keys(gameState[gameID]['active']).filter(k => k !== playerID)[0];
+
 		if(gameState[gameID]['players'][playerID] === undefined){
 			const totalHits = data.totalHits;
 			const playerBoard = data.playerBoard;
@@ -54,7 +54,8 @@ io.on('connection', (client) => {
 			gameState[gameID]['players'][playerID]['playerBoard'] = playerBoard;
 			gameState['changed'] = true;
 			client.to(gameID).emit('opponentReady');
-		
+		}else{
+			callback();
 		}
 	});
 
@@ -139,6 +140,14 @@ app.use(express.static(__dirname))
 	.set('view engine', 'ejs')
 	.get('/', (req, res) => {
 		const ssn = req.session;
+		if (ssn.gamesID !== undefined) {
+			for (let i = 0; i < ssn.gamesID.length; i++) {
+				if (gameState[ssn.gamesID[i]] === undefined) {
+					ssn.gamesID.splice(i, 1);
+					i--;
+				}
+			}
+		}
 		res.render('pages/index', {gamesID: ssn.gamesID ? ssn.gamesID : []});
 	})
 	.get('/index', (req, res) => res.redirect('/'))
@@ -149,15 +158,6 @@ http.listen(PORT, () => {
 
 app.post('/init', (req, res, next) => {
 	const ssn = req.session;
-	
-	if (ssn.gamesID !== undefined) {
-		for (let i = 0; i < ssn.gamesID.length; i++) {
-			if (gameState[ssn.gamesID[i]] === undefined) {
-				ssn.gamesID.splice(i, 1);
-				i--;
-			}
-		}
-	}
 
 	if (ssn.gamesID === undefined || ssn.gamesID && ssn.gamesID.length < 3) {
 		const gameID = uuidv4();
@@ -181,8 +181,9 @@ app.get('/play/:gameID', (req, res, next) => {
 	const { gameID } = req.params;
 	const gameExists = Object.keys(gameState).includes(gameID);
 	const ssn = req.session;
+
 	if (gameExists) {
-		if (ssn.playerID) {
+		if (ssn.playerID && Object.keys(gameState[gameID]['active']).includes(ssn.playerID) && Object.keys(gameState[gameID]['players']).length < 2) {
 			//Game exists and player has been given a unique id
 			const player = gameState[gameID]['players'][ssn.playerID];
 			res.render('pages/index_multiplayer', {
@@ -197,13 +198,15 @@ app.get('/play/:gameID', (req, res, next) => {
 					attacks: player.attacks
 				} : null
 			});
-		} else if (gameState[gameID]['players'] === undefined || Object.keys(gameState[gameID]['players']).length < 2) {
-			//Another player joins the game, and has not been given a unique id
-			const playerID = uuidv4();
-			ssn.playerID = playerID;
-			res.render('pages/index_multiplayer', { gameID: gameID, playerID: ssn.playerID, data: null });
-		} else {
-			res.redirect('/')
+		} else{
+			if(Object.keys(gameState[gameID]['active']).length < 2 && Object.keys(gameState[gameID]['players']).length < 2){
+				//Another player joins the game, and has not been given a unique id
+				const playerID = uuidv4();
+				ssn.playerID = playerID;
+				res.render('pages/index_multiplayer', { gameID: gameID, playerID: ssn.playerID, data: null });
+			} else{
+				res.redirect('/')
+			}
 		}
 	} else {
 		//Link to game does not exist

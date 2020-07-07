@@ -19,61 +19,54 @@
 
 <body>
     <main>
-        <button id="help" onclick="tutorial()" class="button-square">?</button>
-        <div id="game" class = "noDisplay">
-            <div id = "multiple-sessions" class = "noDisplay">
-                <p>Another session of the same game is running on your browser.</p>
-                <p>Please return to that session to continue playing.</p>
-            </div>
-            <div id="help-info">
-                <section>
-                    <p>Rules <button id="close" onclick="tutorial()" class="button-square" style="padding-top: 0.5%;">&times;</button></p>
-                    <ol>
-                        <li>War Vessels is played by 2 players</li>
-                        <li>It is a game of guessing where the opponent has placed their ships</li>
-                        <li><img alt='hit' src='../public/img/hit.png' class='help-icons'> is a hit and <img alt='miss'
-                                src='../public/img/miss.png' class='help-icons'> is a miss</li>
-                        <li>Ships sink when they cannot survive another attack</li>
-                        <li>Game is over when either all your ships or your opponent's ships have sunk</li>
-                    </ol>
-                    <p>Instructions</p>
-                    <ol>
-                        <li>Drag ships to place them</li>
-                        <li><span class='touch'></span> on ships to rotate them</li>
-                        <li><span class='touch'></span> on the opponent's board to attack</li>
-                    </ol>
-                </section>
-            </div>
-            <div id="info">
-                <button id="readyBtn" onclick="playerReady()" class="button noDisplay">Ready</button>
-                <p id="turn"></p>
-                <button id="playAgainBtn" onclick="playAgain()" class="button noDisplay">Play again?</button>
-            </div>
-            <div id="board">
-                <div id="player" class = "boards">
-                    <div id="patrol" draggable="false" class="interactable piece loadingImg">
-                        <div id = "patrol-img" class = "piece-img"></div>
-                    </div>
-                    <div id="submarine" draggable="false" class="interactable piece loadingImg">
-                        <div id = "submarine-img" class = "piece-img"></div>
-                    </div>
-                    <div id="destroyer" draggable="false" class="interactable piece loadingImg">
-                        <div id = "destroyer-img" class = "piece-img"></div>
-                    </div>
-                    <div id="battleship" draggable="false" class="interactable piece loadingImg">
-                        <div id = "battleship-img" class = "piece-img"></div>
-                    </div>
-                    <div id="carrier" draggable="false" class="interactable piece loadingImg">
-                        <div id = "carrier-img" class = "piece-img"></div>
-                    </div>
-                    <canvas id="playerCanvas"></canvas>
+        <button onclick="tutorial()" class="square-button button-top-right"><p>?</p></button>
+        <section id = "dropdown-info" class = "noDisplay">
+            
+        </section>
+        <section id="help-info">
+            <p class = 'help-info-heading'>Rules</p><button id="close" onclick="tutorial()" class="square-button create cross button-top-right"></button>
+            <ol>
+                <li>War Vessels is played by 2 players</li>
+                <li>It is a game of guessing where the opponent has placed their ships</li>
+                <li><img alt='hit' src='../public/img/hit.png' class='help-icons'> is a hit and <img alt='miss'
+                        src='../public/img/miss.png' class='help-icons'> is a miss</li>
+                <li>Ships sink when they cannot survive another attack</li>
+                <li>Game is over when either all your ships or your opponent's ships have sunk</li>
+            </ol>
+            <p class = 'help-info-heading'>Instructions</p>
+            <ol>
+                <li>Drag ships to place them</li>
+                <li><span class='touch'></span> on ships to rotate them</li>
+                <li><span class='touch'></span> on the opponent's board to attack</li>
+            </ol>
+        </section>
+        <section id="info">
+            <button id="playButton" class="button noDisplay info-element"><p>Ready</p></button>
+            <p id="infoPara" class = "info-element"></p>
+        </section>
+        <section id="board">
+            <div id="player" class = "boards">
+                <div id="patrol" draggable="false" class="interactable piece loadingImg">
+                    <div id = "patrol-img" class = "piece-img"></div>
                 </div>
-                <div id="opponent" class = "boards">
-                    <canvas id="opponentCanvas"></canvas>
+                <div id="submarine" draggable="false" class="interactable piece loadingImg">
+                    <div id = "submarine-img" class = "piece-img"></div>
                 </div>
+                <div id="destroyer" draggable="false" class="interactable piece loadingImg">
+                    <div id = "destroyer-img" class = "piece-img"></div>
+                </div>
+                <div id="battleship" draggable="false" class="interactable piece loadingImg">
+                    <div id = "battleship-img" class = "piece-img"></div>
+                </div>
+                <div id="carrier" draggable="false" class="interactable piece loadingImg">
+                    <div id = "carrier-img" class = "piece-img"></div>
+                </div>
+                <canvas id="playerCanvas"></canvas>
             </div>
-
-        </div>
+            <div id="opponent" class = "boards">
+                <canvas id="opponentCanvas"></canvas>
+            </div>
+        </section>
     </main>
 </body>
 <script src="/socket.io/socket.io.js"></script>
@@ -81,6 +74,7 @@
     const gameID = "<%= gameID %>";
     const playerID = "<%= playerID %>";
     const json = <%- JSON.stringify(data) %>;
+
     let tutorialOpen = false;
 
     const socket = io();
@@ -110,7 +104,13 @@
     function tutorial() {
         tutorialOpen = !tutorialOpen;
         select('#help-info').classList.toggle('show');
-        select('body').classList.toggle('has-overlay');
+        select('body').classList.toggle('overlay');
+        setTimeout(() => {
+            const infoHeadings = document.getElementsByClassName('help-info-heading');
+            for(const h of infoHeadings){
+                h.classList.toggle('underline');
+            }
+        }, 200);
     }
 </script>
 

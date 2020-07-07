@@ -1,177 +1,416 @@
-:root{
-	--cellsize: 0px;
-	--cellsizepx: 0px;
-	--canvas-size: 0px;
+:root {
+    --cellsize: 0px;
+    --cellsizepx: 0px;
+    --canvas-size: 0px;
+    --font-size: 20px;
+    --info-width: 380px;
+    --button-background: #222;
+    --button-color: #eee;
 }
 
-html, body {
-	margin: 0;
-	padding: 0;
-	font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial, sans-serif;
-	font-weight: 300;
-	background: #eee;
-	width: 100vw;
-	height: 100%;
-	overflow: hidden;
+html,
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #eee;
+    width: 100vw;
+    height: 100%;
+    overflow: hidden;
 }
 
-body.has-overlay::before {
-	content: "";
-	display: block;
-	position: fixed;
-	width: 100%;
-	height: 100%;
-	top: 0;
-	left: 0;
-	z-index: 2;
-	background: rgba(0, 0, 0, 0.5);
+body::before {
+    content: "";
+    display: block;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    z-index: -1;
+    background: rgba(0, 0, 0, 0.5);
+    transition: opacity 1s ease;
+}
+
+body.overlay::before {
+    opacity: 1;
+    z-index: 2;
+}
+
+p {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    display: inline-block;
+    font-size: var(--font-size);
+    font-weight: 200;
+    margin: 0;
+    padding: calc(var(--font-size)/2);
+    border: none;
+    outline: none;
+}
+
+main {
+    position: absolute;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
 }
 
 .noDisplay {
-	display: none;
+    display: none;
 }
 
-/*======================Help info========================*/
-.button-square{
-	position: absolute;
-	right: 0;
-	top: 0;
-	height: 40px;
-	width: 40px;
+/*============ BUTTONS ============*/
+button {
+    background: var(--button-background);
+    color: var(--button-color);
+    border: none;
+    outline: none;
+	margin: 0;
 	padding: 0;
-	text-align: center;
-	background-color: #222;
-	color: #eee;
 	border-radius: .1875em;
-	margin: .5em;
-	outline: none;
-	border: none;
-	font-weight: 300;
-	z-index: 1;
+	transition: background-color 0.2s ease;
 }
 
-.button-square:hover{
-	background-color: #eee;
-	color: #222;
+button:hover {
+    background: var(--button-color);
+    color: var(--button-background);
 }
 
+.button-top-right {
+    position: absolute;
+    right: 0;
+    top: 0;
+    transform: translate(-25%, 25%);
+}
+
+.square-button {
+    padding: 0;
+    margin: 0;
+    width: calc(var(--font-size)*2);
+    height: calc(var(--font-size)*2);
+    text-align: center;
+    line-height: 100%;
+}
+
+button:hover.create::after, button:hover.create::before{
+	background: var(--button-background);
+}
+
+.create::after,
+.create::before {
+    content: " ";
+    position: absolute;
+    display: block;
+    background-color: #eee;
+    border-radius: .1875em;
+}
+
+.create::after {
+    height: 5%;
+    margin-top: -2.5%;
+    top: 50%;
+    left: 20%;
+    right: 20%;
+}
+
+.create::before {
+    width: 5%;
+    margin-left: -2.5%;
+    left: 50%;
+    top: 20%;
+    bottom: 20%;
+}
+
+.cross::after,
+.cross::before {
+    transform: scale(0.6) rotate(45deg);
+}
+
+.plus::after,
+.plus::before {
+    transform: rotate(90deg);
+}
+
+/*=====================================================*/
+
+/*====================== Help info ====================*/
 #help-info {
-	position: absolute;
-	width: 380px;
-	padding: 20px;
-	background: #eee;
-	border-radius: 5px;
-	box-shadow: 0 19px 38px rgba(0, 0, 0, 0.30), 0 15px 12px rgba(0, 0, 0, 0.22);
-	z-index: -1;
-	opacity: 0;
-	transition: opacity 0.5s ease;
+    position: absolute;
+    width: var(--info-width);
+    padding: 20px;
+    background: #eee;
+    border-radius: 5px;
+    box-shadow: 0 19px 38px rgba(0, 0, 0, 0.30), 0 15px 12px rgba(0, 0, 0, 0.22);
+    z-index: -1;
+    opacity: 0;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.5s ease;
 }
 
 #help-info.show {
-	z-index: 2;
-	opacity: 1;
+    z-index: 2;
+    opacity: 1;
 }
 
-.help-icons {
-	width: 16px;
-	height: 16px;
-	transform: translate(0, 2px);
-}
-
-#help-info ol {
-	padding-left: 8%;
-}
-
-#help-info li {
-	padding: 5px 0;
-}
-
-#help-info p {
-	font-size: 22px;
-	text-align: center;
-	margin: 0;
-}
-
-#info {
-	margin: .5em;
-	padding: 0.75em;
-	display: flex;
-	flex-direction: column;
-}
-/*=====================================================*/
-
-
-
-canvas {
-	border-radius: 5px;
-	box-shadow: 0 0 50px 2px rgba(0, 0, 0, 0.30);
-	width: var(--canvas-size);
-	height: var(--canvas-size);
-}
-
-
-
-main {
-	position: relative;
-	width: 100vw;
-}
-
-#multiple-sessions{
-	position: absolute;
-	top: 0;
-	left: 50%;
-	transform: translate(-50%, -100%);
-	border-bottom-left-radius: 10px;
-	border-bottom-right-radius: 10px;
-	padding: 0 2%;
-	box-shadow: 0 0 50px 2px rgba(0, 0, 0, 0.30);
-	z-index: 3;
-	background: #eee;
-	transition: transform 1s ease;
-}
-
-#multiple-sessions.active{
-	transform: translate(-50%, 0%);
-	transition: transform 1s ease;
-}
-
-#player {
-	position: relative;
-}
-
-#game {
-	position: absolute;
-	width: 100vw;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	flex-direction: column;
-}
-
-#game.noDisplay{
-	opacity: 0;
-}
-
-#turn {
-	font-size: 20px;
-	margin: .5em;
-	padding: 0.75em;
-	text-align: center;
+ol,
+li {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: calc(var(--font-size)*0.9);
 	font-weight: 300;
 }
 
-#turn.end{
-	font-size: 30px;
-	padding: 0 0.75em;
+ol {
+	margin: 0 auto;
+	padding-left: 7.5%;
 }
 
-.dot-pulse span {
+.help-icons:before {
+    content: "";
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+}
+
+.help-icons {
+    vertical-align: middle;
+    width: var(--font-size);
+    height: var(--font-size);
+}
+
+.help-info-heading {
+    margin: 0 auto;
+    font-size: calc(var(--font-size)*1.1);
+}
+
+.help-info-heading:after {
+    background: none repeat scroll 0 0 transparent;
+    bottom: 0;
+    content: "";
+    display: block;
+    height: 2px;
+    background: #222;
+    transition: width 0.3s ease 0s;
+    width: 0;
+    border-radius: 2.5em;
+}
+
+.help-info-heading.underline:after {
+    width: 100%;
+}
+
+/*================================================================*/
+
+/*============= Canvas =========*/
+canvas {
+    border-radius: 5px;
+    box-shadow: 0 0 50px 2px rgba(0, 0, 0, 0.30);
+    width: var(--canvas-size);
+    height: var(--canvas-size);
+}
+
+#board {
+    display: flex;
+    flex-direction: row;
+}
+
+.boards {
+    position: relative;
+    margin: 0 20px;
+}
+
+#info {
+	margin-bottom: 1%;
+}
+
+/*===================================*/
+
+/*============== Pieces ================*/
+
+#player .loadingImg {
+    display: none;
+}
+
+#player .piece {
+    position: absolute;
+    opacity: 0.9;
+    margin: 0px;
+    padding: 0px;
+	background-repeat: no-repeat;
+	z-index: 1;
+}
+
+#player .piece .piece-img {
+    position: relative;
+    top: 50%;
+    left: 50%;
+    margin: 0;
+    padding: 0;
+    background-size: 100% 100%;
+    background-position: center;
+    transform: translate(-50%, -50%);
+    -webkit-filter: drop-shadow(0px 0px 5px rgba(0, 0, 0, 0.5));
+    filter: drop-shadow(0px 0px 5px rgba(0, 0, 0, 0.5));
+}
+
+#player .pickedup .piece-img {
+    -webkit-filter: drop-shadow(0px 0px 10px rgba(0, 0, 0, 0.5));
+    filter: drop-shadow(0px 0px 10px rgba(0, 0, 0, 0.5));
+}
+
+
+#patrol {
+    width: var(--cellsize);
+    height: calc(var(--cellsize)*2);
+    transform: translate(-100%, calc(var(--canvas-size) - calc(50%*8)));
+}
+
+
+#patrol .piece-img {
+    width: 50%;
+    height: 60%;
+    background: url("../img/ships/png/patrol.png");
+    transform: translate(-50%, -50%);
+}
+
+#submarine {
+    width: var(--cellsize);
+    height: calc(var(--cellsize)*3);
+    transform: translate(-100%, calc(var(--canvas-size) - 200%));
+}
+
+#submarine .piece-img {
+    width: 70%;
+    height: 70%;
+    background: url("../img/ships/png/submarine.png");
+    transform: translate(-50%, -50%);
+}
+
+#destroyer {
+    width: var(--cellsize);
+    height: calc(var(--cellsize)*3);
+    transform: translate(-100%, calc(var(--canvas-size) - 100%));
+}
+
+#destroyer .piece-img {
+    width: 70%;
+    height: 70%;
+    background: url("../img/ships/png/destroyer.png");
+    transform: translate(-50%, -50%);
+}
+
+#battleship {
+    width: var(--cellsize);
+    height: calc(var(--cellsize)*4);
+    transform: translate(calc(var(--cellsizepx)*6.5), calc(calc(var(--canvas-size) - 50%) + var(--cellsize)*1.5));
+}
+
+#battleship .piece-img {
+    width: 75%;
+    height: 80%;
+    background: url("../img/ships/png/battleship.png");
+    transform: translate(-50%, -50%);
+}
+
+#carrier {
+    width: var(--cellsize);
+    height: calc(var(--cellsize)*5);
+    transform: translate(calc(var(--cellsizepx)*2), calc(calc(var(--canvas-size) - 50%) + var(--cellsize)*1.25));
+}
+
+#carrier .piece-img {
+    width: 100%;
+    height: 85%;
+    background: url("../img/ships/png/carrier.png");
+    transform: translate(-50%, -50%);
+}
+
+/*==============================================================*/
+
+/*=================Multiple sessions=============================*/
+#dropdown-info {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -100%);
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    width: min(90vw, 90vh);
+    padding: 1% 2%;
+    box-shadow: 0 0 50px 2px rgba(0, 0, 0, 0.30);
+    z-index: 3;
+    background: #eee;
+    text-align: center;
+    transition: transform 1s ease;
+}
+
+#dropdown-info p {
+    display: inline-block;
+    text-align: left;
+}
+
+#dropdown-info.active {
+    transform: translate(-50%, 0%);
+    transition: transform 1s ease;
+}
+
+/*=================================================================*/
+
+@media only screen and (max-width: 600px) {
+    :root {
+        --canvas-size: 42vh;
+        --font-size: 18px;
+        --info-width: 320px;
+    }
+
+    canvas {
+        box-shadow: 0 0 25px 1px rgba(0, 0, 0, 0.30);
+    }
+
+    #board {
+        flex-direction: column-reverse;
+    }
+
+    .boards {
+        margin: 1px 0;
+    }
+
+    #battleship {
+        transform: translate(calc(12.5% + var(--canvas-size)), calc(var(--canvas-size) - var(--cellsizepx)*9));
+    }
+
+    #carrier {
+        transform: translate(calc(12.5% + var(--canvas-size)), calc(var(--canvas-size) - var(--cellsizepx)*5));
+    }
+}
+
+@media only screen and (max-width: 450px) {
+    :root {
+        --font-size: 16px;
+        --info-width: 300px;
+    }
+}
+
+@media only screen and (max-width: 350px) {
+    :root {
+        --font-size: 14px;
+        --info-width: 250px;
+    }
+}
+
+
+dot-pulse span {
 	animation-name: pulse;
 	animation-duration: 1.4s;
 	animation-iteration-count: infinite;
 	animation-fill-mode: both;
 }
 
+/*================dots animation =================*/
 @keyframes pulse {
 	0% {
 		opacity: .2;
@@ -190,212 +429,4 @@ main {
 
 .dot-pulse span:nth-child(3) {
 	animation-delay: .4s;
-}
-
-.buttons {
-	position: absolute;
-	left: 0;
-	top: 0;
-}
-
-
-.button {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	box-sizing: inherit;
-	font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial, sans-serif;
-	background-color: #222;
-	margin: .5em;
-	padding: 0.75em;
-	color: #fff;
-	text-align: center;
-	border-radius: .1875em;
-	font-size: 20px;
-	outline: none;
-	border: none;
-	font-weight: 300;
-	z-index: 1;
-}
-
-.button.noDisplay {
-	display: none;
-}
-
-.button:hover {
-	background-color: #eee;
-	color: #222;
-}
-
-#board {
-	display: flex;
-	flex-direction: row;
-}
-
-.boards {
-	margin: 0 20px;
-}
-
-#player .piece {
-	position: absolute;
-	opacity: 0.9;
-	margin: 0px;
-	padding: 0px;
-	background-repeat: no-repeat;
-}
-
-#player .piece .piece-img{
-	position: relative;
-	top: 50%;
-	left: 50%;
-	margin: 0;
-	padding: 0;
-	background-size: 100% 100%;
-	background-position: center;
-	transform: translate(-50%, -50%);
-	-webkit-filter: drop-shadow(0px 0px 15px rgba(0,0,0, 0.5));
-    filter: drop-shadow(0px 0px 15px rgba(0,0,0, 0.5));
-}
-
-#player .pickedup .piece-img{
-	-webkit-filter: drop-shadow(0px 0px 15px rgba(0,0,0, 1));
-    filter: drop-shadow(0px 0px 15px rgba(0,0,0, 1));
-}
-
-#player .loadingImg {
-	display: none;
-}
-
-#patrol {
-	width: var(--cellsize);
-	height: calc(var(--cellsize)*2);
-	transform: translate(-100%, calc(var(--canvas-size) - calc(50%*8)));
-}
-
-
-#patrol .piece-img{
-	width: 50%;
-	height: 60%;
-	background: url("../img/ships/png/patrol.png");
-	transform: translate(-50%, -50%);
-}
-
-#submarine {
-	width: var(--cellsize);
-	height: calc(var(--cellsize)*3);
-	transform: translate(-100%, calc(var(--canvas-size) - 200%));
-}
-
-#submarine .piece-img{
-	width: 70%;
-	height: 70%;
-	background: url("../img/ships/png/submarine.png");
-	transform: translate(-50%, -50%);
-}
-
-#destroyer {
-	width: var(--cellsize);
-	height: calc(var(--cellsize)*3);
-	transform: translate(-100%, calc(var(--canvas-size) - 100%));
-}
-
-#destroyer .piece-img{
-	width: 70%;
-	height: 70%;
-	background: url("../img/ships/png/destroyer.png");
-	transform: translate(-50%, -50%);
-}
-
-#battleship {
-	width: var(--cellsize);
-	height: calc(var(--cellsize)*4);
-	transform: translate(calc(var(--cellsizepx)*6.5),calc(calc(var(--canvas-size) - 50%) + var(--cellsize)*1.5));
-}
-
-#battleship .piece-img{
-	width: 75%;
-	height: 80%;
-	background: url("../img/ships/png/battleship.png");
-	transform: translate(-50%, -50%);
-}
-
-#carrier {
-	width: var(--cellsize);
-	height: calc(var(--cellsize)*5);
-	transform: translate(calc(var(--cellsizepx)*2),calc(calc(var(--canvas-size) - 50%) + var(--cellsize)*1.25));
-}
-
-#carrier .piece-img{
-	width: 100%;
-	height: 85%;
-	background: url("../img/ships/png/carrier.png");
-	transform: translate(-50%, -50%);
-}
-
-@media only screen and (max-width: 600px) {
-	:root{
-		--canvas-size:  42vh;
-	}
-
-	canvas {
-		box-shadow: 0 0 25px 1px rgba(0, 0, 0, 0.30);
-	}
-	#board {
-		flex-direction: column-reverse;
-	}
-	#board div {
-		margin: 1px 0;
-	}
-	#info {
-		padding: 0;
-	}
-	#turn, .button {
-		font-size: 16px;
-		margin: 0;
-	}
-
-	#battleship{
-		transform: translate(calc(12.5% + var(--canvas-size)),calc(var(--canvas-size) - var(--cellsizepx)*9));
-	}
-
-	#carrier{
-		transform: translate(calc(12.5% + var(--canvas-size)),calc(var(--canvas-size) - var(--cellsizepx)*5));
-	}
-}
-
-@media only screen and (max-width: 450px) {
-	#help-info {
-		font-size: 18px;
-		width: 300px;
-		padding: 10px;
-	}
-	.button-square {
-		height: 30px;
-		width: 30px;
-	}
-	#help-info p {
-		font-size: 20px;
-	}
-	#turn, .button {
-		font-size: 16px;
-		padding: 0.55em;
-	}
-}
-
-@media only screen and (max-width: 350px) {
-	#help-info {
-		font-size: 14px;
-		width: 250px;
-		padding: 10px;
-	}
-	.button-square {
-		height: 20px;
-		width: 20px;
-	}
-	#help-info p {
-		font-size: 14px;
-	}
-	#turn, .button {
-		font-size: 12px;
-	}
 }
