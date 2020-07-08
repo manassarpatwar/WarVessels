@@ -32,10 +32,10 @@
         <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
         </defs>
         <g class="parallax">
-        <use xlink:href="#gentle-wave" x="30" y="7"/>
-        <use xlink:href="#gentle-wave" x="30" y="0"/>
-        <use xlink:href="#gentle-wave" x="30" y="3"/>
-        <use xlink:href="#gentle-wave" x="30" y="5"/>
+        <use xlink:href="#gentle-wave" x="48" y="7"/>
+        <use xlink:href="#gentle-wave" x="48" y="0"/>
+        <use xlink:href="#gentle-wave" x="48" y="3"/>
+        <use xlink:href="#gentle-wave" x="48" y="5"/>
         </g>
         </svg>
         <div id="center">
@@ -67,7 +67,6 @@
             <div id = "mode" class = "card noDisplay">
                 <button onclick = "switchState('splash')" class = "square-button triangle point button-top-left"></button>
                 <div id = "mode-button-wrapper">
-                    <p class='text'>How do you want to play?</p>
                     <button id = "playWithFriend" class = "mode-button">
                         <p class='text'>Play with friend</p>
                     </button>
@@ -92,13 +91,6 @@
 
 </body>
 <script>
-    //wave
-    const waveStart = 48;
-    const waves = document.getElementsByTagName('use');
-    for(const w of waves){
-        w.setAttribute('x', waveStart+Math.random()*waveStart);
-    }
-    
     const splash = select('#splash');
     const share = select('#share');
     const sessions = select('#sessions');

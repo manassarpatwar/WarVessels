@@ -162,7 +162,7 @@ button:hover.create::before {
     display: inline-flex;
     flex-direction: column;
     justify-content: center;
-    margin-bottom: 10%;
+    margin: 10%;
 }
 
 .mode-button{
@@ -173,11 +173,11 @@ button:hover.create::before {
     justify-content: flex-start;
 }
 
-.mode-button:nth-child(even){
+.mode-button:nth-child(odd){
     margin: 0 0 2% 0;
 }
 
-.mode-button:nth-child(odd){
+.mode-button:nth-child(even){
     margin: 2% 0 0 0;
 }
 
