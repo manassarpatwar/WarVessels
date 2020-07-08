@@ -162,7 +162,7 @@ button:hover.create::before {
     display: inline-flex;
     flex-direction: column;
     justify-content: center;
-    margin: 10%;
+    margin: 10% 0;
 }
 
 .mode-button{
