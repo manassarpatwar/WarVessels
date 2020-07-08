@@ -1,9 +1,9 @@
 .waves{
     position: absolute;
-    bottom: -5%;
+    bottom: 0;
     left: 0;
     width: 100%;
-    height: min(50vh, 35vw);
+    height: min(45vh, 30vw);
 }
 
 /* Animation */
