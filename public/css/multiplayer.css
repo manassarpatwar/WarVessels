@@ -2,7 +2,7 @@
     --cellsize: 0px;
     --cellsizepx: 0px;
     --canvas-size: 0px;
-    --font-size: 20px;
+    --font-size: 22px;
     --info-width: 380px;
     --button-background: #222;
     --button-color: #eee;
@@ -42,7 +42,7 @@ p {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial, sans-serif;
     display: inline-block;
     font-size: var(--font-size);
-    font-weight: 200;
+    font-weight: 300;
     margin: 0;
     padding: calc(var(--font-size)/2);
     border: none;
@@ -109,29 +109,29 @@ button:hover.create::after, button:hover.create::before{
 }
 
 .create::after {
-    height: 5%;
-    margin-top: -2.5%;
+    height: 50%;
+    width: 5%;
     top: 50%;
-    left: 20%;
-    right: 20%;
+    left: 50%;
+    transform: translate(-50%,-50%);
 }
 
 .create::before {
-    width: 5%;
-    margin-left: -2.5%;
+    height: 5%;
+    width: 50%;
+    top: 50%;
     left: 50%;
-    top: 20%;
-    bottom: 20%;
+    transform: translate(-50%,-50%);
 }
 
 .cross::after,
 .cross::before {
-    transform: scale(0.6) rotate(45deg);
+    transform: translate(-50%, -50%) rotate(45deg);
 }
 
 .plus::after,
 .plus::before {
-    transform: rotate(90deg);
+    transform: translate(-50%, -50%) rotate(45deg);
 }
 
 /*=====================================================*/
@@ -363,7 +363,6 @@ canvas {
 @media only screen and (max-width: 600px) {
     :root {
         --canvas-size: 42vh;
-        --font-size: 18px;
         --info-width: 320px;
     }
 
@@ -390,14 +389,14 @@ canvas {
 
 @media only screen and (max-width: 450px) {
     :root {
-        --font-size: 16px;
+        --font-size: 20px;
         --info-width: 300px;
     }
 }
 
 @media only screen and (max-width: 350px) {
     :root {
-        --font-size: 14px;
+        --font-size: 18px;
         --info-width: 250px;
     }
 }
