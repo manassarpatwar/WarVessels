@@ -123,7 +123,7 @@ class WaterWave {
 
         for (var j = dy - this.riprad; j < dy + this.riprad; j++) {
             for (var k = dx - this.riprad; k < dx + this.riprad; k++) {
-                this.current[this.oldind + (j * this.width) + k] += 1024;
+                this.current[this.oldind + (j * this.width) + k] += 512;
             }
         }
     }
@@ -131,5 +131,4 @@ class WaterWave {
     done() {
         return this.rippleLength == 0;
     }
-
 }

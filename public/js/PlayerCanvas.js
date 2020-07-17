@@ -57,7 +57,7 @@ class PlayerCanvas extends Canvas{
                 }
     
                 if (self.touchWater) {
-                    self.updateTexture(attack);
+                    self.loadTexture();
                     self.touchWater(attack[1] * global.cellSize + global.cellSize / 2, attack[0] * global.cellSize + global.cellSize / 2)
                     
                     if (!self.showing)

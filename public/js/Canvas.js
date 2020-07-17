@@ -57,23 +57,10 @@ class Canvas{
     }
 
     loadTexture(){
+        this.ctx.clearRect(0,0,this.width, this.height);
+        this.ctx.drawImage(this.bg, 0, 0, this.bg.width, this.bg.height);
+        this.drawBoard();
         this.waterWave.loadTexture();
-    }
-
-    updateTexture(data){
-        const i = data[0];
-        const j = data[1];
-        const value = this.board[i][j];
-        this.ctx.beginPath();
-        this.ctx.rect(j * this.cellSize, i * this.cellSize, this.cellSize, this.cellSize);
-        if (value < 0) {
-            this.ctx.fillStyle = 'rgba(255,0,0,0.6)';
-            this.ctx.fill();
-        } else if (value == 'miss') {
-            this.ctx.fillStyle = 'rgba(0,0,0,0.6)';
-            this.ctx.fill();
-        }
-        this.loadTexture();
     }
 
 }

@@ -68,7 +68,7 @@ class OpponentCanvas extends Canvas{
                             switchState('end', result);
                             }, 1000);
                         }
-                        self.updateTexture(attack);
+                        self.loadTexture();
                         self.waterWave.touchWater(Math.floor(e.clientX - rect.left), Math.floor(e.clientY - rect.top));
                         
                         if (!self.showing)

@@ -324,8 +324,6 @@ function setup() {
                 switchState('end', json.result ? 1 : -1)
             }
 
-            global.playerCanvas.drawBoard(false);
-            global.opponentCanvas.drawBoard(false);
             global.playerCanvas.loadTexture();
             global.opponentCanvas.loadTexture();
         } 
