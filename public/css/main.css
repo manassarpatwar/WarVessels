@@ -393,13 +393,6 @@ button:hover.create.flood {
 
     100% {
         opacity: 0;
-@media only screen and (max-width: 350px) {
-    :root{
-        --font-size: min(6vw, 6vh);
-    }
-
-    .card{
-        width: 90vw;
     }
 }
 
@@ -453,7 +446,6 @@ button:hover.create.flood {
 }
 
 /* =================================== media ================== */
-/*======================================================*/
 
 @media only screen and (max-width: 370px) {
     :root {
