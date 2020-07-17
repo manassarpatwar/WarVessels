@@ -98,19 +98,12 @@ class WaterWave {
 
                     new_pixel = (a + (b * this.width)) * 4;
                     cur_pixel = i * 4;
+                
+            
+                    this.ripple.data[cur_pixel] = this.texture.data[new_pixel];
+                    this.ripple.data[cur_pixel + 1] = this.texture.data[new_pixel + 1];
+                    this.ripple.data[cur_pixel + 2] = this.texture.data[new_pixel + 2];
 
-                    if(this.texture.data[cur_pixel+3] == 0){
-                        if(this.current[this.newind + i] != 0){
-                            this.ripple.data[cur_pixel] = this.texture.data[cur_pixel];
-                            this.ripple.data[cur_pixel + 1] = this.texture.data[cur_pixel + 1];
-                            this.ripple.data[cur_pixel + 2] = this.texture.data[cur_pixel + 2];
-                            this.texture.data[cur_pixel+3] == 1;
-                        }
-                    }else{
-                        this.ripple.data[cur_pixel] = this.texture.data[new_pixel];
-                        this.ripple.data[cur_pixel + 1] = this.texture.data[new_pixel + 1];
-                        this.ripple.data[cur_pixel + 2] = this.texture.data[new_pixel + 2];
-                    }
                 }
 
                 ++this.mapind;
@@ -121,20 +114,6 @@ class WaterWave {
 
     loadTexture(){
         this.texture = this.ctx.getImageData(0, 0, this.width, this.height);
-    }
-
-    updateTexture(color, x, y, size){
-        const offset = x*this.width+y;
-        const alpha = color.a;
-        for(let j = 0; j < size; j++){
-            for(let i = 0; i < size; i++){
-                const index = (offset+j*this.width+i)*4;
-                this.texture.data[index] = (1 - alpha) * this.texture.data[index] + alpha * color.r;
-                this.texture.data[index+1] = (1 - alpha) * this.texture.data[index+1] + alpha * color.g;
-                this.texture.data[index+2] = (1 - alpha) * this.texture.data[index+2] + alpha * color.b;
-                this.texture.data[index+3] = 0;
-            }
-        }
     }
 
     touchWater(dx, dy) {
