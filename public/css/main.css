@@ -176,6 +176,13 @@ button:hover.create.flood {
     background: var(--button-background);
 }
 
+#mode-button-wrapper{
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 10% 0;
+}
+
 .mode-button {
     text-align: left;
     width: 85%;
@@ -241,7 +248,7 @@ button:hover.create.flood {
 .card {
     position: relative;
     text-align: center;
-    width: 360px;
+    width: 340px;
     background: #eee;
     border-radius: var(--border-radius);
     box-shadow: 0 19px 38px rgba(0, 0, 0, 0.30), 0 15px 12px rgba(0, 0, 0, 0.22);
@@ -386,6 +393,13 @@ button:hover.create.flood {
 
     100% {
         opacity: 0;
+@media only screen and (max-width: 350px) {
+    :root{
+        --font-size: min(6vw, 6vh);
+    }
+
+    .card{
+        width: 90vw;
     }
 }
 
