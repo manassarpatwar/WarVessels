@@ -211,6 +211,7 @@ app.post('/init/online', (req, res) => {
 		const availablePlayer = players.find(p => gameState['matchmaking'][p] === null);
 		if(availablePlayer && availablePlayer !== ssn.playerID){
 			ssn.searching = false;
+			delete gameState['matchmaking'][ssn.playerID];
 			const gameID = uuidv4();
 			gameState['matchmaking'][availablePlayer] = gameID;
 			gameState[gameID] = {};
@@ -233,12 +234,12 @@ app.post('/matchmake', (req, res) => {
 	const ssn = req.session;
 	if(ssn.playerID && ssn.searching){
 		const gameID = gameState['matchmaking'][ssn.playerID];
+		res.send({gameID: gameID})
 		if(gameID){
 			ssn.searching = false;
 			ssn.onlineGameID = gameID;
 			delete gameState['matchmaking'][ssn.playerID];
-		}
-		res.send({gameID: gameID})
+		};
 	}else{
 		res.send({gameID: null})
 	}
