@@ -26,7 +26,7 @@ class WaterWave {
         this.newind = this.width * (this.height + 3);
         this.half_width = this.width >> 1;
         this.half_height = this.height >> 1;
-        this.size = this.width * (this.height + 2) * 2,
+        this.size = this.width * (this.height+2) * 2,
 
         this.riprad = 2;
         this.mapind;
@@ -79,6 +79,7 @@ class WaterWave {
 
                 this.current[this.newind + i] = data;
                 this.rippleLength += data != 0;
+
                 data = 1024 - data;
 
                 old_data = this.previous[i];
@@ -98,9 +99,18 @@ class WaterWave {
                     new_pixel = (a + (b * this.width)) * 4;
                     cur_pixel = i * 4;
 
-                    this.ripple.data[cur_pixel] = this.texture.data[new_pixel];
-                    this.ripple.data[cur_pixel + 1] = this.texture.data[new_pixel + 1];
-                    this.ripple.data[cur_pixel + 2] = this.texture.data[new_pixel + 2];
+                    if(this.texture.data[cur_pixel+3] == 0){
+                        if(this.current[this.newind + i] != 0){
+                            this.ripple.data[cur_pixel] = this.texture.data[cur_pixel];
+                            this.ripple.data[cur_pixel + 1] = this.texture.data[cur_pixel + 1];
+                            this.ripple.data[cur_pixel + 2] = this.texture.data[cur_pixel + 2];
+                            this.texture.data[cur_pixel+3] == 1;
+                        }
+                    }else{
+                        this.ripple.data[cur_pixel] = this.texture.data[new_pixel];
+                        this.ripple.data[cur_pixel + 1] = this.texture.data[new_pixel + 1];
+                        this.ripple.data[cur_pixel + 2] = this.texture.data[new_pixel + 2];
+                    }
                 }
 
                 ++this.mapind;
@@ -113,6 +123,20 @@ class WaterWave {
         this.texture = this.ctx.getImageData(0, 0, this.width, this.height);
     }
 
+    updateTexture(color, x, y, size){
+        const offset = x*this.width+y;
+        const alpha = color.a;
+        for(let j = 0; j < size; j++){
+            for(let i = 0; i < size; i++){
+                const index = (offset+j*this.width+i)*4;
+                this.texture.data[index] = (1 - alpha) * this.texture.data[index] + alpha * color.r;
+                this.texture.data[index+1] = (1 - alpha) * this.texture.data[index+1] + alpha * color.g;
+                this.texture.data[index+2] = (1 - alpha) * this.texture.data[index+2] + alpha * color.b;
+                this.texture.data[index+3] = 0;
+            }
+        }
+    }
+
     touchWater(dx, dy) {
         this.rippleLength = 0;
         dx <<= 0;
@@ -120,7 +144,7 @@ class WaterWave {
 
         for (var j = dy - this.riprad; j < dy + this.riprad; j++) {
             for (var k = dx - this.riprad; k < dx + this.riprad; k++) {
-                this.current[this.oldind + (j * this.width) + k] += 512;
+                this.current[this.oldind + (j * this.width) + k] += 1024;
             }
         }
     }

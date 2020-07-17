@@ -2,7 +2,7 @@
     --font-size: 24px;
     --button-background: #222;
     --button-color: #eee;
-    --border-radius: 3px;
+    --border-radius: .1875em;
 }
 
 @font-face {
@@ -45,7 +45,7 @@ p {
     outline: none;
 }
 
-.small{
+.small {
     font-size: calc(var(--font-size)*0.75);
 }
 
@@ -57,18 +57,23 @@ p {
 
 /*==============Buttons===========================*/
 button {
+    position: relative;
     background: var(--button-background);
     color: var(--button-color);
     border: none;
     outline: none;
     margin: 0;
-    border-radius: .1875em;
+    border-radius: var(--border-radius);
     transition: background-color 0.2s ease;
 }
 
 button:hover {
     background: var(--button-color);
     color: var(--button-background);
+}
+
+button:hover .loader div{
+    background: var(--button-background);
 }
 
 .button-top-left {
@@ -95,25 +100,26 @@ button:hover {
     border-left: var(--font-size) solid #222;
     border-bottom: var(--font-size) solid transparent;
     border-right: var(--font-size) solid transparent;
+    border-radius: var(--border-radius);
     transform: scale(0.5);
     transition: transform 0.1s ease;
 }
 
 .triangle:hover {
     background: none;
-    transform: translate(-5%, -5%) scale(0.5);
+    transform: scale(0.5) translate(-7.5%, -7.5%);
 }
 
 button.fill {
     width: 100%;
 }
 
-button.point{
+button.point {
     cursor: pointer;
 }
 
-.create{
-    transform: translate(-50%,-50%);
+.create {
+    transform: translate(-50%, -50%);
 }
 
 .create::after,
@@ -123,11 +129,23 @@ button.point{
     background: var(--button-background);
     display: block;
     border-radius: .1875em;
-    transform: translate(-50%,-50%);
+    transform: translate(-50%, -50%);
 }
 
 button:hover.create::after,
 button:hover.create::before {
+    background: var(--button-color);
+}
+
+.create.flood::after, .create.flood:before{
+    display: none;
+}
+
+.create.flood {
+    background: var(--button-background);
+}
+
+button:hover.create.flood {
     background: var(--button-color);
 }
 
@@ -146,7 +164,7 @@ button:hover.create::before {
 }
 
 
-.plus{
+.plus {
     box-sizing: border-box;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
@@ -154,34 +172,24 @@ button:hover.create::before {
     border: calc(var(--font-size)*0.075) solid var(--button-background);
 }
 
-.plus:hover{
+.plus:hover {
     background: var(--button-background);
 }
 
-#mode-button-wrapper{
-    display: inline-flex;
-    flex-direction: column;
-    justify-content: center;
-    margin: 10% 0;
+.mode-button {
+    text-align: left;
+    width: 85%;
 }
 
-.mode-button{
-    text-align: center;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: flex-start;
+.mode-button:nth-child(even) {
+    margin: 8.5% 0 2% 0;
 }
 
-.mode-button:nth-child(odd){
-    margin: 0 0 2% 0;
+.mode-button:nth-child(odd) {
+    margin: 2% 0 8.5% 0;
 }
 
-.mode-button:nth-child(even){
-    margin: 2% 0 0 0;
-}
-
-#sessions-buttons{
+#sessions-buttons {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -189,12 +197,12 @@ button:hover.create::before {
     padding-bottom: 10%;
 }
 
-.sessions-button{
+.sessions-button {
     transform: scale(1.25);
     margin: 2% 3% 0 3%;
 }
 
-.sessions-button .create{
+.sessions-button .create {
     width: 100%;
     height: 100%;
     position: relative;
@@ -233,14 +241,14 @@ button:hover.create::before {
 .card {
     position: relative;
     text-align: center;
-    width: 340px;
+    width: 360px;
     background: #eee;
     border-radius: var(--border-radius);
     box-shadow: 0 19px 38px rgba(0, 0, 0, 0.30), 0 15px 12px rgba(0, 0, 0, 0.22);
     font-weight: 300;
 }
 
-#link-wrapper{
+#link-wrapper {
     display: flex;
     width: 100%;
     flex-direction: row;
@@ -248,7 +256,7 @@ button:hover.create::before {
     align-items: center;
 }
 
-#link{
+#link {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: calc(var(--font-size)*0.9);
     background: transparent;
@@ -264,35 +272,181 @@ button:hover.create::before {
     border-radius: var(--border-radius);
 }
 
-#copy{
+#copy {
     background: none;
-}
-
-#copy img{
-    width: calc(var(--font-size)*1.5);
-    height: calc(var(--font-size)*1.5);
-    transform: scale(1);
-    transition: transform 0.1s ease;
-}
-
-#copy:hover img{
-    transform: scale(1.1);
 }
 
 /*========================================================*/
 
-/*=============== Loading ==============================*/
+/*=============== Loading ======================*/
 
-/*======================================================*/
+.loader {
+    position: absolute;
+    width: var(--font-size);
+    height: var(--font-size);
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+}
 
-@media only screen and (max-width: 350px) {
-    :root{
-        --font-size: min(6vw, 6vh);
+.loader-right .loader{
+    right: 0;
+}
+
+.loader-center .loader{
+    left: 50%;
+}
+
+.loader div {
+    animation: lds-spinner 1.2s linear infinite;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 30%;
+    height: 10%;
+    border-radius: 20px;
+    background: var(--button-color);
+}
+
+.loader div:nth-child(1) {
+    transform: translate(-50%, -50%) rotate(0deg) translate(calc(var(--font-size)/2));
+    animation-delay: -1.1s;
+}
+
+.loader div:nth-child(2) {
+    transform: translate(-50%, -50%) rotate(30deg) translate(calc(var(--font-size)/2));
+    ;
+    animation-delay: -1s;
+}
+
+.loader div:nth-child(3) {
+    transform: translate(-50%, -50%) rotate(60deg) translate(calc(var(--font-size)/2));
+    ;
+    animation-delay: -0.9s;
+}
+
+.loader div:nth-child(4) {
+    transform: translate(-50%, -50%) rotate(90deg) translate(calc(var(--font-size)/2));
+    ;
+    animation-delay: -0.8s;
+}
+
+.loader div:nth-child(5) {
+    transform: translate(-50%, -50%) rotate(120deg) translate(calc(var(--font-size)/2));
+    ;
+    animation-delay: -0.7s;
+}
+
+.loader div:nth-child(6) {
+    transform: translate(-50%, -50%) rotate(150deg) translate(calc(var(--font-size)/2));
+    ;
+    animation-delay: -0.6s;
+}
+
+.loader div:nth-child(7) {
+    transform: translate(-50%, -50%) rotate(180deg) translate(calc(var(--font-size)/2));
+    ;
+    animation-delay: -0.5s;
+}
+
+.loader div:nth-child(8) {
+    transform: translate(-50%, -50%) rotate(210deg) translate(calc(var(--font-size)/2));
+    ;
+    animation-delay: -0.4s;
+}
+
+.loader div:nth-child(9) {
+    transform: translate(-50%, -50%) rotate(240deg) translate(calc(var(--font-size)/2));
+    ;
+    animation-delay: -0.3s;
+}
+
+.loader div:nth-child(10) {
+    transform: translate(-50%, -50%) rotate(270deg) translate(calc(var(--font-size)/2));
+    ;
+    animation-delay: -0.2s;
+}
+
+.loader div:nth-child(11) {
+    transform: translate(-50%, -50%) rotate(300deg) translate(calc(var(--font-size)/2));
+    ;
+    animation-delay: -0.1s;
+}
+
+.loader div:nth-child(12) {
+    transform: translate(-50%, -50%) rotate(330deg) translate(calc(var(--font-size)/2));
+    ;
+    animation-delay: 0s;
+}
+
+@keyframes lds-spinner {
+    0% {
+        opacity: 1;
     }
 
-    .card{
-        width: 90vw;
+    100% {
+        opacity: 0;
     }
 }
 
+/*===========================================*/
 
+/*================== Copy ================*/
+
+.copy {
+    position: absolute;
+    width: 50%;
+    height: 65%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    outline: none;
+}
+
+
+.copy::before, .copy::after{
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    border: calc(var(--font-size)*0.05) solid #222;
+    border-radius: 20%;
+    background: #eee;
+}
+
+.copy::before{
+    transform: rotate(45deg) translate(-20%) rotate(-45deg);
+    transition: transform 0.5s ease;
+}
+
+.copy::after{
+    transform: rotate(45deg) translate(20%) rotate(-45deg);
+    transition: transform 0.5s ease;
+    transition-delay: 0.15s;
+}
+
+#copy:hover .copy::before{
+    transform: rotate(45deg) translate(-20%) rotate(-45deg) translateY(-25%);
+}
+
+#copy:hover .copy::after{
+    transform: rotate(45deg) translate(20%) rotate(-45deg) translateY(-25%);
+}
+
+/* =================================== media ================== */
+/*======================================================*/
+
+@media only screen and (max-width: 370px) {
+    :root {
+        --font-size: min(6vw, 6vh);
+    }
+
+    .card {
+        width: 90vw;
+    }
+}

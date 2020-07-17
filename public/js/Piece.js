@@ -12,6 +12,8 @@ class Piece{
         this.el = select('#'+this.name)
         this.rotation = rot;
         this.length = length;
+        this.width = global.cellSize;
+        this.height = this.length*global.cellSize;
         for(let i = 0; i < length; i++){
             this.coords[i] = [i*this.rotation, i*(1-this.rotation)];
         }
@@ -42,44 +44,39 @@ class Piece{
             this.startPosition = {x: e.clientX, y: e.clientY};
             this.currentPosition = this.transform();
             this.el.classList.add('pickedup');
-            playButton.classList.add('noDisplay');
-            infoPara.classList.remove('noDisplay');
-            requestAnimationFrame(update);
+            switchState('text', null);
+            updatePiece();
         }
     }
 
-    getPiecePlace(cellSize){
+    getPiecePlace(){
         const data = this.transform();
-        const height = this.length*cellSize;
-        const width = cellSize;
     
-        data.x -= (height/2-width/2)*this.rotation;
-        data.y += (height/2-width/2)*this.rotation;
+        data.x -= (this.height/2-this.width/2)*this.rotation;
+        data.y += (this.height/2-this.width/2)*this.rotation;
         return {x: data.x, y: data.y};
     }
 
-    getFitBuffer(cellSize){
+    getFitBuffer(){
         const data = {x: 0, y :0};
-        const height = this.length*cellSize;
-        const width = cellSize;
-        data.x = (height/2-width/2)*this.rotation;
-        data.y = -(height/2-width/2)*this.rotation;
+
+        data.x = (this.height/2-this.width/2)*this.rotation;
+        data.y = -(this.height/2-this.width/2)*this.rotation;
         return data;
     }
 
-    getCenter(cellSize){
-        const data = this.getPiecePlace(cellSize);
-        const height = this.length*cellSize;
-        const width = cellSize;
-        data.x += height/2*this.rotation+width/2*(1-this.rotation);
-        data.y += width/2*this.rotation+height/2*(1-this.rotation);
+    getCenter(){
+        const data = this.getPiecePlace();
+
+        data.x += this.height/2*this.rotation+this.width/2*(1-this.rotation);
+        data.y += this.width/2*this.rotation+this.height/2*(1-this.rotation);
 
         return data;
     }
 
-    fit(place, cellSize){
-        const buffer = this.getFitBuffer(cellSize);
-        this.transform(place.x*cellSize+buffer.x, place.y*cellSize+buffer.y);
+    fit(place){
+        const buffer = this.getFitBuffer();
+        this.transform(place.x*global.cellSize+buffer.x, place.y*global.cellSize+buffer.y);
     }
 
     transform(x, y, r, el = this.el){

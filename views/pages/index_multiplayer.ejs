@@ -9,7 +9,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="../public/css/multiplayer.css" />
     <script language="javascript" type="text/javascript" src="../public/js/sketch.js"></script>
-    <script language="javascript" type="text/javascript" src="../public/js/WarVessels.js"></script>
+    <script language="javascript" type="text/javascript" src="../public/js/Canvas.js"></script>
+    <script language="javascript" type="text/javascript" src="../public/js/PlayerCanvas.js"></script>
+    <script language="javascript" type="text/javascript" src="../public/js/OpponentCanvas.js"></script>
     <script language="javascript" type="text/javascript" src="../public/js/Piece.js"></script>
     <script language="javascript" type="text/javascript" src="../public/js/Player.js"></script>
     <script language="javascript" type="text/javascript" src="../public/js/helpers.js"></script>
@@ -40,11 +42,11 @@
                 <li><span class='touch'></span> on the opponent's board to attack</li>
             </ol>
         </section>
-        <section id="info">
+        <section id="info" class = "noDisplay">
             <button id="playButton" class="button noDisplay info-element"><p>Ready</p></button>
             <p id="infoPara" class = "info-element"></p>
         </section>
-        <section id="board">
+        <section id="board" class = "noDisplay">
             <div id="player" class = "boards">
                 <div id="patrol" draggable="false" class="interactable piece loadingImg">
                     <div id = "patrol-img" class = "piece-img"></div>
@@ -71,25 +73,13 @@
 </body>
 <script src="/socket.io/socket.io.js"></script>
 <script>
-    const gameID = "<%= gameID %>";
-    const playerID = "<%= playerID %>";
+    global.gameID = "<%= gameID %>";
+    global.playerID = "<%= playerID %>";
+
     const json = <%- JSON.stringify(data) %>;
-
-    let tutorialOpen = false;
-
-    const socket = io();
-    socket.on('disconnect', () => {window.location.reload()});
-    socket.on('reconnect', () => {window.location.reload()});
     const buttons = document.getElementsByTagName('button');
     for (const button of buttons) {
         button.addEventListener('touchstart', () => { button.click() });
-    }
-
-    if (!localStorage.getItem('tutorialDone')) {
-        setTimeout(() => {
-            tutorial();
-            localStorage.setItem('tutorialDone', true);
-        }, 500);
     }
 
     function is_touch_device() {
@@ -98,19 +88,20 @@
 
     const touchElements = document.getElementsByClassName('touch');
     for (const t of touchElements) {
-        html(t, (is_touch_device() ? 'Tap' : 'Click'));
+        const text = is_touch_device() ? 'Tap' : 'Click';
+        t.appendChild(document.createTextNode(text));
     }
 
     function tutorial() {
-        tutorialOpen = !tutorialOpen;
-        select('#help-info').classList.toggle('show');
-        select('body').classList.toggle('overlay');
+        global.tutorialOpen = !global.tutorialOpen;
+        elements.helpInfo.classList.toggle('show');
+        elements.body.classList.toggle('overlay');
         setTimeout(() => {
             const infoHeadings = document.getElementsByClassName('help-info-heading');
             for(const h of infoHeadings){
                 h.classList.toggle('underline');
             }
-        }, 200);
+        }, 400);
     }
 </script>
 

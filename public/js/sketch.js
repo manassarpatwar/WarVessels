@@ -1,145 +1,358 @@
-let PLAYERSKETCH
-let OPPONENTSKETCH;
+let socket;
 
-let WARVESSELS;
-let PLAYER;
+const elements = {
+    text: '#infoPara', 
+    button: '#playButton', 
+    dropdown: '#dropdown-info', 
+    body: 'body', 
+    board: '#board',
+    info: '#info', 
+    player: '#player', 
+    opponent: '#opponent',
+    helpInfo: '#help-info'
+};
+const states = ['text', 'button', 'dropdown']
+const global = {
+    size: 10, 
+    gameID: null,
+    player: null,
+    boardLength: null, 
+    cellSize: null,
+    ready: false,
+    opponentReady: false,
+    started: false,
+    finished: false,
+    playerCanvas: null,
+    opponentCanvas: null,
+    tutorialOpen: false
+};
 
-let infoPara;
-let playButton;
-let dropdownInfoDiv;
-let body;
 
-const session_error = "<p>Another session of the same game is running on your browser.<br>Please return to that session to continue playing.</p>"
-const max_players_error = "<p>Game session already underway with 2 players</p>"
+function switchState(state, data){
+    switch(state){
+        case 'on': {
+            elements.board.classList.remove('noDisplay');
+            elements.info.classList.remove('noDisplay');
+            break;
+        }
+        case 'text': {
+            elements.text.classList.remove('noDisplay');
+            elements.button.classList.add('noDisplay');
+            elements.text.classList.remove('end');
+            if(data){
+                const text = document.createTextNode(data);
+                elements.text.innerHTML = '';
+                elements.text.appendChild(text);
+            }
+            break;
+        }
+        case 'button': {
+            elements.button.classList.remove('noDisplay');
+            elements.text.classList.add('noDisplay');
+            if(data){
+                const tag = document.createElement('p');
+                const text = document.createTextNode(data);
+                tag.appendChild(text);
+                elements.button.innerHTML = '';
+                elements.button.appendChild(tag);
+            }
+            break;
+        }
+        case 'end': {
+            elements.text.classList.remove('noDisplay');
+          
+            elements.button.classList.remove('noDisplay');
+            const result = data === 1 ? 'You won!' : data === -1 ? 'You lost!' : null;
+            if(result){
+                const text = document.createTextNode(result);
+                elements.text.innerHTML = '';
+                elements.text.appendChild(text);
+                elements.text.classList.add('end');
+
+                const tag = document.createElement('p');
+                tag.appendChild(document.createTextNode('Play again?'));
+                elements.button.innerHTML = '';
+                elements.button.appendChild(tag);
+                elements.button.onclick = playAgain;
+
+                if(data === 1){
+                    elements.player.classList.add('noDisplay');
+                }else if(data === -1){
+                    elements.opponent.classList.add('noDisplay');
+                };
+            }
+            break;
+        }
+        case 'dropdown': {
+            elements.dropdown.classList.remove('noDisplay');
+            setTimeout(()=>{elements.dropdown.classList.add('active')}, 500);
+            elements.body.classList.add('overlay');
+            if(data){
+                const tag = document.createElement('p');
+                for(const d of data){
+                    const br = document.createElement('br');
+                    const text = document.createTextNode(d);
+                    tag.appendChild(text);
+                    tag.appendChild(br);
+                }
+                elements.dropdown.innerHTML = '';
+                elements.dropdown.appendChild(tag);
+            }
+            break
+        }
+        case 'dropdown-close': {
+            elements.dropdown.classList.add('noDisplay');
+            elements.dropdown.classList.remove('active');
+            elements.body.classList.remove('overlay');
+            elements.dropdown.innerHTML = '';
+            break
+        }
+        default:
+            break;
+
+    }
+    
+}
+
+
+function playAgain() {
+    socket.emit('playAgain', global.gameID);
+    window.location.reload();
+}
+
+function playerReady() {
+    if (global.ready)
+        return;
+
+    const ready = global.player.pieces.every(x => x.ready);
+
+    if (!ready) {
+        return;
+    }
+
+    Object.values(global.player.pieces).map(x => x.el.classList.remove('interactable'));
+    start();
+}
+
+function start() {
+    switchState('text', 'Waiting for other player to be ready');
+    const data = {
+        playerBoard: global.playerCanvas.board,
+        gameID: global.gameID,
+        totalHits: Player.totalPieceLength,
+        playerID: global.player.id
+    }
+
+    if(!global.ready){
+        socket.emit('ready', data, function(json){
+            if(json.error == 'gameDoesNotExist'){
+                switchState('dropdown', ['Game session has been terminated.', 'Please return to home page and create a new game.'])
+            }else if(json.error == 'playersFull'){
+                switchState('dropdown', ['Game session already underway with two players.', 'Please return to home page and create a new game.'])
+            }
+        });
+    }
+    global.ready = true;
+    if (global.opponentReady && !global.started) {
+        global.player.turn = true;
+        global.started = false;
+        switchState('text', 'Attack to start playing');
+    }
+
+    global.playerCanvas.start();
+}
+
+function updatePiece(){
+    const selectedPiece = global.player.getSelectedPiece();
+    if(selectedPiece){
+        if (selectedPiece.isDragging) {
+            requestAnimationFrame(updatePiece);
+        }
+        selectedPiece.transform(selectedPiece.currentPosition.x + selectedPiece.delta.x, selectedPiece.currentPosition.y + selectedPiece.delta.y);
+    }
+}
+
+function renderPlayerCanvas(){
+    global.playerCanvas.waterWave.render();
+
+    if (!global.playerCanvas.waterWave.done()) {
+        global.playerCanvas.showing = true;
+        requestAnimationFrame(renderPlayerCanvas);
+    } else {
+        global.playerCanvas.showing = false;
+    }
+}
+
+function renderOpponentCanvas(){
+    global.opponentCanvas.waterWave.render();
+
+    if (!global.opponentCanvas.waterWave.done()) {
+        global.opponentCanvas.showing = true;
+        requestAnimationFrame(renderOpponentCanvas);
+    } else {
+        global.opponentCanvas.showing = false;
+    }
+}
+
+function mouseDragged(e){
+    e.preventDefault();
+    if (e.touches) { e = e.touches[0]; }
+    const selectedPiece = global.player.getSelectedPiece();
+    if (selectedPiece) {
+        selectedPiece.dragged = true;
+        selectedPiece.isDragging = true;
+        dx = (e.clientX - selectedPiece.startPosition.x);
+        dy = (e.clientY - selectedPiece.startPosition.y);
+        selectedPiece.delta = { x: dx, y: dy };
+    }
+}
+
+function mouseUp(e){
+    e.preventDefault();
+    const selectedPiece = global.player.getSelectedPiece();
+    if (selectedPiece) {
+        global.playerCanvas.mouseReleased(selectedPiece);
+        selectedPiece.delta = { x: 0, y: 0 };
+        selectedPiece.isDragging = false;
+        selectedPiece.dragged = false;
+        selectedPiece.selected = false;
+        selectedPiece.el.classList.remove('pickedup');
+    }
+}
+
+function mouseDown(e){
+    e.preventDefault();
+    if (global.tutorialOpen) {
+        return;
+    }
+    if (e.touches) { e = e.touches[0]; }
+    global.opponentCanvas.mouseDown(e);
+}
+
 
 window.onload = setup;
 
-function preload(url, callback) {
-    const img = new Image();
-    img.src = url;
-    img.addEventListener('load', () => {callback(img)});
-    return img;
-}
-
-function createCanvas(canvasId, size) {
-    var canvas = document.getElementById(canvasId);
-    canvas.width = size;
-    canvas.height = size;
-    return canvas;
-}
-
 function setup() {
-    
-    const main = select('main');
-    main.style.height = window.innerHeight + 'px';
-
     const smallSize = window.innerWidth < 600;
-    const boardWidth = smallSize ? 0.42 * window.innerHeight : Math.min(350, 0.4 * window.innerWidth);
+    global.boardLength = smallSize ? 0.42 * window.innerHeight : Math.min(350, 0.4 * window.innerWidth);
+    global.cellSize = global.boardLength/global.size;
 
-    WARVESSELS = new WarVessels(gameID, 10, boardWidth);
     const root = document.documentElement;
-    const percentage = ((WARVESSELS.cellSize/boardWidth)*100).toFixed(2);
+    const percentage = ((global.cellSize/global.boardLength)*100).toFixed(2);
     root.style.setProperty("--cellsize", percentage+"%");
-    root.style.setProperty("--cellsizepx", WARVESSELS.cellSize+"px");
-    root.style.setProperty("--canvas-size", boardWidth+"px");
+    root.style.setProperty("--cellsizepx", global.cellSize+"px");
+    root.style.setProperty("--canvas-size", global.boardLength+"px");
     
-    PLAYER = new Player(playerID, smallSize);
+    global.player = new Player(global.playerID, smallSize);
 
-    Object.values(PLAYER.pieces).map(x => {
+    Object.values(global.player.pieces).map(x => {
         x.el.classList.remove('loadingImg');
         x.transform(null,null,x.rotation*90);
     });
 
-    infoPara = select('#infoPara');
-    dropdownInfoDiv = select('#dropdown-info');
-    body = select('body');
-    playButton = select('#playButton');
-    playButton.onclick = playerReady;
-    html(infoPara, 'Place ships');
+    Object.keys(elements).map(x => elements[x] = select(elements[x]));
 
-    if (json !== null) {
+    elements.button.onclick = playerReady;
 
-        WARVESSELS.playerBoard = json.playerBoard;
-        const attacks = json.attacks;
+    socket = io();
+    switchState('text', 'Place ships')
 
-        for (const a of attacks) {
-            WARVESSELS.opponentBoard[a[0]][a[1]] = a[2] ? 'hit' : 'miss';
-        }
-        WARVESSELS.ready = json.ready;
-        WARVESSELS.started = json.started;
-        PLAYER.turn = json.turn;
+    const preload = (url, callback) => {
+        const img = new Image();
+        img.src = url;
+        img.addEventListener('load', () => {callback(img)});
+        return img;
+    }
 
-        if (WARVESSELS.ready) {
-            start();
-        }
-        if (PLAYER.turn && WARVESSELS.started) {
-            html(infoPara, 'Your turn');
-        } else if (!PLAYER.turn && WARVESSELS.started) {
-            html(infoPara, 'Their turn');
-        }
+    preload('../public/img/bg2.png', (bg) => {
+        global.playerCanvas = new PlayerCanvas('playerCanvas', bg);
+        global.opponentCanvas = new OpponentCanvas('opponentCanvas', bg);   
 
-        //Fixing pieces to the board
-        const pieceData = {};
-        for (let i = 0; i < WARVESSELS.playerBoard.length; i++) { //rows
-            for (let j = 0; j < WARVESSELS.playerBoard[i].length; j++) { //columns
-                let key = WARVESSELS.playerBoard[j][i];
-                if (Number.isInteger(key) && key !== 0) {
-                    key = Math.abs(key);
-                    if (pieceData[key] == undefined) {
-                        pieceData[key] = { x: i, y: j }
-                    } else if (pieceData[key].x == i) {
-                        pieceData[key].r = false;
-                    } else if (pieceData[key].y == j) {
-                        pieceData[key].r = true;
+        if (json !== null) {
+
+            global.playerCanvas.board = json.playerBoard;
+            const attacks = json.attacks;
+
+            for (const a of attacks) {
+                if(a[2]){
+                    global.opponentCanvas.board[a[0]][a[1]] = -1;
+                }else{
+                    global.opponentCanvas.board[a[0]][a[1]] = 'miss'; 
+                };
+            }
+            global.ready = json.ready;
+            global.started = json.started;
+            global.player.turn = json.turn;
+
+            if (global.ready && json.result == -1) {
+                start();
+            }
+            if (global.player.turn && global.started) {
+                switchState('text', 'Your turn');
+            } else if (!global.player.turn && global.started) {
+                switchState('text', 'Their turn');
+            }
+
+            //Fixing pieces to the board
+            const pieceData = {};
+            for (let i = 0; i < global.playerCanvas.board.length; i++) { //rows
+                for (let j = 0; j < global.playerCanvas.board[i].length; j++) { //columns
+                    let key = global.playerCanvas.board[j][i];
+                    if (Number.isInteger(key) && key !== 0) {
+                        key = Math.abs(key);
+                        if (pieceData[key] == undefined) {
+                            pieceData[key] = { x: i, y: j }
+                        } else if (pieceData[key].x == i) {
+                            pieceData[key].r = false;
+                        } else if (pieceData[key].y == j) {
+                            pieceData[key].r = true;
+                        }
                     }
                 }
             }
-        }
 
-        for (const p of Object.keys(PLAYER.pieces)) {
-            const data = pieceData[PLAYER.pieces[p].id]
-            PLAYER.pieces[p].el.classList.remove('interactable');
-            PLAYER.pieces[p].rotate(data.r);
-            PLAYER.pieces[p].fit(data, WARVESSELS.cellSize);
-        }
-
+            for (const p of Object.keys(global.player.pieces)) {
+                const data = pieceData[global.player.pieces[p].id]
+                global.player.pieces[p].el.classList.remove('interactable');
+                global.player.pieces[p].rotate(data.r);
+                global.player.pieces[p].fit(data, global.cellSize);
+            }
 
 
-        if (json.result !== -1) {
-            infoPara.classList.add('end');
-            html(infoPara, 'You ' + (json.result == 1 ? 'won!' : 'lost!'));
-            json.result == 1 ? select('#player').classList.add('noDisplay') : select('#opponent').classList.add('noDisplay');
-            playButton.onclick = playAgain;
-            html(playAgain, '<p>Play again?</p>');
-            playButton.classList.remove('noDisplay');
-        }
-    } 
 
+            if (json.result !== -1) {
+                switchState('end', json.result ? 1 : -1)
+            }
 
-    socket.emit('join', WARVESSELS.id, PLAYER.id, function(id){
-        if(id != socket.id){
-            dropdownInfo(session_error);
+            global.playerCanvas.drawBoard(false);
+            global.opponentCanvas.drawBoard(false);
+            global.playerCanvas.loadTexture();
+            global.opponentCanvas.loadTexture();
+        } 
+        switchState('on');
+        if (!localStorage.getItem('tutorialDone')) {
+            setTimeout(() => {
+                if(!global.tutorialOpen)tutorial();
+                localStorage.setItem('tutorialDone', true);
+            }, 1000);
         }
     });
 
-
-    preload('../public/img/bg2.png', (bg) => {
-        const playerCanvas = createCanvas('playerCanvas', boardWidth);
-        const opponentCanvas = createCanvas('opponentCanvas', boardWidth);
-
-        PLAYERSKETCH = new initPlayerSketch(playerCanvas);
-        OPPONENTSKETCH = new initOpponentSketch(opponentCanvas);
-
-        PLAYERSKETCH.setup(bg);
-        OPPONENTSKETCH.setup(bg);
-    })
+    socket.emit('join', global.gameID, global.player.id, function(json){
+        if(json.error == 'gameDoesNotExist'){
+            switchState('dropdown', ['Game session has been terminated.', 'Please return to home page and create a new game.'])
+        }else if(json.error == 'anotherTabOpen'){
+            switchState('dropdown', ['Another session of the same game is running on your browser. ',
+            'Please return to that session to continue playing.'])
+        }
+    });
 
     socket.on('opponentReady', function () {
-        WARVESSELS.opponentReady = true;
-        if (WARVESSELS.ready && !WARVESSELS.started) {
-            PLAYER.turn = true;
-            WARVESSELS.started = false;
-            html(infoPara, 'Attack to start playing');
+        global.opponentReady = true;
+        if (global.ready && !global.started) {
+            global.player.turn = true;
+            global.started = false;
+            switchState('text', 'Attack to start playing');
         }
     });
 
@@ -150,371 +363,3 @@ function setup() {
     document.addEventListener('mousemove', mouseDragged, { passive: false });
     document.addEventListener('touchmove', mouseDragged, { passive: false });
 }
-
-function dropdownInfo(e){  
-    html(dropdownInfoDiv, e);
-    dropdownInfoDiv.classList.remove('noDisplay');
-    setTimeout(()=>{dropdownInfoDiv.classList.add('active')}, 500);
-    body.classList.add('overlay');
-}
-
-function playAgain() {
-    socket.emit('playAgain', WARVESSELS.id);
-    window.location.reload();
-}
-
-function playerReady() {
-    if (WARVESSELS.ready)
-        return;
-
-    let ready = true;
-    for (let p of Object.values(PLAYER.pieces)) {
-        if (!p.ready)
-            ready = false;
-    }
-
-    if (!ready) {
-        html(infoPara, 'Please place all pieces');
-        return;
-    }
-
-    let pieces = Object.values(PLAYER.pieces);
-    for (let p of pieces) {
-        p.el.classList.remove('interactable');
-    }
-
-    playButton.classList.add('noDisplay');
-    infoPara.classList.remove('noDisplay');
-    start();
-}
-
-function start() {
-    infoPara.classList.remove('noDisplay');
-    html(infoPara, 'Waiting for other player to be ready');
-    const data = {
-        playerBoard: WARVESSELS.playerBoard,
-        gameID: WARVESSELS.id,
-        totalHits: Player.totalPieceLength,
-        playerID: PLAYER.id
-    }
-
-    if(!WARVESSELS.ready){
-        socket.emit('ready', data, ()=>{
-            dropdownInfo(max_players_error);
-        });
-    }
-    WARVESSELS.ready = true;
-    if (WARVESSELS.opponentReady && !WARVESSELS.started) {
-        PLAYER.turn = true;
-        WARVESSELS.started = false;
-        html(infoPara, 'Attack to start playing');
-    }
-
-    socket.on('incomingAttack', function (attack) {
-        if(attack[3] == PLAYER.id){
-            WARVESSELS.started = true;
-            PLAYER.turn = true;
-            html(infoPara, 'Your turn');
-            if (attack[2] == 1) {
-                WARVESSELS.playerBoard[attack[0]][attack[1]] *= -1;
-            } else {
-                WARVESSELS.playerBoard[attack[0]][attack[1]] = 'miss';
-            }
-
-            if (PLAYERSKETCH.touchWater) {
-                PLAYERSKETCH.touchWater(attack[1] * WARVESSELS.cellSize + WARVESSELS.cellSize / 2, attack[0] * WARVESSELS.cellSize + WARVESSELS.cellSize / 2)
-                PLAYERSKETCH.loadTexture();
-                if (!PLAYERSKETCH.showing)
-                    PLAYERSKETCH.show();
-            }
-
-            result = WARVESSELS.done();
-            if (WARVESSELS.finished) {
-                setTimeout(() => {
-                    infoPara.classList.add('end');
-                    html(infoPara, 'You ' + (result == 1 ? 'won!' : 'lost!'));
-                    result == 1 ? select('#player').classList.add('noDisplay') : select('#opponent').classList.add('noDisplay');
-                    playButton.onclick = playAgain;
-                    html(playAgain, '<p>Play again?</p>');
-                    playButton.classList.remove('noDisplay');
-                }, 1000);
-                WARVESSELS.ready = false;
-
-            }
-        }
-    })
-}
-
-
-function update() {
-    const selectedPiece = PLAYER.getSelectedPiece();
-    if (selectedPiece) {
-        if (selectedPiece.isDragging) {
-            requestAnimationFrame(update);
-        }
-        selectedPiece.transform(selectedPiece.currentPosition.x + selectedPiece.delta.x, selectedPiece.currentPosition.y + selectedPiece.delta.y);
-    }
-}
-
-function mouseDragged(e) {
-    e.preventDefault();
-    if (e.touches) { e = e.touches[0]; }
-    const selectedPiece = PLAYER.getSelectedPiece();
-    if (selectedPiece) {
-        selectedPiece.dragged = true;
-
-        dx = (e.clientX - selectedPiece.startPosition.x);
-        dy = (e.clientY - selectedPiece.startPosition.y);
-        selectedPiece.delta = { x: dx, y: dy };
-    }
-}
-
-function mouseUp(e) {
-    e.preventDefault();
-    const selectedPiece = PLAYER.getSelectedPiece();
-    if (selectedPiece) {
-        PLAYERSKETCH.mouseReleased(selectedPiece);
-        selectedPiece.delta = { x: 0, y: 0 };
-        selectedPiece.isDragging = false;
-        selectedPiece.dragged = false;
-        selectedPiece.selected = false;
-        selectedPiece.el.classList.remove('pickedup');
-    }
-}
-
-function mouseDown(e) {
-    e.preventDefault();
-    if (tutorialOpen) {
-        return;
-    }
-    if (e.touches) { e = e.touches[0]; }
-    OPPONENTSKETCH.mouseDown(e);
-}
-
-function initPlayerSketch(canvas) {
-    this.cellSize;
-    this.waterWave;
-    this.ctx;
-    this.showing;
-    this.bg;
-
-    this.setup = (bg) => {
-        this.cellSize = (canvas.width - 2) / WARVESSELS.size;
-        this.bg = bg;
-        this.bg.width = canvas.width;
-        this.bg.height = canvas.height;
-
-        this.ctx = canvas.getContext('2d');
-        this.ctx.drawImage(this.bg, 0, 0, this.bg.width, this.bg.height);
-        this.drawBoard();
-        this.waterWave = new WaterWave(canvas.width, canvas.height, this.ctx);
-
-        this.show();
-
-    }
-
-    this.drawBoard = () => {
-        this.ctx.strokeStyle = 'rgba(255,255,255,0.15)'
-
-        for (let i = 0; i < WARVESSELS.playerBoard.length; i++) { //rows
-            for (let j = 0; j < WARVESSELS.playerBoard[i].length; j++) { //columns
-                this.ctx.beginPath();
-                this.ctx.rect(j * this.cellSize + 1, i * this.cellSize + 1, this.cellSize + 2 / WARVESSELS.size, this.cellSize + 2 / WARVESSELS.size);
-                if (WARVESSELS.playerBoard[i][j] < 0) {
-                    this.ctx.fillStyle = 'rgba(255, 0, 0, 0.6)';
-                    this.ctx.fill();
-                } else if (WARVESSELS.playerBoard[i][j] == 'miss') {
-                    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-                    this.ctx.fill();
-                } else {
-                    this.ctx.stroke();
-                }
-            }
-        }
-    }
-
-
-    this.touchWater = (x, y) => {
-        this.waterWave.touchWater(Math.floor(x), Math.floor(y));
-    }
-
-    this.loadTexture = () => {
-        this.ctx.clearRect(0, 0, canvas.width, canvas.height);
-        this.ctx.drawImage(this.bg, 0, 0, this.bg.width, this.bg.height);
-        this.drawBoard();
-        this.waterWave.loadTexture();
-    }
-
-    this.show = () => {
-        this.waterWave.render();
-
-        if (!this.waterWave.done()) {
-            this.showing = true;
-            requestAnimationFrame(this.show);
-        } else {
-            this.showing = false;
-        }
-    }
-
-    this.mouseReleased = (piece) => {
-
-        if (WARVESSELS.ready)
-            return;
-
-        if (Math.abs(piece.delta.x) < 0.5 && Math.abs(piece.delta.y) < 0.5) {
-            piece.rotate();
-        }
-
-
-        const place = WARVESSELS.getPiecePlace(piece);
-        place.x = Math.round(place.x / canvas.width * WARVESSELS.size);
-        place.y = Math.round(place.y / canvas.width * WARVESSELS.size);
-        
-        if (piece.ready) {
-            piece.boardCoords.map(c => WARVESSELS.playerBoard[c[1]][c[0]] = 0);
-            piece.ready = false;
-        }
-
-        if (WARVESSELS.piecePlaceOK(place, piece)) {
-            
-            WARVESSELS.placePiece(piece, place);
-            const center = WARVESSELS.getCenter(piece);
-
-            this.waterWave.touchWater(Math.floor(center.x), Math.floor(center.y));
-            this.loadTexture();
-            if (!this.showing)
-                this.show();
-
-            const pieceCoordinates = piece.coords.map(([i, j]) => [i + place.x, j + place.y]);
-
-            for (const p of pieceCoordinates) {
-                WARVESSELS.playerBoard[p[1]][p[0]] = piece.id;
-            }
-            piece.boardCoords = pieceCoordinates;
-            piece.ready = true;
-
-            let ready = true;
-            for (const p of Object.values(PLAYER.pieces)) {
-                if (!p.ready)
-                    ready = false;
-            }
-            if (ready) {
-                playButton.classList.remove('noDisplay');
-                infoPara.classList.add('noDisplay');
-            }
-        }
-    }
-}
-
-function initOpponentSketch(canvas) {
-    this.cellSize;
-    this.waterWave;
-    this.ctx;
-    this.showing;
-    this.bg;
-
-    this.setup = (bg) => {
-        this.cellSize = (canvas.width - 2) / WARVESSELS.size;
-
-        this.bg = bg;
-        this.bg.width = canvas.width;
-        this.bg.height = canvas.height;
-
-        this.ctx = canvas.getContext('2d');
-        this.ctx.drawImage(this.bg, 0, 0, this.bg.width, this.bg.height);
-
-        this.drawBoard();
-        this.waterWave = new WaterWave(canvas.width, canvas.height, this.ctx);
-        this.show();
-
-    }
-
-
-    this.drawBoard = () => {
-        this.ctx.strokeStyle = 'rgba(255,255,255,0.15)'
-        for (let i = 0; i < WARVESSELS.opponentBoard.length; i++) { //rows
-            for (let j = 0; j < WARVESSELS.opponentBoard[i].length; j++) { //columns
-                this.ctx.beginPath();
-                this.ctx.rect(j * this.cellSize + 1, i * this.cellSize + 1, this.cellSize + 2 / WARVESSELS.size, this.cellSize + 2 / WARVESSELS.size);
-                if (WARVESSELS.opponentBoard[i][j] == 'hit') {
-                    this.ctx.fillStyle = 'rgba(255, 0, 0, 0.6)';
-                    this.ctx.fill();
-                } else if (WARVESSELS.opponentBoard[i][j] == 'miss') {
-                    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-                    this.ctx.fill();
-                } else {
-                    this.ctx.stroke();
-                }
-            }
-        }
-
-    }
-
-    this.loadTexture = () => {
-        this.ctx.clearRect(0, 0, canvas.width, canvas.height);
-        this.ctx.drawImage(this.bg, 0, 0, this.bg.width, this.bg.height);
-        this.drawBoard();
-        this.waterWave.loadTexture()
-    }
-
-    this.show = () => {
-        this.waterWave.render();
-        if (!this.waterWave.done()) {
-            this.showing = true;
-            requestAnimationFrame(this.show);
-        } else {
-            this.showing = false;
-        }
-    }
-
-    this.mouseDown = (e) => {
-        if (WARVESSELS.ready && WARVESSELS.opponentReady) {
-            const rect = canvas.getBoundingClientRect()
-            const attack = [Math.floor((e.clientY - rect.top) / canvas.width * WARVESSELS.size), Math.floor((e.clientX - rect.left) / canvas.height * WARVESSELS.size)];
-            
-            if (!WARVESSELS.attackOK(attack[0], attack[1]))
-                return
-
-            if (PLAYER.turn) {
-                WARVESSELS.started = true
-                PLAYER.turn = false;
-
-
-                html(infoPara, "<div class='dot-pulse'><span>.</span><span>.</span><span>.</span></div>")
-
-                const data = {
-                    playerID: PLAYER.id,
-                    attack: attack,
-                    gameID: WARVESSELS.id
-                }
-
-                var self = this;
-                socket.emit('attack', data, function (hit) {
-                    const value = hit ? 'hit' : 'miss';
-                    WARVESSELS.opponentBoard[attack[0]][attack[1]] = value;
-                    html(infoPara, 'Their turn')
-
-                    result = WARVESSELS.done();
-                    if (WARVESSELS.finished) {
-                        WARVESSELS.ready = false;
-
-                        setTimeout(() => {
-                            infoPara.classList.add('end');
-                            html(infoPara, 'You ' + (result == 1 ? 'won!' : 'lost!'));
-                            result == 1 ? select('#player').classList.add('noDisplay') : select('#opponent').classList.add('noDisplay');
-                            playButton.onclick = playAgain;
-                            html(playAgain, '<p>Play again?</p>');
-                            playButton.classList.remove('noDisplay');
-                        }, 1000);
-                    }
-
-                    self.waterWave.touchWater(Math.floor(e.clientX - rect.left), Math.floor(e.clientY - rect.top));
-                    self.loadTexture();
-                    if (!self.showing)
-                        self.show();
-                });
-            } 
-        }
-    }
-}
-
