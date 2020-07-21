@@ -45,12 +45,12 @@
                     <div class = 'title-word'>&nbsp;&nbsp;&nbsp;&nbsp;VESSELS</div>
                 </div>
                 <button onclick="switchState('mode')" style = "transform: translateY(-10%);" class="fill" id="multiplayer">
-                    <p>Multiplayer</p>
+                    <p class='text'>Multiplayer</p>
                 </button>
             </div>
             <div id="share" class="card noDisplay">
                 <button onclick = "switchState('sessions')" class = "square-button triangle button-top-left point"></button>
-                <p>Share
+                <p class='text'>Share
                     game
                     link:</p>
                 <div id = "link-wrapper">
@@ -60,30 +60,25 @@
                     <input contenteditable="true" readonly='true' id="link">
                 </div>
                 <button class="button fill" id="play">
-                    <p>Play</p>
+                    <p class='text'>Play</p>
                 </button>
             </div>
             <div id = "mode" class = "card noDisplay">
                 <button onclick = "switchState('splash')" class = "square-button triangle point button-top-left"></button>
                 <button id = "playWithFriend" class = "mode-button loader-right">
-                    <p>Play with friend</p>
+                    <p class='text'>Play with friend</p>
                 </button>
-                <button id = 'playRandom' class="mode-button  loader-right">
-                    <p>Play random player</p>
+                <button id = 'playRandom' onclick = "switchState('matchmaking')" class="mode-button  loader-right">
+                    <p class='text'>Play random opponent</p>
                 </button>
             </div>
-            <div id = "online" class = "card noDisplay">
+            <div id = "matchmaking" class = "card noDisplay">
                 <button onclick = "switchState('mode')" class = "square-button triangle point button-top-left"></button>
-                <button id = "continue-game" class = "mode-button loader-right">
-                    <p>Continue game</p>
-                </button>
-                <button id = 'new-game' class="mode-button  loader-right">
-                    <p>New game</p>
-                </button>
+                <p>Coming soon!</p>
             </div>
             <div id="sessions" class="card noDisplay">
                 <button onclick = "switchState('mode')" class = "square-button triangle point button-top-left"></button>
-                <p id = "sessions-header">Resume or create game</p>
+                <p class='text' id = "sessions-header">Resume or create game</p>
                 <div id='sessions-buttons'>
 
                 </div>
@@ -94,10 +89,7 @@
 </body>
 <script>
     let sessionGamesID = <%- JSON.stringify(gamesID) %>;
-    let onlineGameID = "<%- onlineGameID %>";
-    const searching = <%- searching %>;
     const maxSessions = <%- maxSessions %>;
-
     const splash = select('#splash');
     const share = select('#share');
     const sessions = select('#sessions');
@@ -106,14 +98,10 @@
     const playButton = select('#play');
     const mode = select('#mode')
     const copyButton = select('#copy');
-    const online = select('#online');
-    
+    const matchmaking = select('#matchmaking');
     const playWithFriend = select('#playWithFriend');
     const playRandom = select('#playRandom');
-    const continueGame = select('#continue-game');
-    const newGame = select('#new-game');
-
-    const states = [splash, share, sessions, mode, online];
+    const states = [splash, share, sessions, mode, matchmaking];
     const loader = document.createElement('div');
     const sessionsHeader = document.getElementById('sessions-header');
 
@@ -123,31 +111,16 @@
         loader.appendChild(div);
     }
 
-    if(!onlineGameID){
-        if(searching){
-            switchState('mode');
-            playWithFriend.onclick = '';
-            playRandom.appendChild(loader);
-            pollMatchmake();
-        }else{
-            playRandom.onclick = function(){init(playRandom, true)};
-        }
-    }else{
-        playRandom.onclick = function(){switchState('online')};
-        continueGame.onclick = function(){play(onlineGameID)};
-        newGame.onclick = function(){init(newGame, true)}
-    }
-
     function sessionGamesIDChanged(){
         playWithFriend.onclick = function(){
             if(sessionGamesID.length == 0){
-                init(playWithFriend);
+                init(this);
             }else{
                 switchState('sessions');
             }
         }
 
-        if(sessionGamesID.length == 3){
+         if(sessionGamesID.length == 3){
             editText(sessionsHeader, "Resume game");
         }
 
@@ -182,9 +155,9 @@
                 sessionGamesIDChanged();
                 mode.classList.remove('noDisplay');
                 break;
-            case 'online':
+            case 'matchmaking':
                 states.map(x => x.classList.add('noDisplay'));
-                online.classList.remove('noDisplay');
+                matchmaking.classList.remove('noDisplay');
                 break;
             default:
                 break;
@@ -203,6 +176,7 @@
         playButton.onclick = function(){play(g)};
         if (!isOS())
             copy();
+
     }
 
     function appendSessionButtons(gamesID){
@@ -237,24 +211,8 @@
         }
     }
 
-    function pollMatchmake(){
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', '/matchmake', true);
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState == XMLHttpRequest.DONE) {
-                const json = JSON.parse(xhr.responseText);
-                if(json.gameID){
-                    play(json.gameID);
-                }else{
-                    setTimeout(pollMatchmake, 2000);
-                }
-            }
-        }
-        xhr.send();
-    }
 
-
-    function init(el, online = false){
+    function init(el){
         el.appendChild(loader);
         let duration = 750;
         const dt = 10;
@@ -267,31 +225,21 @@
                 callback();
             };
         }, 1);
-        if(sessionGamesID.length < maxSessions+1 || online){
+        if(sessionGamesID.length < maxSessions+1){
             const xhr = new XMLHttpRequest();
-            const route = online ? '/online' : ''
-            xhr.open('POST', '/init'+route, true);
+            xhr.open('POST', '/init', true);
             xhr.onreadystatechange = function () {
                 if (xhr.readyState == XMLHttpRequest.DONE) {
-                    if(online){
+                    const initDone = () => {
+                        el.removeChild(loader);
                         const json = JSON.parse(xhr.responseText);
-                        callback = () => {
-                            if(json.gameID){
-                                play(json.gameID);
-                            }else{
-                                pollMatchmake();
-                            }
-                        }
-                    }else{
-                        callback = () => {
-                            el.removeChild(loader);
-                            const json = JSON.parse(xhr.responseText);
-                            sessionGamesID = json.gamesID;
-                            shareGame(sessionGamesID[sessionGamesID.length-1]);
-                        }
+                        sessionGamesID = json.gamesID;
+                        shareGame(sessionGamesID[sessionGamesID.length-1]);
                     }
-                    if(duration <= 0){
-                        callback();
+                    if(duration > 0){
+                        callback = initDone;
+                    }else{
+                        initDone();
                     }
                 }
             }

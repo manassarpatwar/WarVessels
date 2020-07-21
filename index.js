@@ -113,7 +113,6 @@ const fs = require('fs');
 
 const gameState = require('./game.json');
 gameState['changed'] = false;
-gameState['matchmaking'] = {};
 
 const maxAge = (1000 * 1) *//s
 	(60 * 1) *
@@ -150,10 +149,9 @@ const maxSessions = 3;
 app.use(express.json());
 
 app.use(session({ secret: 'XASDASDA' }));
-app.use(express.static(__dirname)).set('view engine', 'ejs');
-	
-
-app.get('/', (req, res) => {
+app.use(express.static(__dirname))
+	.set('view engine', 'ejs')
+	.get('/', (req, res) => {
 		const ssn = req.session;
 		if (ssn.gamesID !== undefined) {
 			for (let i = 0; i < ssn.gamesID.length; i++) {
@@ -163,23 +161,16 @@ app.get('/', (req, res) => {
 				}
 			}
 		}
-		if(ssn.onlineGameID && gameState[ssn.onlineGameID] === undefined){
-			ssn.onlineGameID = null;
-		}
-		res.render('pages/index', {
-			gamesID: ssn.gamesID ? ssn.gamesID : [], 
-			maxSessions: maxSessions,
-			searching: ssn.searching ? ssn.searching : false,
-			onlineGameID: ssn.onlineGameID ? ssn.onlineGameID : ''
-		});
+		res.render('pages/index', {gamesID: ssn.gamesID ? ssn.gamesID : [], maxSessions: maxSessions});
 	})
+	.get('/index', (req, res) => res.redirect('/'))
 
 http.listen(PORT, () => {
 	console.log('listening on *:' + PORT);
 });
 
 
-app.post('/init', (req, res) => {
+app.post('/init', (req, res, next) => {
 	const ssn = req.session;
 
 	if (ssn.gamesID === undefined || ssn.gamesID && ssn.gamesID.length < maxSessions) {
@@ -200,53 +191,7 @@ app.post('/init', (req, res) => {
 	res.send({gamesID: ssn.gamesID });
 })
 
-app.post('/init/online', (req, res) => {
-	const ssn = req.session;
-	if(!ssn.playerID){
-		ssn.playerID = uuidv4();
-	}
-	if(!ssn.searching){
-		const players = Object.keys(gameState['matchmaking']);
-
-		const availablePlayer = players.find(p => gameState['matchmaking'][p] === null);
-		if(availablePlayer && availablePlayer !== ssn.playerID){
-			ssn.searching = false;
-			delete gameState['matchmaking'][ssn.playerID];
-			const gameID = uuidv4();
-			gameState['matchmaking'][availablePlayer] = gameID;
-			gameState[gameID] = {};
-			gameState[gameID]['time'] = Date.now();
-			gameState[gameID]['players'] = {};
-			gameState[gameID]['active'] = {};
-			gameState[gameID]['lastAttack'] = null;
-			gameState['changed'] = true;
-			ssn.onlineGameID = gameID;
-			res.send({gameID: gameID})
-		}else{
-			ssn.searching = true;
-			gameState['matchmaking'][ssn.playerID] = null;
-			res.send({gameID: null})
-		}
-	}
-});
-
-app.post('/matchmake', (req, res) => {
-	const ssn = req.session;
-	if(ssn.playerID && ssn.searching){
-		const gameID = gameState['matchmaking'][ssn.playerID];
-		res.send({gameID: gameID})
-		if(gameID){
-			ssn.searching = false;
-			ssn.onlineGameID = gameID;
-			delete gameState['matchmaking'][ssn.playerID];
-		};
-	}else{
-		res.send({gameID: null})
-	}
-});
-
-
-app.get('/play/:gameID', (req, res) => {
+app.get('/play/:gameID', (req, res, next) => {
 	const { gameID } = req.params;
 	const gameExists = gameState[gameID] !== undefined;
 	const ssn = req.session;
