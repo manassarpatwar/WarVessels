@@ -148,8 +148,8 @@ const maxSessions = 3;
 
 app.use(express.json());
 
-app.use(session({ secret: 'XASDASDA' }));
-app.use(express.static(__dirname))
+app.use(session({ secret: 'XASDASDA',  resave: true,
+    saveUninitialized: true }));app.use(express.static(__dirname))
 	.set('view engine', 'ejs')
 	.get('/', (req, res) => {
 		const ssn = req.session;
