@@ -15,7 +15,7 @@
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "heroku-ssl-redirect": "0.0.4",
-    "socket.io": "^2.3.0",
+    "socket.io": "^2.4.0",
     "uuid": "^7.0.3"
   },
   "devDependencies": {
