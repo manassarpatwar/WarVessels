@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "ejs": "^2.5.6",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "express-session": "^1.17.1",
     "heroku-ssl-redirect": "0.0.4",
     "socket.io": "^2.3.0",
