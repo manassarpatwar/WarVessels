@@ -3,7 +3,7 @@
   "version": "0.3.0",
   "description": "War Vessels in browser",
   "engines": {
-    "node": "12.x"
+    "node": "16.x"
   },
   "main": "index.js",
   "scripts": {
